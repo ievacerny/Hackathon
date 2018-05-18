@@ -1,51 +1,50 @@
-#EBNF syntax specification for digital circuit definition file
+#EBNF syntax specification for digital circuit definition file#
 
-#TODO - CLARIFY AMBIGUITY OF COMMA - WHITESPACE OR ""
+#TODO - CLARIFY AMBIGUITY OF COMMA - WHITESPACE OR ""#
 
 
-#Section order - final monitor list is optional
+#Section order - final monitor list is optional#
 
 specfile = "DEVICES:" , device_list , ";" , "CONNECTIONS:" , connection_list , ";" , [ "MONITOR:" , monitor_list , ";" ] ;
 
 
 
-#Device Lists
+device_list = { (dtype | xor | andnandornor | switch | clock) , "," };
 
-device_list = { regular_device | clock , "," }; #different rules for clock, which can have non-binary input
+dtype = "DTYPE" , name; #assume all inputs to (dtype, xor, nand, nor, and, or) are specified by connections to switches in the connection list#
 
-	regular_device = device_type , name, "{" , { bool } , "}"; #number of bools to be checked as semantics
+xor = "XOR" , name; 
 
-	clock = "CLK" , name , "{" , number , "}";
+andnandornor = ( "AND" | "NAND" | "OR" | "NOR" ) , name, one_to_sixteen, "inputs"; 
 
-	device_type = "CLOCK" | "AND" | "NAND" | "OR" | "NOR" | "DTYPE" | "XOR"; 
+switch = "SWITCH" , name , bool , "state";
 
-	name = letter , { letter | digit }; #name must start with letter
+clock = "CLOCK" , name , nonzeronumber , "cycles";
+
+name = letter , (letter | digit | "_" | "-") , { letter | digit | "_" | "-"}; #name must start with letter and have at least one more character after that#
 
 
-
-# Connection Lists
 
 connection_list = { name , "." , output , "->" , name , "." , input , "," }; 
 
-	output = "O" | "Q" | "QBAR"; #Q and QBAR for DTYPE, O for all others
-	
-	input = ( "I" , one_to_sixteen ) | "DATA" | "CLK" | "SET" | "CLEAR";
+output = "O" | "Q" | "QBAR"; #Q and QBAR for DTYPE, O for all others - validate as semantics#
 
+input = ( "I" , one_to_sixteen ) | "DATA" | "CLK" | "SET" | "CLEAR"; #check proper input name as semantics#
 
-
-# Monitor Lists 
 
 monitor_list = { name , "." , output , "," };
 
 
 
-#Primitives
+#Primitives#
 
 bool = "0" | "1"; 
 
-number = digit, { digit };
+nonzeronumber = nonzerodigit, { digit };
 
-digit = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
+nonzerodigit = "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"; 
+
+digit = "0" | nonzerodigit;
 
 one_to_sixteen = "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" | "10" | "11" | "12" | "13" | "14" | "15" | "16";
 
