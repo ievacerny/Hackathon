@@ -1,0 +1,59 @@
+#EBNF syntax specification for digital circuit definition file
+
+#TODO - CLARIFY AMBIGUITY OF COMMA - WHITESPACE OR ""
+
+
+#Section order - final monitor list is optional
+
+specfile = "DEVICES:" , device_list , ";" , "CONNECTIONS:" , connection_list , ";" , [ "MONITOR:" , monitor_list , ";" ] ;
+
+
+
+#Device Lists
+
+device_list = { regular_device | clock , "," }; #different rules for clock, which can have non-binary input
+
+	regular_device = device_type , name, "{" , { bool } , "}"; #number of bools to be checked as semantics
+
+	clock = "CLK" , name , "{" , number , "}";
+
+	device_type = "CLOCK" | "AND" | "NAND" | "OR" | "NOR" | "DTYPE" | "XOR"; 
+
+	name = letter , { letter | digit }; #name must start with letter
+
+
+
+# Connection Lists
+
+connection_list = { name , "." , output , "->" , name , "." , input , "," }; 
+
+	output = "O" | "Q" | "QBAR"; #Q and QBAR for DTYPE, O for all others
+	
+	input = ( "I" , one_to_sixteen ) | "DATA" | "CLK" | "SET" | "CLEAR";
+
+
+
+# Monitor Lists 
+
+monitor_list = { name , "." , output , "," };
+
+
+
+#Primitives
+
+bool = "0" | "1"; 
+
+number = digit, { digit };
+
+digit = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
+
+one_to_sixteen = "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" | "10" | "11" | "12" | "13" | "14" | "15" | "16";
+
+letter = "A" | "B" | "C" | "D" | "E" | "F" | "G"
+       | "H" | "I" | "J" | "K" | "L" | "M" | "N"
+       | "O" | "P" | "Q" | "R" | "S" | "T" | "U"
+       | "V" | "W" | "X" | "Y" | "Z" | "a" | "b"
+       | "c" | "d" | "e" | "f" | "g" | "h" | "i"
+       | "j" | "k" | "l" | "m" | "n" | "o" | "p"
+       | "q" | "r" | "s" | "t" | "u" | "v" | "w"
+       | "x" | "y" | "z" ;
