@@ -9,3 +9,4 @@ Semantic errors:
 	7. Connection on the right must be an input
 	8. Input/output with such name doesn't exist
 	9. Device with such name doesn’t exist
+test
