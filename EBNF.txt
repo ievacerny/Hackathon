@@ -1,4 +1,4 @@
-#EBNF syntax specification for digital circuit definition file#
+E#BNF syntax specification for digital circuit definition file#
 
 #TODO - CLARIFY AMBIGUITY OF COMMA - WHITESPACE OR ""#
 
@@ -9,30 +9,31 @@ specfile = "DEVICES:" , device_list , ";" , "CONNECTIONS:" , connection_list , "
 
 
 
-device_list = { (dtype | xor | andnandornor | switch | clock) , "," };
+device_list = (dtype | xor | andnandornor | switch | clock) , { "," , (dtype | xor | andnandornor | switch | clock) };
 
 dtype = "DTYPE" , name; #assume all inputs to (dtype, xor, nand, nor, and, or) are specified by connections to switches in the connection list#
 
 xor = "XOR" , name; 
 
-andnandornor = ( "AND" | "NAND" | "OR" | "NOR" ) , name, one_to_sixteen, "inputs"; 
+andnandornor = ( "AND" | "NAND" | "OR" | "NOR" ) , name, one_to_sixteen; # one_to_sixteen = number of inputs
 
-switch = "SWITCH" , name , bool , "state";
+switch = "SWITCH" , name , bool;
 
-clock = "CLOCK" , name , nonzeronumber , "cycles";
+clock = "CLOCK" , name , nonzeronumber;
 
-name = letter , (letter | digit | "_" | "-") , { letter | digit | "_" | "-"}; #name must start with letter and have at least one more character after that#
+name = letter , { letter | digit | "_" }; #name must start with letter#
 
 
 
-connection_list = { name , "." , output , "->" , name , "." , input , "," }; 
+connection_list = (name , ["." , dtypeoutput] , "->" , name , "." , input) , { "," , name , ["." , dtypeoutput] , "->" , name , "." , input }; 
 
-output = "O" | "Q" | "QBAR"; #Q and QBAR for DTYPE, O for all others - validate as semantics#
+dtypeoutput = "Q" | "QBAR"; 
 
 input = ( "I" , one_to_sixteen ) | "DATA" | "CLK" | "SET" | "CLEAR"; #check proper input name as semantics#
 
 
-monitor_list = { name , "." , output , "," };
+
+monitor_list = (name , ["." , dtypeoutput]) , { "," , name , ["." , dtypeoutput]};
 
 
 
