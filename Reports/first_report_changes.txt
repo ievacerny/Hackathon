@@ -1,0 +1,6 @@
+Things that changed after the first report:
+- device list, connections list and monitor list fixed to keep LL(1) sturcture
+- no .o for output; need to add a semantic error if a dtype before the arrow is missing an output name
+- semantic error for device names matching keywords
+- remove 'state', 'inputs' and 'cycles' keywords
+- constraint for at least to charachters in the name is removed
