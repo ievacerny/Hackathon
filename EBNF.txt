@@ -1,7 +1,4 @@
-E#BNF syntax specification for digital circuit definition file#
-
-#TODO - CLARIFY AMBIGUITY OF COMMA - WHITESPACE OR ""#
-
+#EBNF syntax specification for digital circuit definition file#
 
 #Section order - final monitor list is optional#
 
