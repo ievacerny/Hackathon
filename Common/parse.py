@@ -47,10 +47,24 @@ class Parser:
         self.symbol_id = None
         self.error_counter = 0
 
-        [self.NO_ERROR, self.NOT_VALID_SYMBOL, self.NO_DEVICE_LIST_KEYWORD,
-         self.MISSING_COLON, self.INVALID_DEVICE, self.DUPLICATE_NAME,
-         self.INVALID_DEVICE_NAME, self.MORE_PARAMETERS_NEEDED,
-         ] = self.names.unique_error_codes(6)
+        [self.NO_ERROR, self.NO_DEVICE_KEYWORD, self.NO_CONNECTIONS_KEYWORD,
+         self.MISSING_COLON, self.MISSING_SEMICOLON, self.BAD_DEVICE,
+         self.INVALID_DEVICE_NAME, self.MISSING_DELIMITER,
+         self.UNDEFINED_DEVICE, self.PORT_ABSENT, self.PORT_MISSING,
+         self.MISSING_ARROW, self.DUPLICATE_NAME,
+         self.MORE_PARAMETERS_NEEDED, self.UNEXPECTED_SYMBOL
+         ] = range(15)
+        # = self.names.unique_error_codes(11)
+
+        self.device_list = ["DTYPE", "XOR", "AND", "NAND", "OR", "NOR",
+                            "SWITCH", "CLOCK"]
+
+        self.log = True
+
+    # Temporary method for error printing
+    def _log(self, msg):
+        if self.log:
+            print(msg)
 
     def parse_network(self):
         """Parse the circuit definition file."""
@@ -59,271 +73,305 @@ class Parser:
         # errors in the circuit definition file.
         no_errors = True
 
+        self._log("Start parsing")
         [self.symbol_type, self.symbol_id] = self.scanner.get_symbol()
-        if (self.symbol_type == self.scanner.KEYWORD and
-           self.symbol_id == self.scanner.DEVICES_ID):
-            [self.symbol_type, self.symbol_id] = self.scanner.get_symbol()
-            if self.symbol_type == self.scanner.COLON:
-                self._parse_device_list()
-            else:
-                self._error(self.MISSING_COLON)
-                self._skip_until(self.scanner.SEMICOLON)
-                # TODO add skip to "CONNECTIONS"
-        else:
-            self.error(self.NO_DEVICE_LIST_KEYWORD)
-            self._skip_until(self.scanner.SEMICOLON)
-            # TODO add skip to "CONNECTIONS"
-
-        # TODO check if skipped until CONNECTIONS
-        [self.symbol_type, self.symbol_id] = self.scanner.get_symbol()
-        if (self.symbol_type == self.scanner.KEYWORD and
-           self.symbol_id == self.scanner.CONNECTIONS_ID):
-            [self.symbol_type, self.symbol_id] = self.scanner.get_symbol()
-            if self.symbol_type == self.scanner.COLON:
-                self._parse_connections_list()
-            else:
-                self._error(self.MISSING_COLON)
-                self._skip_until(self.scanner.SEMICOLON)
-                # TODO add skip to "MONITORS"
-        else:
-            self.error(self.NO_CONNECTIONS_LIST_KEYWORD)
-            self._skip_until(self.scanner.SEMICOLON)
-            # TODO add skip to "MONITORS"
+        self._log("Device section symbol info: {}, {}".format(self.symbol_type, self.symbol_id))
+        if self.symbol_type == 5 or self.symbol_type == 3:
+            self._log(self.names.get_name_string(self.symbol_id))
+        no_errors = self._parse_section('device',
+                                        self.scanner.DEVICES_ID,
+                                        self.NO_DEVICE_KEYWORD)
+        # Currently returns after a semicolon was detected
 
         [self.symbol_type, self.symbol_id] = self.scanner.get_symbol()
+        self._log("Connections section symbol info: {}, {}".format(self.symbol_type, self.symbol_id))
+        if self.symbol_type == 5 or self.symbol_type == 3:
+            self._log(self.names.get_name_string(self.symbol_id))
+        no_errors = self._parse_section('connection',
+                                        self.scanner.CONNECTIONS_ID,
+                                        self.NO_CONNECTIONS_KEYWORD)
+        # Currently returns after a semicolon was detected
+
+        [self.symbol_type, self.symbol_id] = self.scanner.get_symbol()
+        self._log("Monitors section symbol info: {}, {}".format(self.symbol_type, self.symbol_id))
+        if self.symbol_type == 5 or self.symbol_type == 3:
+            self._log(self.names.get_name_string(self.symbol_id))
         if (self.symbol_type == self.scanner.KEYWORD and
-           self.symbol_id == self.scanner.MONITORS_ID):
-            self._parse_monitors_list()
+           self.symbol_id == self.scanner.MONITOR_ID):
+            no_errors = self._parse_section('monitor',
+                                            self.scanner.MONITOR_ID, 0)
+        # Currently returns after a semicolon was detected
 
         return no_errors
 
-    def _parse_device_list(self):
-        # _parse_device returns when a comma, a semicolon is detected
-        # or it returns with an error code
-        [self.symbol_type, self.symbol_id] = self.scanner.get_symbol()
-        exit_code = self._parse_device()
-        if exit_code != self.NO_ERROR:
-            self._error(exit_code)
-            self._skip_until(self.scanner.COMMA, self.scanner.SEMICOLON)
-            # TODO add skip to "CONNECTIONS"
-        while self.symbol_type == self.scanner.COMMA:
+    def _parse_section(self, section, keyword_id, missing_keyword_error):
+        """Parse section keyword and colon."""
+        no_errors = True
+        # First symbol must be the keyword of the section
+        self._log("Parsing {} section".format(section))
+        if (self.symbol_type == self.scanner.KEYWORD and
+           self.symbol_id == keyword_id):
             [self.symbol_type, self.symbol_id] = self.scanner.get_symbol()
-            exit_code = self._parse_device()
-            if exit_code != self.NO_ERROR:
-                self._error(exit_code)
-                self._skip_until(self.scanner.COMMA, self.scanner.SEMICOLON)
-                # TODO add skip to "CONNECTIONS"
-        if self.symbol_type == self.scanner.SEMICOLON:
-            return
+            # Second symbol must be a colon
+            if self.symbol_type == self.scanner.COLON:
+                # Parse the list. Returns after the list is parsed or a
+                # semicolon is reached (or EOF)
+                no_errors = self._parse_list(section)
+            else:
+                no_errors = self._error(self.MISSING_COLON)
+                self._log("ERROR: Missing colon")
+                self._skip_until(self.scanner.SEMICOLON)
+                # TODO add skip to next section keyword
+        else:
+            no_errors = self._error(missing_keyword_error)
+            self._log("ERROR: Missing keyword")
+            self._skip_until(self.scanner.SEMICOLON)
+            # TODO add skip to next section keyword
+        return no_errors
 
-    def _parse_connections_list(self):
-        # _parse_device returns when a comma, a semicolon is detected
-        # or it returns with an error code
-        [self.symbol_type, self.symbol_id] = self.scanner.get_symbol()
-        exit_code = self._parse_connection()
-        if exit_code != self.NO_ERROR:
-            self._error(exit_code)
-            self._skip_until(self.scanner.COMMA, self.scanner.SEMICOLON)
-            # TODO add skip to "CONNECTIONS"
-        while self.symbol_type == self.scanner.COMMA:
-            [self.symbol_type, self.symbol_id] = self.scanner.get_symbol()
-            exit_code = self._parse_connection()
-            if exit_code != self.NO_ERROR:
-                self._error(exit_code)
-                self._skip_until(self.scanner.COMMA, self.scanner.SEMICOLON)
-                # TODO add skip to "CONNECTIONS"
-        if self.symbol_type == self.scanner.SEMICOLON:
-            return
+    def _parse_list(self, section):
+        """Parse the structure of the list: commas and semicolon."""
+        self._log("Parse {} list".format(section))
+        no_errors = True
+        # Method that will be called depending on section:
+        method_name = '_parse_' + section
+        parse_item = getattr(self, method_name)
 
-    def _parse_monitors_list(self):
-        [self.symbol_type, self.symbol_id] = self.scanner.get_symbol()
-        exit_code = self._parse_monitor()
-        if exit_code != self.NO_ERROR:
-            self._error(exit_code)
+        self._log("Before parsing item, symbol: {}, {}".format(self.symbol_type, self.symbol_id))
+        no_errors = parse_item()
+        # Parse_item returns successfully only when , or ; is detected
+        # If an error has happened, skip until next comma or semicolon
+        if not no_errors:
+            # self._error(exit_code)  # TODO move inside parse_item()
             self._skip_until(self.scanner.COMMA, self.scanner.SEMICOLON)
-            # TODO add skip to EOF
+            # TODO add skip to next section keyword
+
+        self._log("After parsing item, symbol: {}, {}".format(self.symbol_type, self.symbol_id))
+        # If a comma at the end of the item, keep reading items
         while self.symbol_type == self.scanner.COMMA:
-            [self.symbol_type, self.symbol_id] = self.scanner.get_symbol()
-            exit_code = self._parse_monitor()
-            if exit_code != self.NO_ERROR:
-                self._error(exit_code)
+            no_errors = parse_item()
+            if not no_errors:
+                # self._error(exit_code)  # TODO move inside parse_item()
                 self._skip_until(self.scanner.COMMA, self.scanner.SEMICOLON)
-                # TODO add skip to EOF
-        if self.symbol_type == self.scanner.SEMICOLON:
-            return
+                # TODO add skip to next section keyword
+
+        # At this point, symbol posibilities: ;/EOF/(section keyword)
+        if self.symbol_type != self.scanner.SEMICOLON:
+            no_errors = self._error(self.MISSING_SEMICOLON)
+            self._log("ERROR: Missing semicolon")
+
+        return no_errors
 
     def _parse_device(self):
-        exit_code = self.NO_ERROR
+        """Parse device: device type, name and parameters."""
+        self._log("Parse device")
+        no_errors = True
+        device_type = None
+        device_id = None
+        device_param = None
 
-        # Device types are keywords
+        # First symbol should be device type (saved as keywords)
+        [self.symbol_type, self.symbol_id] = self.scanner.get_symbol()
+        # If device supported is checked in Devices class
         if self.symbol_type == self.scanner.KEYWORD:
-            if self.symbol_id == self.names.query("SWITCH"):
-                device_type = "SWITCH"
-            elif self.symbol_id == self.names.query("CLOCK"):
-                device_type = "CLOCK"
-            elif (self.symbol_id in self.names.lookup(["DTYPE", "XOR"])):
-                device_type = "DTYPE/XOR"
-            elif (self.symbol_id in self.names.lookup(["AND", "NAND",
-                                                      "OR", "NOR"])):
-                device_type = "AND/NAND/OR/NOR"
-            else:
-                exit_code = self.INVALID_DEVICE
+            device_type = self.symbol_id
         else:
-            exit_code = self.INVALID_DEVICE
-
-        # Quit if error
-        if exit_code != self.NO_ERROR:
-            return exit_code
-
-        [self.symbol_type, self.symbol_id] = self.scanner.get_symbol()
-        # Check if device name valid
-        if self.symbol_type == self.scanner.NAME:
-            # If index of the name is the last one in the name_table, it's a
-            # new name. If not, it has been declared before -> duplicate
-            last_index = len(self.names.name_table)-1
-            if self.symbol_id != last_index:
-                exit_code = self.DUPLICATE_NAME
-        else:
-            exit_code = self.INVALID_DEVICE_NAME
-
-        # Quit if error
-        if exit_code != self.NO_ERROR:
-            return exit_code
-
-        [self.symbol_type, self.symbol_id] = self.scanner.get_symbol()
-        # Check if extra parameters needed
-        if (self.symbol_type == self.scanner.COMMA or
-           self.symbol_type == self.scanner.SEMICOLON):
-            if device_type == "DTYPE/XOR":
-                return exit_code  # No further parameters expected, device done
-            else:
-                exit_code = self.MORE_PARAMETERS_NEEDED
-        elif self.symbol_type == self.scanner.NUMBER:
-            if device_type == "DTYPE/XOR":
-                exit_code = self.NO_MORE_PARAMETERS_NEEDED
-            elif self.symbol_id < 0:
-                exit_code = self.NEGATIVE_PARAMETER
-            elif self.symbol_id == 0:
-                if device_type == "CLOCK":
-                    exit_code = self.CLOCK_0_CYCLE
-                elif device_type == "AND/NAND/OR/NOR":
-                    exit_code = self.DEVICE_0_INPUTS
-            elif self.symbol_id > 1 and device_type == "SWITCH":
-                exit_code = self.NONBINARY_SWITCH_STATE
-            elif self.symbol_id > 16 and device_type == "AND/NAND/OR/NOR":
-                exit_code = self.MORE_THAN_16_INPUTS
-        else:
-            if device_type == "DTYPE/XOR":
-                exit_code = self.EXPECTED_DELIMITER
-            else:
-                exit_code = self.PARAMETER_NOT_NUMBER
-
-        # Quit if error
-        if exit_code != self.NO_ERROR:
-            return exit_code
-
-        [self.symbol_type, self.symbol_id] = self.scanner.get_symbol()
-        # Check if comma or semicolon
-        if (self.symbol_type != self.scanner.COMMA and
-           self.symbol_type != self.scanner.SEMICOLON):
-            exit_code = self.EXPECTED_DELIMITER
-
-        return exit_code
-
-    def _parse_connection(self):
-        exit_code = self.NO_ERROR
+            no_errors = self._error(self.BAD_DEVICE)
+            self._log("ERROR: Invalid device: {}".format(self.symbol_type))
 
         # Device name
-        if self.symbol_type != self.scanner.NAME:
-            exit_code = self.INVALID_DEVICE_NAME
-            return exit_code
+        [self.symbol_type, self.symbol_id] = self.scanner.get_symbol()
+        if self.symbol_type == self.scanner.NAME:
+            # Type name is given only if name satisfies character requirements
+            # If device has already been added is checked in Devices class
+            device_id = self.symbol_id
+        else:
+            no_errors = self._error(self.INVALID_DEVICE_NAME)
+            self._log("ERROR: Invalid device name")
 
-        # Checks if valid device and if valid port done through network
-        first_device_id = self.symbol_id
+        # Device parameters
+        [self.symbol_type, self.symbol_id] = self.scanner.get_symbol()
+        if self.symbol_type == self.scanner.NUMBER:
+            # If parameters is valid is checked in Devices class
+            device_param = self.symbol_id
+            # Read one more to end up at the end of legit device definition
+            [self.symbol_type, self.symbol_id] = self.scanner.get_symbol()
+
+        if self.symbol_type == self.scanner.KEYWORD:
+            no_errors = self._error(self.MISSING_DELIMITER)
+            self._log("ERROR: Missing delimiter")
+        elif (self.symbol_type != self.scanner.COMMA and
+              self.symbol_type != self.scanner.SEMICOLON):
+            no_errors = self._error(self.UNEXPECTED_SYMBOL)
+            self._log("ERROR: Unexpected symbol")
+
+        if no_errors:
+            error_code = self.devices.make_device(device_id, device_type,
+                                                  device_param)
+            if error_code != self.NO_ERROR:
+                no_errors = self._error(error_code)
+                self._log("ERROR: Devices error {}".format(error_code))
+
+        return no_errors
+
+    def _parse_connection(self):
+        """Parse connection: devices and ports, arrow symbol."""
+        self._log("Parse connection")
+        no_errors = True
+        first_device_id = None
         first_port_id = None
+        second_device_id = None
+        second_port_id = None
+
+        # First symbol should be a device name
+        [self.symbol_type, self.symbol_id] = self.scanner.get_symbol()
+        if self.symbol_type == self.scanner.NAME:
+            first_device_id = self.symbol_id
+        else:
+            no_errors = self._error(self.INVALID_DEVICE_NAME)
+            self._log("ERROR: Invalid device name: {}".format(self.symbol_type))
 
         # Next might be the arrow or dot
         [self.symbol_type, self.symbol_id] = self.scanner.get_symbol()
-        if self.symbol_type == self.scanner.ARROW:
-            pass
-        elif self.symbol_type == self.scanner.DOT:
-            # Get output name
+        # If dot, read until arrow placement is reached
+        if self.symbol_type == self.scanner.DOT:
             [self.symbol_type, self.symbol_id] = self.scanner.get_symbol()
-            if self.symbol_type != self.scanner.NAME:
-                exit_code = self.INVALID_PORT_NAME
-                return exit_code
-            first_port_id = self.symbol_id
-            # Get arrow
+            if self.symbol_type == self.scanner.NAME:
+                first_port_id = self.symbol_id
+                [self.symbol_type, self.symbol_id] = self.scanner.get_symbol()
+            elif self.symbol_type == self.scanner.ARROW:
+                no_errors = self._error(self.PORT_MISSING)
+                self._log("ERROR: Port missing: {}".format(self.symbol_type))
+            else:
+                no_errors = self._error(self.PORT_ABSENT)
+                self._log("ERROR: Invalid port: {}".format(self.symbol_type))
+                [self.symbol_type, self.symbol_id] = self.scanner.get_symbol()
+
+        # Parse arrow and go to the name symbol
+        if self.symbol_type == self.scanner.NAME:
+            no_errors = self._error(self.MISSING_ARROW)
+            self._log("ERROR: Missing arrow")
+        elif self.symbol_type == self.scanner.ARROW:
             [self.symbol_type, self.symbol_id] = self.scanner.get_symbol()
-            if self.symbol_type != self.scanner.ARROW:
-                exit_code = self.EXPECTEED_ARROW
-                return exit_code
         else:
-            exit_code = self.UNEXPECTED_SYMBOL
+            no_errors = self._error(self.UNEXPECTED_SYMBOL)
+            self._log("ERROR: Unexpected symbol instead of arrow")
+            [self.symbol_type, self.symbol_id] = self.scanner.get_symbol()
 
-        # Next should be output
-        [self.symbol_type, self.symbol_id] = self.scanner.get_symbol()
-        if self.symbol_type != self.scanner.NAME:
-            exit_code = self.INVALID_DEVICE_NAME
-            return exit_code
-
-        # Checks if valid device and if valid port done through network
-        second_device_id = self.symbol_id
-        second_port_id = None
+        # Parse device name
+        if self.symbol_type == self.scanner.NAME:
+            second_device_id = self.symbol_id
+        else:
+            no_errors = self._error(self.INVALID_DEVICE_NAME)
+            self._log("ERROR: Invalid device name: {}".format(self.symbol_type))
 
         # Next might be comma/semicolon or dot
         [self.symbol_type, self.symbol_id] = self.scanner.get_symbol()
+        # If dot, read until comma.semicolon placement is reached
         if self.symbol_type == self.scanner.DOT:
-            # Get input name
             [self.symbol_type, self.symbol_id] = self.scanner.get_symbol()
-            if self.symbol_type != self.scanner.NAME:
-                exit_code = self.INVALID_PORT_NAME
-                return exit_code
-            second_port_id = self.symbol_id
+            if self.symbol_type == self.scanner.NAME:
+                second_port_id = self.symbol_id
+                [self.symbol_type, self.symbol_id] = self.scanner.get_symbol()
+            elif (self.symbol_type == self.scanner.COMMA or
+                  self.symbol_type == self.scanner.SEMICOLON):
+                no_errors = self._error(self.PORT_MISSING)
+                self._log("ERROR: Port missing: {}".format(self.symbol_type))
+            else:
+                no_errors = self._error(self.PORT_ABSENT)
+                self._log("ERROR: Invalid port: {}".format(self.symbol_type))
+                [self.symbol_type, self.symbol_id] = self.scanner.get_symbol()
 
-        if (self.symbol_type != self.scanner.COMMA and
-           self.symbol_type != self.scanner.SEMICOLON):
-            exit_code = self.UNEXPECTED_SYMBOL
+        # Parse semicolon/comma
+        if(self.symbol_type == self.scanner.NAME or
+           self.symbol_type == self.scanner.KEYWORD):
+            no_errors = self._error(self.MISSING_DELIMITER)
+            self._log("ERROR: Missing delimiter")
+        elif(self.symbol_type != self.scanner.COMMA and
+             self.symbol_type != self.scanner.SEMICOLON):
+            no_errors = self._error(self.UNEXPECTED_SYMBOL)
+            self._log("ERROR: Unexpected symbol instead of comma/semicolon")
 
-        return exit_code
+        if no_errors:
+            error_code = self.network.make_connection(
+                                first_device_id, first_port_id,
+                                second_device_id, second_port_id)
+            if error_code != self.NO_ERROR:
+                no_errors = self._error(error_code)
+                self._log("ERROR: Network error {}".format(error_code))
+
+        return no_errors
 
     def _parse_monitor(self):
-        exit_code = self.NO_ERROR
+        """Parse monitor: devices and ports."""
+        self._log("Parse monitor")
+        no_errors = True
+        device_id = None
+        output_id = None
 
+        # First symbol should be name
+        [self.symbol_type, self.symbol_id] = self.scanner.get_symbol()
         # Device name
-        if self.symbol_type != self.scanner.NAME:
-            exit_code = self.INVALID_DEVICE_NAME
-            return exit_code
-
-        device_id = self.symbol_id
+        if self.symbol_type == self.scanner.NAME:
+            device_id = self.symbol_id
+        else:
+            no_errors = self._error(self.INVALID_DEVICE_NAME)
+            self._log("ERROR: Invalid device name")
 
         # Next might be comma/semicolon or dot
         [self.symbol_type, self.symbol_id] = self.scanner.get_symbol()
+        # If dot, read until comma.semicolon placement is reached
         if self.symbol_type == self.scanner.DOT:
-            # Get input name
             [self.symbol_type, self.symbol_id] = self.scanner.get_symbol()
-            if self.symbol_type != self.scanner.NAME:
-                exit_code = self.INVALID_PORT_NAME
-                return exit_code
-            port_id = self.symbol_id
+            if self.symbol_type == self.scanner.NAME:
+                output_id = self.symbol_id
+                [self.symbol_type, self.symbol_id] = self.scanner.get_symbol()
+            elif (self.symbol_type == self.scanner.COMMA or
+                  self.symbol_type == self.scanner.SEMICOLON):
+                no_errors = self._error(self.PORT_MISSING)
+                self._log("ERROR: Port missing: {}".format(self.symbol_type))
+            else:
+                no_errors = self._error(self.PORT_ABSENT)
+                self._log("ERROR: Invalid port: {}".format(self.symbol_type))
+                [self.symbol_type, self.symbol_id] = self.scanner.get_symbol()
 
-        if (self.symbol_type != self.scanner.COMMA and
-           self.symbol_type != self.scanner.SEMICOLON):
-            exit_code = self.UNEXPECTED_SYMBOL
+        # Parse semicolon/comma
+        if self.symbol_type == self.scanner.NAME:
+            no_errors = self._error(self.MISSING_DELIMITER)
+            self._log("ERROR: Missing delimiter")
+        elif(self.symbol_type != self.scanner.COMMA and
+             self.symbol_type != self.scanner.SEMICOLON):
+            no_errors = self._error(self.UNEXPECTED_SYMBOL)
+            self._log("ERROR: Unexpected symbol instead of comma/semicolon")
 
-        # TODO check if device_id and port_id are valid
+        if no_errors:
+            error_code = self.monitors.make_monitor(device_id, output_id)
+            if error_code != self.NO_ERROR:
+                no_errors = self._error(error_code)
+                self._log("ERROR: Monitor error {}".format(error_code))
 
-        return exit_code
+        return no_errors
 
     def _error(self, error_code):
-        self.error_counter += 1
-        # FIXME change error detection so that the cursor is on the right line
-        # TODO how to deal with device split in multiple lines?
+        """Count errors and print error message."""
+        # TODO create a separate flag once proper error reporting is done
+        # Stop counting errors after EOF error is detected once
+        if self._log:
+            self.error_counter += 1
+            # self.scanner.print_line(error_code)
 
-        self.scanner.print_line(error_code)
+        if self.symbol_type == self.scanner.EOF:
+            self._log("ERROR: File ends abruptly.")
+            # If end of file, stop detecting and counting errors
+            self._log = False
+
         # TODO think about the best way to store and print error messages
+        # TODO return True/False depending if an error was detected
+        return True
 
     def _skip_until(self, symb1, symb2=None, symb3=None):
+        """Stop parsing until one of the symbols is detected."""
+        # TODO improve the code
         skip_symb = [symb1, symb2, symb3]
         skip_symb = [symb for symb in skip_symb if symb is not None]
 
