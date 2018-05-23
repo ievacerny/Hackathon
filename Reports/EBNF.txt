@@ -1,6 +1,5 @@
 #EBNF syntax specification for digital circuit definition file#
 
-#Section order - final monitor list is optional#
 
 specfile = "DEVICES:" , device_list , ";" , "CONNECTIONS:" , connection_list , ";" , [ "MONITOR:" , monitor_list , ";" ] ;
 
@@ -8,17 +7,17 @@ specfile = "DEVICES:" , device_list , ";" , "CONNECTIONS:" , connection_list , "
 
 device_list = (dtype | xor | andnandornor | switch | clock) , { "," , (dtype | xor | andnandornor | switch | clock) };
 
-dtype = "DTYPE" , name; #assume all inputs to (dtype, xor, nand, nor, and, or) are specified by connections to switches in the connection list#
+dtype = "DTYPE" , name; 
 
 xor = "XOR" , name; 
 
-andnandornor = ( "AND" | "NAND" | "OR" | "NOR" ) , name, one_to_sixteen; # one_to_sixteen = number of inputs
+andnandornor = ( "AND" | "NAND" | "OR" | "NOR" ) , name, one_to_sixteen; 
 
 switch = "SWITCH" , name , bool;
 
 clock = "CLOCK" , name , nonzeronumber;
 
-name = letter , { letter | digit | "_" }; #name must start with letter#
+name = letter , { letter | digit };
 
 
 
@@ -26,15 +25,13 @@ connection_list = (name , ["." , dtypeoutput] , "->" , name , "." , input) , { "
 
 dtypeoutput = "Q" | "QBAR"; 
 
-input = ( "I" , one_to_sixteen ) | "DATA" | "CLK" | "SET" | "CLEAR"; #check proper input name as semantics#
+input = ( "I" , one_to_sixteen ) | "DATA" | "CLK" | "SET" | "CLEAR"; 
 
 
 
 monitor_list = (name , ["." , dtypeoutput]) , { "," , name , ["." , dtypeoutput]};
 
 
-
-#Primitives#
 
 bool = "0" | "1"; 
 
