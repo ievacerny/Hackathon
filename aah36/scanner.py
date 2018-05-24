@@ -7,7 +7,7 @@ Classes
 -------
 Scanner - reads definition file and translates characters into symbols.
 """
-
+# OPTIMIZE Imported but unused modules
 import re
 import sys
 
@@ -49,15 +49,21 @@ class Scanner:
                                  self.KEYWORD, self.NUMBER, self.NAME, self.ARROW, self.EOF, self.NEWLINE] = range(9)
         self.keywords_list = ["DEVICES", "CONNECTIONS", "MONITOR", "DTYPE", "XOR", "AND", "NAND", "OR", "NOR", "SWITCH",
                               "CLOCK"]
+        # OPTIMIZE no need to save as a variable if not used later
         dummy = self.names.lookup(self.keywords_list)
+        # FIXME parser requires self.DEVICES_ID, self.CONNECTIONS_ID and
+        # FIXME self.MONITOR_ID to be saved in the scanner
         #[self.DEVICES_ID, self.CONNECTIONS_ID, self.MONITOR_ID] = self.names.lookup(self.keywords_list)
         self.current_character = ""
+        # OPTIMIZE No need to save name_string as a class atrribute since its
+        # only used in one function
         self.name_string = ''
         self.advance()
         self.skip_spaces()
 
 
     def advance(self):
+        # OPTIMIZE no need to return something and therefore, no need for char
         char = self.input_file.read(1)
         self.current_character = char
         return char
@@ -68,6 +74,8 @@ class Scanner:
 
     def get_name(self):
         name = ''
+        # OPTIMIZE this condition is already checked before enetring the
+        # function
         if self.current_character.isalpha():
             name = self.current_character
 
@@ -75,6 +83,7 @@ class Scanner:
             nextchar = self.input_file.read(1)
             if nextchar.isalnum():
                 name = name + nextchar
+                # OPTIMIZE no need for continue, it's gonna do that anyways
                 continue
             else:
                 self.current_character = nextchar
@@ -83,6 +92,8 @@ class Scanner:
 
     def get_number(self):
         number = ""
+        # OPTIMIZE this condition is already checked before enetring the
+        # function
         if self.current_character.isdigit():
             number = self.current_character
         """while True:
@@ -95,12 +106,16 @@ class Scanner:
 
         while True:
             nextchar = self.input_file.read(1)
+            # OPTIMIZE Can simply write if nextchar.isdigit()
             if nextchar.isdigit() == True:
                 number = number + nextchar
+                # OPTIMIZE no need for continue, it's gonna do that anyways
                 continue
             else:
                 self.current_character = nextchar
                 break
+
+        # FIXME an integer number needs to be returned
 
     def get_symbol(self):
         """Return the symbol type and ID of the next sequence of characters.
@@ -146,16 +161,20 @@ class Scanner:
             symbol_id = None
             self.advance()
 
+        # OPTIMIZE we're not using this symbol
         elif self.current_character == '\n':
             symbol_type = self.NEWLINE
             symbol_id = None
             self.advance()
 
+        # FIXME this would return self.ARROW if -* instead of -> is written
         elif self.current_character == "-":
             symbol_type = self.ARROW
             symbol_id = None
             self.advance()
             self.advance()
+
+        # FIXME need a self.DOT symbol
 
         elif self.current_character == "":
             symbol_type = self.EOF
@@ -169,5 +188,3 @@ class Scanner:
         self.skip_spaces()
 
         return [symbol_type, symbol_id]
-
-
