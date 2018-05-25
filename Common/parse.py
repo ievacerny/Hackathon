@@ -52,8 +52,9 @@ class Parser:
         [self.NO_ERROR, self.NO_DEVICE_KEYWORD, self.NO_CONNECTIONS_KEYWORD,
          self.MISSING_COLON, self.MISSING_SEMICOLON,
          self.INVALID_DEVICE_NAME, self.MISSING_DELIMITER, self.PORT_MISSING,
-         self.MISSING_ARROW, self.UNEXPECTED_SYMBOL, self.PREMATURE_EOF
-         ] = self.names.unique_error_codes(11)
+         self.MISSING_ARROW, self.NOT_ALL_INPUTS_CONNECTED,
+         self.UNEXPECTED_SYMBOL, self.PREMATURE_EOF
+         ] = self.names.unique_error_codes(12)
 
         self.device_list = ["DTYPE", "XOR", "AND", "NAND", "OR", "NOR",
                             "SWITCH", "CLOCK"]
@@ -95,6 +96,9 @@ class Parser:
                                                   self.scanner.CONNECTIONS_ID,
                                                   self.NO_CONNECTIONS_KEYWORD)
         # Currently returns after a semicolon was detected
+        # Check if all inputs connected (method returns TRUE if connected)
+        if not self.network.check_network():
+            no_error = no_error & self._error(self.NOT_ALL_INPUTS_CONNECTED)
 
         [self.symbol_type, self.symbol_id] = self.scanner.get_symbol()
         self._log("Monitors section symbol info: {}, {}"

@@ -68,6 +68,8 @@ class Errors:
                 .format(parser.PORT_MISSING),
             parser.MISSING_ARROW: "Error {}: Missing arrow in connection description."
                 .format(parser.MISSING_ARROW),
+            parser.NOT_ALL_INPUTS_CONNECTED: "Error {}: Not all inputs in the network are connected."
+                .format(parser.NOT_ALL_INPUTS_CONNECTED),
             parser.UNEXPECTED_SYMBOL: "Error {}: Unexpected symbol detected."
                 .format(parser.UNEXPECTED_SYMBOL),
             parser.PREMATURE_EOF: "Error {}: File ended abruptly."
