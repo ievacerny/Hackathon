@@ -50,10 +50,9 @@ class Scanner:
         self.keywords_list = ["DEVICES", "CONNECTIONS", "MONITOR", "DTYPE", "XOR", "AND", "NAND", "OR", "NOR", "SWITCH",
                               "CLOCK"]
         # OPTIMIZE no need to save as a variable if not used later
-        dummy = self.names.lookup(self.keywords_list)
-        # FIXME parser requires self.DEVICES_ID, self.CONNECTIONS_ID and
-        # FIXME self.MONITOR_ID to be saved in the scanner
-        #[self.DEVICES_ID, self.CONNECTIONS_ID, self.MONITOR_ID] = self.names.lookup(self.keywords_list)
+       # dummy = self.names.lookup(self.keywords_list)
+
+        [self.DEVICES_ID, self.CONNECTIONS_ID, self.MONITOR_ID] = self.names.lookup(self.keywords_list[:3])
         self.current_character = ""
         # OPTIMIZE No need to save name_string as a class atrribute since its
         # only used in one function
@@ -115,7 +114,7 @@ class Scanner:
                 self.current_character = nextchar
                 break
 
-        # FIXME an integer number needs to be returned
+        return int(number)
 
     def get_symbol(self):
         """Return the symbol type and ID of the next sequence of characters.
@@ -167,18 +166,27 @@ class Scanner:
             symbol_id = None
             self.advance()
 
-        # FIXME this would return self.ARROW if -* instead of -> is written
-        elif self.current_character == "-":
-            symbol_type = self.ARROW
+
+        elif self.current_character == ".":
+            symbol_type = self.DOT
             symbol_id = None
             self.advance()
-            self.advance()
-
-        # FIXME need a self.DOT symbol
 
         elif self.current_character == "":
             symbol_type = self.EOF
             symbol_id = None
+
+
+        elif self.current_character == "-":
+            self.advance()
+            if self.current_character == ">":
+                symbol_type = self.ARROW
+                symbol_id = None
+                self.advance()
+            else:
+                symbol_type = None
+                symbol_id = None
+                self.advance()
 
         else:  # not a valid character
             symbol_type = None
