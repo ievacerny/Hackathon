@@ -75,7 +75,7 @@ class Names:
         for str in name_string_list:
             query_result = self.query(str)
             if query_result is None:
-                ids.append(self.__add_name_string(str))
+                ids.append(self._add_name_string(str))
             else:
                 ids.append(query_result)
         return ids
@@ -92,7 +92,7 @@ class Names:
         else:
             return None
 
-    def __add_name_string(self, name_string):
+    def _add_name_string(self, name_string):
         """Add name_string to the name table."""
         name_id = len(self.name_table)
         self.name_table.append(name_string)
