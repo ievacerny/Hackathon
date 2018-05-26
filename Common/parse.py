@@ -344,9 +344,9 @@ class Parser:
             if self.symbol_type == self.scanner.EOF:
                 error_code = self.PREMATURE_EOF
                 self.count_errors = False
-            # Print error message
-            # self.scanner.print_line(error_previous_symbol)
+            # Print error message (switched places for unit tests)
             print(self.errors.error_msg[error_code])
+            self.scanner.get_line(True)
             # Update counter
             self.error_counter += 1
 

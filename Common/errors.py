@@ -60,7 +60,7 @@ class Errors:
                 format(parser.MISSING_COLON),
             parser.MISSING_SEMICOLON: "Error {}: Missing semicolon at the end of the list."
                 .format(parser.MISSING_SEMICOLON),
-            parser.INVALID_DEVICE_NAME: "Error {}: Invalid device name. Name must start with a letter and must consist of letters and digits only."
+            parser.INVALID_DEVICE_NAME: "Error {}: Invalid device name. Name must start with a letter and must consist of letters and digits only. Name can't be the same as one of the device types."
                 .format(parser.INVALID_DEVICE_NAME),
             parser.MISSING_DELIMITER: "Error {}: A comma between list items or a semicolon at the end of the list expected."
                 .format(parser.MISSING_DELIMITER),
