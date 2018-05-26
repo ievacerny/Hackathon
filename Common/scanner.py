@@ -58,6 +58,7 @@ class Scanner:
         self.skip_spaces()
         self.line_count = 0
         self.current_symbol = ''
+        self.prev_symbol = ''
 
     def advance(self):
         char = self.input_file.read(1)
@@ -144,6 +145,7 @@ class Scanner:
           # current character now not whitespace
         if self.current_character.isalpha():  # name
             self.name_string = self.get_name()
+            self.prev_symbol = self.current_symbol
             self.current_symbol = self.name_string
 
             if self.name_string in self.keywords_list:
@@ -157,59 +159,72 @@ class Scanner:
 
         elif self.current_character.isdigit():  # number
             symbol_id = self.get_number()
+            self.prev_symbol = self.current_symbol
             self.current_symbol = str(symbol_id)
             symbol_type = self.NUMBER
 
         elif self.current_character == ",":
+            self.prev_symbol = self.current_symbol
             self.current_symbol = self.current_character
             symbol_type = self.COMMA
             symbol_id = None
             self.advance()
 
         elif self.current_character == ";":
+            self.prev_symbol = self.current_symbol
             self.current_symbol = self.current_character
             symbol_type = self.SEMICOLON
             symbol_id = None
             self.advance()
 
         elif self.current_character == ":":
+            self.prev_symbol = self.current_symbol
             self.current_symbol = self.current_character
             symbol_type = self.COLON
             symbol_id = None
             self.advance()
 
         elif self.current_character == ".":
+            self.prev_symbol = self.current_symbol
             self.current_symbol = self.current_character
             symbol_type = self.DOT
             symbol_id = None
             self.advance()
 
         elif self.current_character == '\n':
+            self.prev_symbol = self.current_symbol
             self.current_symbol = self.current_character
             symbol_type = self.NEWLINE
             symbol_id = None
             self.advance()
 
         elif self.current_character == "":
+            self.prev_symbol = self.current_symbol
             self.current_symbol = self.current_character
             symbol_type = self.EOF
             symbol_id = None
 
 
         elif self.current_character == "-":
+            self.prev_symbol = self.current_symbol
             self.current_symbol = self.current_character
             self.advance()
             if self.current_character == ">":
+                self.prev_symbol = self.current_symbol
                 self.current_symbol = self.current_character
                 symbol_type = self.ARROW
                 symbol_id = None
                 self.advance()
             else:
+                self.prev_symbol = self.current_symbol
+                self.current_symbol = self.current_character
                 symbol_type = None
                 symbol_id = None
                 self.advance()
 
         else:  # not a valid character
+            self.prev_symbol = self.current_symbol
+            self.current_symbol = self.current_character
             symbol_type = None
             symbol_id = None
             self.advance()
