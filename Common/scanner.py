@@ -88,12 +88,20 @@ class Scanner:
     def cur_sym(self):
         print(self.current_symbol)
 
-    def get_line(self):
+    def get_line(self, before):
         length = len(self.current_symbol)
-        if self.current_symbol == self.list_file[self.line_count][:length] and self.line_count != 0:
-            print(self.list_file[self.line_count - 1])
+        # if self.current_symbol == self.list_file[self.line_count][:length] and self.line_count != 0:
+        if before == True and self.line_count != 0:
+            prev_line = self.list_file[self.line_count - 1]
+            prev_symbol = self.prev_symbol
+            print(prev_line)
+            print(' ' * (prev_line.find(prev_symbol) - 1), '^')
         else:
-            print(self.list_file[self.line_count])
+            line = self.list_file[self.line_count]
+            symbol = self.current_symbol
+
+            print(line)
+            print(' ' * (line.find(symbol)-1), '^')
 
         #print(len(self.current_symbol))
         #return self.list_file[self.line_count]
