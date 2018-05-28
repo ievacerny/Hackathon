@@ -8,7 +8,6 @@ Classes
 Scanner - reads definition file and translates characters into symbols.
 """
 
-import re
 import sys
 
 class Scanner:
@@ -34,16 +33,14 @@ class Scanner:
 
     def __init__(self, path, names):
         """Open specified file and initialise reserved words and IDs."""
-        """try:
-            input_file = open(path, 'r')
+        try:
+            self.input_file = open(path, 'r')
         except FileNotFoundError:
-            print("File doesn't exist")
-            sys.exit()"""
+            print("Filename incorrect or file doesn't exist")
+            sys.exit()
 
-        self.input_file = open(path, 'r')
+        #self.input_file = open(path, 'r')
         self.list_file = [line.rstrip('\n') for line in open(path, 'r')]
-
-        #re.sub('/[^>]+/', '', input_file)
 
         self.names = names
         self.symbol_type_list = [self.COMMA, self.SEMICOLON, self.COLON,
@@ -62,6 +59,16 @@ class Scanner:
 
     def advance(self):
         char = self.input_file.read(1)
+        # if char == "/":
+        #     char = self.input_file.read(1)
+        #     while char != "/":
+        #         if char == "\n":
+        #             self.line_count += 1
+        #             char = self.input_file.read(1)
+        #         else:
+        #             char = self.input_file.read(1)
+        #
+
         self.current_character = char
         return char
 
@@ -70,6 +77,8 @@ class Scanner:
             if self.current_character == "\n":
                 self.line_count += 1
             self.current_character = self.input_file.read(1)
+
+
 
     def get_name(self):
         name = ''
@@ -142,6 +151,19 @@ class Scanner:
         #print(self.get_line())
         """Return the symbol type and ID of the next sequence of characters."""
         self.skip_spaces()
+
+        #skipping over comments
+        if self.current_character == "/":
+            self.advance()
+            while self.current_character != "/":
+                if self.current_character == "\n":
+                    self.line_count += 1
+                    self.advance()
+                else:
+                    self.advance()
+            self.advance()
+
+
           # current character now not whitespace
         if self.current_character.isalpha():  # name
             self.name_string = self.get_name()
@@ -232,3 +254,4 @@ class Scanner:
         #self.skip_spaces()
 
         return [symbol_type, symbol_id]
+
