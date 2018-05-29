@@ -54,10 +54,10 @@ class Errors:
             # Parser class
             parser.NO_DEVICE_KEYWORD: "Error {}: Missing section header DEVICES."
                 .format(parser.NO_DEVICE_KEYWORD),
-            parser.NO_CONNECTIONS_KEYWORD: "Error {}: Missing section header CONNECTIONS.".
-                format(parser.NO_CONNECTIONS_KEYWORD),
-            parser.MISSING_COLON: "Error {}: Missing colon after the section header".
-                format(parser.MISSING_COLON),
+            parser.NO_CONNECTIONS_KEYWORD: "Error {}: Missing section header CONNECTIONS."
+                .format(parser.NO_CONNECTIONS_KEYWORD),
+            parser.MISSING_COLON: "Error {}: Missing colon after the section header"
+                .format(parser.MISSING_COLON),
             parser.MISSING_SEMICOLON: "Error {}: Missing semicolon at the end of the list."
                 .format(parser.MISSING_SEMICOLON),
             parser.INVALID_DEVICE_NAME: "Error {}: Invalid device name. Name must start with a letter and must consist of letters and digits only. Name can't be the same as one of the device types."
@@ -66,9 +66,13 @@ class Errors:
                 .format(parser.MISSING_DELIMITER),
             parser.PORT_MISSING: "Error {}: After dot a valid input or output port should follow."
                 .format(parser.PORT_MISSING),
+            parser.INVALID_OUTPUT: "Error {}: The port is not an output. Must be output -> input."
+                .format(parser.INVALID_OUTPUT),
+            parser.INVALID_INPUT: "Error {}: The port is not an input. Must be output -> input."
+                .format(parser.INVALID_OUTPUT),
             parser.MISSING_ARROW: "Error {}: Missing arrow in connection description."
                 .format(parser.MISSING_ARROW),
-            parser.NOT_ALL_INPUTS_CONNECTED: "Error {}: Not all inputs in the network are connected."
+            parser.NOT_ALL_INPUTS_CONNECTED: "Error {}: Not all inputs in the network are connected. Please check your circuit diagram."
                 .format(parser.NOT_ALL_INPUTS_CONNECTED),
             parser.UNEXPECTED_SYMBOL: "Error {}: Unexpected symbol detected."
                 .format(parser.UNEXPECTED_SYMBOL),
