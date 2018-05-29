@@ -44,7 +44,7 @@ def init_parser(data):
     (";R O1 2,", "devices.BAD_DEVICE"),
     (";", "devices.BAD_DEVICE"),
     ("-> DTYPE D1,", "devices.BAD_DEVICE"),
-    ("NAND N! 2,", "UNEXPECTED_SYMBOL"),  # Are we sure we want this behaviour?
+    ("NAND N! 2,", "devices.INVALID_QUALIFIER"),
     ("NAND , 2,", "INVALID_DEVICE_NAME"),
     ("NAND N1 2: NAND n2 2,", "MISSING_DELIMITER"),
     ("NAND N1 2 NAND N2 2,", "MISSING_DELIMITER"),
@@ -97,10 +97,10 @@ def test_connection_parsing(capsys, data, expected_error):
     (".,", "INVALID_DEVICE_NAME"),
     ("3,", "INVALID_DEVICE_NAME"),
     ("A1.,", "PORT_MISSING"),
-    ("A1.2,", "monitors.NOT_OUTPUT"),
+    ("A1.2,", "INVALID_OUTPUT"),
     ("SW1 A1", "MISSING_DELIMITER"),
     ("SW1:", "MISSING_DELIMITER"),
-    ("A1.I1,", "monitors.NOT_OUTPUT"),
+    ("A1.I1,", "INVALID_OUTPUT"),
 ])
 def test_monitor_parsing(capsys, data, expected_error):
     """Test parse_monitor function."""
