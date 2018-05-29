@@ -6,11 +6,12 @@ use this module either directly or indirectly.
 Classes
 -------
 Names - maps variable names and string names to unique integers.
+
+Written by Ieva
 """
 
 
 class Names:
-
     """Map variable names and string names to unique integers.
 
     This class deals with storing grammatical keywords and user-defined words,
@@ -36,11 +37,13 @@ class Names:
 
     get_name_string(self, name_id): Returns the corresponding name string for
                         the name ID. Returns None if the ID is not present.
+
     """
 
     def __init__(self):
         """Initialise names list."""
         self.error_code_count = 0  # how many error codes have been declared
+        self.name_table = []
 
     def unique_error_codes(self, num_error_codes):
         """Return a list of unique integer error codes."""
@@ -55,15 +58,48 @@ class Names:
 
         If the name string is not present in the names list, return None.
         """
+        try:
+            name_id = self.name_table.index(name_string)
+        # Exception is raised if name_string not in the list
+        except ValueError:
+            return None
+        else:
+            return name_id
 
     def lookup(self, name_string_list):
         """Return a list of name IDs for each name string in name_string_list.
 
         If the name string is not present in the names list, add it.
         """
+        ids = []
+        for str in name_string_list:
+            query_result = self.query(str)
+            if query_result is None:
+                ids.append(self._add_name_string(str))
+            else:
+                ids.append(query_result)
+        return ids
 
     def get_name_string(self, name_id):
         """Return the corresponding name string for name_id.
 
         If the name_id is not an index in the names list, return None.
         """
+        if name_id < 0:
+            raise ValueError('NameID cannot be negative')
+        elif name_id < len(self.name_table):
+            return self.name_table[name_id]
+        else:
+            return None
+
+    def _add_name_string(self, name_string):
+        """Add name_string to the name table."""
+        name_id = len(self.name_table)
+        self.name_table.append(name_string)
+        return name_id
+
+    # DEBUGGING METHODS
+    def print_name_table(self):
+        """Print name table for debugging purposes."""
+        for key, value in enumerate(self.name_table):
+            print(key, value)

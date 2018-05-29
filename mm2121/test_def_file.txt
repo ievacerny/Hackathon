@@ -1,0 +1,16 @@
+DEVICES:
+CLOCK clk 5,
+DTYPE d1,
+SWITCH sw1 1,
+SWITCH sw2 0,
+SWITCH sw3 0;
+
+CONNECTIONS:
+d1.QBAR->d1.DATA,
+sw2->d1.SET,
+sw3->d1.CLEAR,
+clk->d1.CLK;
+
+MONITOR:
+clk,
+d1.Q;

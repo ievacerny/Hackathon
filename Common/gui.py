@@ -102,25 +102,11 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.y_axis_label_offset = 20
 
         #Devices, monitors
-        self.devices_properties = [] #internal use
-
-        #SYSINTEGRATION - after network execution in the parent (Gui), get the values of monitor outputs and store them locally for rendering (later)
-        '''
-        self.update_monitors(devices,monitors)
-        '''
-
-        #Device variables - TODO - use actual devices 
-        self.devices_properties = [["CLOCK", "clock1", [0,2,1,-0.5,0,1,0,1,0,0.5,1,1,-0.5]], ["NAND", "nand1", [0,0.5,1,1,1,1]], ["DTYPE","dtype1.Q", [0,0,0,0.5,1,-0.5]]]
-        self.monitor_devices = [True, True, True] #Temporary - eventually just update self.devices_properties
-        
-        #Simulation control
-        self.simulation_mode = False
-        self.simulation_timer = 0 #Keep track of time for simulations
+        self.devices_properties = [] #internal use - is a list of lists of the form [device_type,device_name,device_signal]. 
+                                     #Is set upon initialisation of Gui class instance
 
         #Windows - decide which window to show 
         self.display_startup = True
-
-        
 
     def init_gl(self):
         """Configure and initialise the OpenGL context."""
@@ -152,7 +138,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         # Clear everything
         GL.glClear(GL.GL_COLOR_BUFFER_BIT)
 
-        #print(time.clock())
+        #print(time.clock()) #for debugging
 
         #if self.display_startup: #TODO different window before a file is loaded (proper application-style)
             #Display the basic startup screen
@@ -160,7 +146,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         #else:
             #Draw main frame lines
 
-        #TODO - enable startup window
+        #TODO - enable startup window (?)
 
         #Draw basic frame
         self.render_line_strip([[self.origin_x, self.origin_y], [size.width-self.right_offset, self.origin_y]], 'black') #horizontal line
@@ -177,8 +163,13 @@ class MyGLCanvas(wxcanvas.GLCanvas):
                 self.render_line_strip([[x,self.origin_y], [x,self.origin_y-5]], 'black')
 
         #Draw device outputs
+        max_num_devices = (size.height - self.top_offset - self.bottom_offset)//(self.inter_panel_spacing + self.panel_height)
+
         for index, device in enumerate(self.devices_properties): #TODO with simple loop over self.devices
-            #self.render_device(index, device[0], device[1], device[2], self.play_simulation) #first argument of render_device is the number of devices presently being monitored
+            if index+1 == max_num_devices: #index + 1 is the number of devices at present iteration
+                print('Too many monitors - limit number of monitors to '+ str(max_num_devices))
+                break
+
             device_type = device[0]
             device_name = device[1]
             device_signal = device[2] #list that takes values in [0,0.5,-0.5,1,2]
@@ -198,20 +189,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             self.render_text(device_name, self.y_axis_label_offset, corner_y + 25, 'black') #render device name to the left of this panel
             self.render_text("[" + device_type + "]", self.y_axis_label_offset, corner_y + 10, 'black') #render device type below device_name
             #self.render_circle([(size.width + size.width - self.right_offset)/2, corner_y + self.panel_height/2], self.panel_height/4,'black',0.2)
-
-            if self.simulation_mode: #TODO figure out how to get around non-uniform rendering in time
-                if self.simulation_timer == 0:
-                    self.simulation_timer = time.clock() #start (or re-start) the simulation clock
-
-                time_elapsed = time.clock() - self.simulation_timer 
-
-                if time_elapsed < 3*len(device_signal): #render signal according to how much time has elapsed
-                    self.render_signal(corner_y, device_signal[0:int(time_elapsed//3+1)])
-                else: #have reached end, so stop simulation and reset simulation variables
-                    self.simulation_timer = 0
-                    self.simulation_mode = False
-            else:
-                self.render_signal(corner_y, device_signal) #show full signal
+            self.render_signal(corner_y, device_signal) #show full signal
             #self.render_circle([150,150], 50, 'red', 0.2)
 
         # We have been drawing to the back buffer, flush the graphics pipeline
@@ -369,9 +347,6 @@ class MyGLCanvas(wxcanvas.GLCanvas):
 
 
 
-
-
-
 class Gui(wx.Frame):
     """Configure the main window and all the widgets.
 
@@ -415,23 +390,13 @@ class Gui(wx.Frame):
         self.monitors = monitors
 
         #define initial number and maximum allowed number of cycles
-        self.num_cycles = 100
+        self.num_cycles = 200
         self.num_cycles_max = 1000
-
-        ''' #SYSINTEGRATION
-        #Network execution and signal recording
-        self.devices.cold_startup()
-        for _ in range(self.num_cycles):
-            if self.network.execute_network():
-                self.monitors.record_signals()
-            else:
-                print("Error! Network oscillating.")
-                #TODO: deal with this error by showing alert box (or some other way)
-        '''
-
-        # Canvas for drawing signals
-        self.canvas = MyGLCanvas(self)
-        #self.update_canvas_monitors()
+        
+        self.run_network(self.num_cycles)
+        self.canvas = MyGLCanvas(self) # Canvas for drawing signals
+        self.canvas.grid_big_value = self.num_cycles/5 #big value attribute of canvas depends on initial number of cycles
+        self.update_canvas_monitors()
 
         # Configure the widgets
         self.button_size = wx.Size(105,15)
@@ -440,7 +405,6 @@ class Gui(wx.Frame):
                                 size=self.button_size, style=wx.SP_ARROW_KEYS, min=0, 
                                 max=self.num_cycles_max, initial=self.num_cycles, name="wxSpinCtrl")
         self.run_button = wx.Button(self, wx.ID_ANY, "Run", size=self.button_size)
-
 
         #Monitor control:
         self.add_monitor_name = wx.TextCtrl(self, wx.ID_ANY, "",
@@ -458,12 +422,7 @@ class Gui(wx.Frame):
                                     style=wx.TE_PROCESS_ENTER, size=self.button_size)
         self.remove_connection = wx.Button(self, wx.ID_ANY, "Del. Connection", size=wx.Size(105,30))
 
-        #Simulation control:
-        self.play_simulation = wx.Button(self, wx.ID_ANY, "Play Simulation", size=self.button_size)
-
-
         # Bind events to widgets
-        
         self.Bind(wx.EVT_MENU, self.on_menu)
         self.spin.Bind(wx.EVT_SPINCTRL, self.on_spin)
         self.run_button.Bind(wx.EVT_BUTTON, self.on_run_button)
@@ -475,7 +434,6 @@ class Gui(wx.Frame):
         self.add_connection.Bind(wx.EVT_BUTTON, self.on_add_connection)
         self.remove_connection_name.Bind(wx.EVT_TEXT_ENTER, self.on_remove_connection_name)
         self.remove_connection.Bind(wx.EVT_BUTTON, self.on_remove_connection)
-        self.play_simulation.Bind(wx.EVT_BUTTON, self.on_play_simulation)
 
         # Configure sizers for layout
         main_sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -495,29 +453,9 @@ class Gui(wx.Frame):
         side_sizer.Add(self.add_connection, 1, wx.ALL, 5)
         side_sizer.Add(self.remove_connection_name, 1, wx.ALL, 5)
         side_sizer.Add(self.remove_connection, 1, wx.ALL, 5)
-        side_sizer.Add(self.play_simulation, 1, wx.ALL, 5)
 
         self.SetSizeHints(300, 300)
         self.SetSizer(main_sizer)
-
-    '''
-    #Supposed to handle resizing of buttons according to window and canvas sizes - doesn't work (crashes the UI)
-    def on_resize(self, event):    
-        canvas_size = self.canvas.GetClientSize()
-        window_size = self.GetSize()
-        new_size = wx.Size((window_size[0] - canvas_size[0]-10/2)/2,30)
-        self.spin.SetSize(new_size)
-        self.run_button.SetSize(new_size)
-        self.add_monitor_name.SetSize(new_size)
-        self.add_monitor.SetSize(new_size)
-        self.remove_monitor_name.SetSize(new_size)
-        self.remove_monitor.SetSize(new_size)
-        self.add_connection_name.SetSize(new_size)
-        self.add_connection.SetSize(new_size)
-        self.remove_connection_name.SetSize(new_size)
-        self.remove_connection.SetSize(new_size)
-        self.play_simulation.SetSize(new_size)
-    '''
 
     def on_menu(self, event):
         """Handle the event when the user selects a menu item."""
@@ -531,131 +469,116 @@ class Gui(wx.Frame):
             #path = open_file_dialog.GetPath()
             open_file_dialog.Destroy()
             #TODO enable file loading
-        if Id == wx.ID_EXIT:
+        elif Id == wx.ID_EXIT:
             self.Close(True)
-        if Id == wx.ID_ABOUT:
+        elif Id == wx.ID_ABOUT:
             wx.MessageBox("Logic Simulator\nCreated by Mojisola Agboola\n2017","About Logsim", wx.ICON_INFORMATION | wx.OK)
-
 
     def on_spin(self, event):
         """Handle the event when the user changes the spin control value."""
-        spin_value = self.spin.GetValue()
-        if spin_value > 0:
-            self.canvas.grid_big_value = spin_value/5 #since there are 5 big subdivisions in the grid
-
-            #TODO run the network again for the new number of cycles, update self.canvas's monitor attribute afterwards
-            if spin_value > self.num_cycles:
-                self.devices.cold_startup()
-                for _ in range(self.num_cycles):
-                    if self.network.execute_network():
-                        self.monitors.record_signals()
-                    else:
-                        print("Error! Network oscillating.")
-                self.update_canvas_monitors()
-            self.num_cycles = spin_value #update num_cycles
-
         #text = "".join(["New spin control value: ", str(spin_value)])
         #self.canvas.render(text)
 
     def on_run_button(self, event):
         """Handle the event when the user clicks the run button."""
-        if self.run_button.GetLabel() == "Run":
-            self.run_button.SetLabel("Pause")
-            print(self.canvas.GetClientSize())
-            print(self.GetSize())
-        else:
-            self.run_button.SetLabel("Run") # TODO actually run the simulation
-        text = "Run button pressed."
-        self.canvas.render(text)
+        spin_value = self.spin.GetValue()
+        if spin_value > 0:
+            self.canvas.grid_big_value = spin_value/5 #since there are 5 big subdivisions in the grid
+            if spin_value > self.num_cycles: #re-start whole simulation upto new number of cycles
+                self.monitors.reset_monitors()
+                self.run_network(spin_value)
+                self.update_canvas_monitors()
+            self.num_cycles = spin_value #update num_cycles
+            self.canvas.render('')
+            #print(self.canvas.devices_properties[0][2]) #DEBUG
 
     def on_add_monitor_name(self, event):
-        text_box_value = self.add_monitor_name.GetValue()
-        #maybe print out to command line?
+        text_box_value = self.add_monitor_name.GetValue() #maybe print out to command line?
 
     def on_remove_monitor_name(self, event):
-        text_box_value = self.remove_monitor_name.GetValue()
-        #maybe print out to command line?
+        text_box_value = self.remove_monitor_name.GetValue() #maybe print out to command line?
 
-    def on_add_monitor(self, event):
+    def on_add_monitor(self, event): 
         device_name = self.add_monitor_name.GetValue()
-        if device_name == "":
-            print('Must enter a device name to add monitor')
-        else:
-            name_exists = self.names.query(device_name) 
+        if device_name != "":
+            name_exists = self.names.query(device_name.split('.')[0]) #if device is multiple output, only query using name
             if name_exists is None:
                 print('Name does not exist')
             else:
-                [device_id,output_id] = self.devices.get_signal_ids(device_name)
-                self.monitors.make_monitor(device_id, output_id, 0)
-                device_type = self.devices.get_device(device_id).device_kind
-                #re-execute network and monitor signals for this device 
-                self.devices.cold_startup()
-                for _ in range(self.num_cycles):
-                    if self.network.execute_network():
-                        self.monitors.record_signals()
-                    else:
-                        print("Error! Network oscillating.")
-                signal_list = self.monitors.monitors_dictionary[(device_id, output_id)]
-                device_signal = self.convert_signal(self.devices,signal_list)
-                self.canvas.devices_properties.append([device_type, device_name, device_signal]) #add data to canvas
-
-        '''
-        #TODO - check if device name exists and add to monitors, track new signal (execute network), etc.
-        '''
-        #add_monitor(self,devices,monitors,device_id,output_id): #function in MyGLCanvas - DONT FORGET TO PASS DEVICES AS ARG.
+                [monitored_list, non_monitored_list] = self.monitors.get_signal_names()
+                if device_name in monitored_list:
+                    print('Device is already being monitored')
+                else: #add device to monitors
+                    [device_id,output_id] = self.devices.get_signal_ids(device_name) 
+                    self.monitors.make_monitor(device_id, output_id, 0) 
+                    self.monitors.reset_monitors()
+                    self.run_network(self.num_cycles)
+                    self.update_canvas_monitors()
+                    self.canvas.render('')
 
     def on_remove_monitor(self, event):
-        #TODO - update monitors
-        #remove_monitor(self,devices,device_id,output_id):
         monitor_name = self.remove_monitor_name.GetValue()
-        if monitor_name == "":
-            print('Must enter a device name to remove monitor')
-        else:
-            for index, device in enumerate(self.canvas.devices_properties):#TODO check against names class variable and add it to canvas.devices if 
-                if device[1] == monitor_name: #check if device is in fact currently being monitored
-                    self.canvas.devices_properties.pop(index) #remove from canvas monitor
+        if monitor_name != "":
+            for index, device in enumerate(self.canvas.devices_properties):
+                if device[1] == monitor_name: #check if device is currently being monitored
+                    self.canvas.devices_properties.pop(index) #easily remove from canvas monitors since we have access to index
                     [device_id,output_id] = self.devices.get_signal_ids(monitor_name) 
                     self.monitors.remove_monitor(device_id, output_id) #remove from local monitor instance
+                    self.canvas.render('')
                     return
             #searched through canvas monitors, name not found...
             print('Device with such name is not being monitored')
-       
-
-        #self.canvas.monitor_devices[-1] = False
-        #print('Goodbye')
 
     def on_add_connection_name(self, event):
         print('Add connection text entered')#TODO add functionality for these - integration with connections
 
-    def on_add_connection(self, event):
-        print('Add connection')
-
     def on_remove_connection_name(self, event):
         print('Remove connection text entered')
 
+    def on_add_connection(self, event):
+        '''
+        connection = self.add_connection_name.GetValue()
+        if connection is not None:
+            connection = connection.split('->')
+            if len(connection) == 2:
+                #convert this list to device names
+                
+
+                [device_id1,output_id1] = self.devices.get_signal_ids(device1) 
+                [device_id2,output_id2] = self.devices.get_signal_ids(device2) 
+                print('Add connection')
+        '''
+
     def on_remove_connection(self, event):
-        print('Remove connection')
+        '''
+        connection = self.remove_connection_name.GetValue()
+        if connection is not None:
+            connection = connection.split('->')
+            if len(connection) == 2:
 
-    def on_play_simulation(self, event):
-        #TODO - render the signals one cycle at a time, every 2s
-        self.canvas.simulation_mode = True
-        print('Pressed play simulation')
+                [device_id1,output_id1] = self.devices.get_signal_ids(device1) 
+                [device_id2,output_id2] = self.devices.get_signal_ids(device2) 
+                print('Remove connection')
+        '''
 
-    #     """Handle the event when the user enters text."""
-    #     text_box_value = self.text_box.GetValue()
-    #     text = "".join(["New text box value: ", text_box_value])
-    #     self.canvas.render(text)
+    def run_network(self, num_cycles):
+        self.devices.cold_startup()
+        for _ in range(num_cycles):
+            if self.network.execute_network():
+                self.monitors.record_signals()
+            else:
+                print("Error - Network oscillating.")
 
     def update_canvas_monitors(self): #list out monitored devices and their properties from scratch
         self.canvas.devices_properties.clear()
         for device_id, output_id in self.monitors.monitors_dictionary:
             device_name = self.devices.get_signal_name(device_id, output_id)
-            device_type = self.devices.get_device(device_id).device_kind
+            device_type = self.translate_device_kind(self.devices.get_device(device_id).device_kind)
             signal_list = self.monitors.monitors_dictionary[(device_id, output_id)]
-            device_signal = self.convert_signal(signal_list)
+            device_signal = self.translate_signal(signal_list)
             self.canvas.devices_properties.append([device_type, device_name, device_signal])
 
-    def convert_signal(self, signal_list):
+    def translate_signal(self, signal_list): #convert from format in devices class to custom gui format (see below)
         device_signal = []
         for signal in signal_list:
             if signal == self.devices.HIGH:
@@ -672,4 +595,24 @@ class Gui(wx.Frame):
                 device_signal.append(2)
                 print('Error - corrupt signal value')
         return device_signal
-        
+    
+    def translate_device_kind(self, device_kind): #convert from devices class constants to strings for display
+        if device_kind == self.devices.SWITCH:
+            return 'SWITCH'
+        elif device_kind == self.devices.CLOCK:
+            return 'CLOCK'
+        elif device_kind == self.devices.XOR:
+            return 'XOR'
+        elif device_kind == self.devices.AND:
+            return 'AND'
+        elif device_kind == self.devices.NAND:
+            return 'NAND'
+        elif device_kind == self.devices.OR:
+            return 'OR'
+        elif device_kind == self.devices.NOR:
+            return 'NOR'
+        elif device_kind == self.devices.D_TYPE:
+            return 'DTYPE'
+        else:
+            print('Error - BAD DEVICE found')
+            return 'BAD DEVICE'
