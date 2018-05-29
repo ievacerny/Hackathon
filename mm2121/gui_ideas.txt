@@ -1,0 +1,6 @@
+GUI Ideas:
+
+-Display current set of monitors and connections
+-Be able to open a definition file from the Menu bar
+-Be able to change order of device signal displays by clicking and dragging (or other less complicated way)
+-
