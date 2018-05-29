@@ -46,9 +46,9 @@ def init_parser(data):
     ("-> DTYPE D1,", "devices.BAD_DEVICE"),
     ("NAND N! 2,", "UNEXPECTED_SYMBOL"),  # Are we sure we want this behaviour?
     ("NAND , 2,", "INVALID_DEVICE_NAME"),
-    ("NAND N1 2: NAND n2 2,", "UNEXPECTED_SYMBOL"),
+    ("NAND N1 2: NAND n2 2,", "MISSING_DELIMITER"),
     ("NAND N1 2 NAND N2 2,", "MISSING_DELIMITER"),
-    ("NAND N1 2 nand n2 2,", "UNEXPECTED_SYMBOL")
+    ("NAND N1 2 nand n2 2,", "MISSING_DELIMITER")
 ])
 def test_device_parsing(capsys, data, expected_error):
     """Test parse_device function."""
@@ -68,19 +68,19 @@ def test_device_parsing(capsys, data, expected_error):
     (". -> A1.I1,", "INVALID_DEVICE_NAME"),
     ("3 -> A1.I1,", "INVALID_DEVICE_NAME"),
     ("A1. -> SW1", "PORT_MISSING"),
-    ("A1.! -> SW1", "network.PORT_ABSENT"),
+    ("A1.! -> SW1", "INVALID_OUTPUT"),
     ("SW1 A1.I1", "MISSING_ARROW"),
-    ("SW1 <- A1.I1", "UNEXPECTED_SYMBOL"),
+    ("SW1 <- A1.I1", "MISSING_ARROW"),
     ("SW1 -> AND.I1", "INVALID_DEVICE_NAME"),
     ("SW1 -> ;", "INVALID_DEVICE_NAME")
 ])
 def test_connection_parsing(capsys, data, expected_error):
-    """Test parse_device function."""
+    """Test parse_connection function."""
     parser = init_parser(data)
     # Add couple of devices
     [device_id_1, device_id_2] = parser.names.lookup(["SW1", "A1"])
     [device_type_1, device_type_2] = parser.names.lookup(["SWITCH", "AND"])
-    parser.devices.make_device(device_id_1, device_type_1, None)
+    parser.devices.make_device(device_id_1, device_type_1, 0)
     parser.devices.make_device(device_id_2, device_type_2, 2)
     # Get expected error message
     expected_error_code = operator.attrgetter(expected_error)(parser)
@@ -97,18 +97,18 @@ def test_connection_parsing(capsys, data, expected_error):
     (".,", "INVALID_DEVICE_NAME"),
     ("3,", "INVALID_DEVICE_NAME"),
     ("A1.,", "PORT_MISSING"),
-    ("A1.2,", "network.PORT_ABSENT"),
+    ("A1.2,", "monitors.NOT_OUTPUT"),
     ("SW1 A1", "MISSING_DELIMITER"),
-    ("SW1:", "UNEXPECTED_SYMBOL"),
+    ("SW1:", "MISSING_DELIMITER"),
     ("A1.I1,", "monitors.NOT_OUTPUT"),
 ])
 def test_monitor_parsing(capsys, data, expected_error):
-    """Test parse_device function."""
+    """Test parse_monitor function."""
     parser = init_parser(data)
     # Add couple of devices
     [device_id_1, device_id_2] = parser.names.lookup(["SW1", "A1"])
     [device_type_1, device_type_2] = parser.names.lookup(["SWITCH", "AND"])
-    parser.devices.make_device(device_id_1, device_type_1, None)
+    parser.devices.make_device(device_id_1, device_type_1, 0)
     parser.devices.make_device(device_id_2, device_type_2, 2)
     # Get expected error message
     expected_error_code = operator.attrgetter(expected_error)(parser)

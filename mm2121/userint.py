@@ -149,7 +149,7 @@ class UserInterface:
         name_string = self.read_string()
         if name_string is None:
             return None
-        else:
+        else: 
             name_id = self.names.query(name_string)
         if name_id is None:
             print("Error! Unknown name.")
