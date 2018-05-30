@@ -38,7 +38,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
     --------------
     init_gl(self): Configures the OpenGL context.
 
-    render(self, text): Handles all drawing operations.
+    render(self): Handles all drawing operations.
 
     on_paint(self, event): Handles the paint event.
 
@@ -68,6 +68,8 @@ class MyGLCanvas(wxcanvas.GLCanvas):
 
         # Initialise variables for zooming
         self.zoom = 1
+        self.min_zoom = 0.9
+        self.max_zoom = 2.5
 
         # Bind events to the canvas
         self.Bind(wx.EVT_PAINT, self.on_paint)
@@ -78,7 +80,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.colormap = {'red':[1.0, 0.0, 0.0],'green':[0.0, 1.0, 0.0],'blue':[0.0, 0.0, 1.0], 'yellow':[1.0, 1.0, 0.0], 'black':[0.0, 0.0, 0.0], 'white':[1.0, 1.0, 1.0]}
         
         #Display variables
-        self.right_offset = 42 #offset for internal frame from right hand side edge of canvas 
+        self.right_offset = 42 #offset for internal frame from right hand edge of canvas 
         self.top_offset = 20
         self.bottom_offset = 70
         self.left_offset = 80 
@@ -105,9 +107,6 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.devices_monitored = [] #internal use - is a list of lists of the form [device_type,device_name,device_signal]. 
                                      #Is set upon initialisation of Gui class instance
 
-        #Windows - decide which window to show 
-        self.display_startup = True
-
     def init_gl(self):
         """Configure and initialise the OpenGL context."""
         size = self.GetClientSize()
@@ -125,7 +124,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         GL.glEnable(GL.GL_BLEND)
         GL.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
 
-    def render(self, text):
+    def render(self):
         """Handle all drawing operations."""
         size = self.GetClientSize()
 
@@ -138,32 +137,43 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         # Clear everything
         GL.glClear(GL.GL_COLOR_BUFFER_BIT)
 
-        #print(time.clock()) #for debugging
-
         #Draw basic frame
-        self.render_line_strip([[self.origin_x, self.origin_y], [size.width-self.right_offset, self.origin_y]], 'black') #horizontal line
-        self.render_line_strip([[self.origin_x, self.origin_y], [self.origin_x, size.height-self.top_offset]], 'black') #vertical line
-        self.render_line_strip([[self.origin_x, size.height-self.top_offset], [size.width-self.right_offset, size.height-self.top_offset]], 'black') #horizontal line
-        self.render_line_strip([[size.width-self.right_offset, size.height-self.top_offset], [size.width-self.right_offset, self.origin_y]], 'black') #vertical line
-        
+        self.render_line_strip([[self.origin_x, self.origin_y], [size.width - self.right_offset, self.origin_y]], 'black') #bottom horizontal line
         self.render_text('Number of cycles', size.width - self.right_offset - self.x_axis_label_offset, 15, 'black')
-        self.render_text('Name\n[Type]', self.y_axis_label_offset, size.height - self.top_offset - 10,'black')
+
+        max_devices_fit = (size.height - self.top_offset - self.bottom_offset)//(self.inter_panel_spacing + self.panel_height) #max number of devices that will fit in un-resized window
+        num_devices_now = len(self.devices_monitored)
+
+        if num_devices_now > max_devices_fit:
+            max_height_panels = self.bottom_offset + (self.panel_height + self.inter_panel_spacing)*num_devices_now
+            self.render_line_strip([[self.origin_x, self.origin_y], [self.origin_x, max_height_panels]], 'black') #left vertical line
+            self.render_line_strip([[size.width - self.right_offset, max_height_panels], [size.width - self.right_offset, self.origin_y]], 'black') #right vertical line
+            self.render_text('Name\n[Type]', self.y_axis_label_offset, max_height_panels + 30,'black')
+        else:
+            self.render_line_strip([[self.origin_x, self.origin_y], [self.origin_x, size.height - self.top_offset]], 'black') #left vertical line
+            self.render_line_strip([[size.width - self.right_offset, size.height-self.top_offset], [size.width-self.right_offset, self.origin_y]], 'black') #right vertical line
+            self.render_text('Name\n[Type]', self.y_axis_label_offset, size.height - self.top_offset - 10,'black')
+
+        #Adjust small and big intervals to occupy window area
+        big_interval = int((size.width - self.right_offset - self.origin_x) / 5)
+        self.grid_small_interval = int(big_interval / 10)
+        self.grid_big_interval = 10*self.grid_small_interval
+
+        if self.grid_small_interval <= 0:
+            self.grid_small_interval = 1
+            self.grid_big_interval = 10
 
         #Draw grid and markers
-        for x in range(self.origin_x, size.width-self.right_offset+1, self.grid_small_interval): # +1 so we can draw a grid marker on the last point as well
-            if (x-self.origin_x)%self.grid_big_interval == 0:
-                self.render_line_strip([[x,self.origin_y], [x,self.origin_y-10]], 'black') #draw a longer line for large intervals
-                self.render_text(str(self.grid_big_value*(x-self.origin_x)/(self.grid_big_interval)), x-self.grid_hor_text_offset, self.origin_y-self.grid_vert_text_offset, 'black') #also show value at large intervals
+        for x in range(self.origin_x, size.width - self.right_offset + 1, self.grid_small_interval): # +1 so we can draw a grid marker on the last point as well
+            if (x - self.origin_x) % self.grid_big_interval == 0:
+                self.render_line_strip([[x,self.origin_y], [x,self.origin_y - 10]], 'black') #draw a longer line for large intervals
+                self.render_text(str(self.grid_big_value*(x - self.origin_x) / (self.grid_big_interval)), 
+                                 x - self.grid_hor_text_offset, self.origin_y - self.grid_vert_text_offset, 'black') #also show value at large intervals
             else:
-                self.render_line_strip([[x,self.origin_y], [x,self.origin_y-5]], 'black')
+                self.render_line_strip([[x,self.origin_y], [x,self.origin_y - 5]], 'black')
 
         #Draw device outputs
-        max_num_devices = (size.height - self.top_offset - self.bottom_offset)//(self.inter_panel_spacing + self.panel_height)
-
         for index, device in enumerate(self.devices_monitored): #TODO with simple loop over self.devices
-            if index+1 == max_num_devices: #index + 1 is the number of devices at present iteration
-                print('Too many monitors - limit number of monitors to '+ str(max_num_devices))
-                break
 
             device_type = device[0]
             device_name = device[1]
@@ -185,9 +195,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             self.render_rectangle([corner_x, corner_y], self.panel_height, size.width - corner_x - self.right_offset, color, 0.2) #draw colored panel behind signal
             self.render_text(device_name, self.y_axis_label_offset, corner_y + 25, 'black') #render device name to the left of this panel
             self.render_text("[" + device_type + "]", self.y_axis_label_offset, corner_y + 10, 'black') #render device type below device_name
-            #self.render_circle([(size.width + size.width - self.right_offset)/2, corner_y + self.panel_height/2], self.panel_height/4,'black',0.2)
-            self.render_signal(corner_y, device_signal) #show full signal
-            #self.render_circle([150,150], 50, 'red', 0.2)
+            self.render_signal(corner_y, device_signal)
 
         # We have been drawing to the back buffer, flush the graphics pipeline
         # and swap the back buffer to the front
@@ -202,10 +210,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             self.init_gl()
             self.init = True
 
-        size = self.GetClientSize()
-        text = "".join(["Canvas redrawn on paint event, size is ",
-                        str(size.width), ", ", str(size.height)])
-        self.render(text)
+        self.render()
 
     def on_size(self, event):
         """Handle the canvas resize event."""
@@ -240,17 +245,30 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         if event.GetWheelRotation() < 0:
             self.zoom *= (1.0 + (
                 event.GetWheelRotation() / (20 * event.GetWheelDelta())))
+            
+            if self.zoom > self.max_zoom:
+                self.zoom = self.max_zoom
+            if self.zoom < self.min_zoom:
+                self.zoom = self.min_zoom
+            
             self.init = False
             text = "".join(["Negative mouse wheel rotation. Zoom is now: ",
                             str(self.zoom)])
+
         if event.GetWheelRotation() > 0:
             self.zoom /= (1.0 - (
                 event.GetWheelRotation() / (20 * event.GetWheelDelta())))
+
+            if self.zoom > self.max_zoom:
+                self.zoom = self.max_zoom
+            if self.zoom < self.min_zoom:
+                self.zoom = self.min_zoom
+
             self.init = False
             text = "".join(["Positive mouse wheel rotation. Zoom is now: ",
                             str(self.zoom)])
         if text:
-            self.render(text)
+            self.render()
         """
         #else:
         #    self.Refresh()  # triggers the paint event
@@ -301,21 +319,6 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         GL.glVertex2f(corner[0], corner[1]+height)
         GL.glEnd()
 
-    def render_circle(self, center, radius, color, opacity):
-        if isinstance(color,str):
-            color = self.colormap[color]
-
-        GL.glColor4f(color[0], color[1], color[2], opacity)
-
-        posx, posy = center[0], center[1]    
-        sides = 100
-        GL.glBegin(GL.GL_POLYGON)    
-        for i in range(100):    
-            cosine= radius * cos(i*2*pi/sides) + posx    
-            sine  = radius * sin(i*2*pi/sides) + posy    
-            GL.glVertex2f(cosine,sine)
-        GL.glEnd()
-
     def render_signal(self, corner_y, bits): #corner_y is the y-coordinate of the bottom-left corner of the panel that the signal belongs to
         size = self.GetClientSize()
         x_prev = self.origin_x 
@@ -327,12 +330,12 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         for index, bit in enumerate(bits):
             if x_prev + x_interval >= x_max: #signal about to go outside panel 
                 break
-            if bit in [-0.5,0.5]: #rising
+            if bit in [-0.5, 0.5]: #rising
                 y_next = y_base + (bit + 0.5)*self.signal_height #if -0.5, y is going to be zero; if +0.5, y is going to be 1
-                self.render_line_strip([[x_prev,y_prev],[x_prev + x_interval, y_next]], 'black')
+                self.render_line_strip([[x_prev, y_prev],[x_prev + x_interval, y_next]], 'black')
             elif bit in [0,1]: 
                 y_next = y_base + bit*self.signal_height
-                if index != 0 and bits[index-1] in [0,1]: #transition directly from 0 to 1 or vice versa
+                if index != 0 and bits[index - 1] in [0,1]: #transition directly from 0 to 1 or vice versa
                     self.render_line_strip([[x_prev, y_prev], [x_prev, y_next]], 'black') #ONLY if 0->1 directly allowed (No rising or falling edge) 
                     #self.render_line_strip([[x_prev, y_next], [x_prev + x_interval, y_next]], 'black')
                 #else:
@@ -374,7 +377,6 @@ class Gui(wx.Frame):
         # Configure the file menu
         fileMenu = wx.Menu()
         menuBar = wx.MenuBar()
-        fileMenu.Append(wx.ID_OPEN, "&Open File")
         fileMenu.Append(wx.ID_ABOUT, "&About")
         fileMenu.Append(wx.ID_EXIT, "&Exit")
         menuBar.Append(fileMenu, "&File")
@@ -388,7 +390,7 @@ class Gui(wx.Frame):
 
         #define initial number and maximum allowed number of cycles
         self.num_cycles = 200
-        self.num_cycles_max = 1000
+        self.num_cycles_max = 10000
         
         self.run_network(True, self.num_cycles)
         self.canvas = MyGLCanvas(self) # Canvas for drawing signals
@@ -399,7 +401,7 @@ class Gui(wx.Frame):
         self.button_size = wx.Size(105,30)
         self.text = wx.StaticText(self, wx.ID_ANY, "Cycles", size=self.button_size)
         self.spin = wx.SpinCtrl(self, wx.ID_ANY, value="", pos=wx.DefaultPosition,
-                                size=wx.Size(120,30), style=wx.SP_ARROW_KEYS, min=0, 
+                                size=wx.Size(120,30), style=wx.SP_ARROW_KEYS, min=1, 
                                 max=self.num_cycles_max, initial=self.num_cycles, name="wxSpinCtrl")
         self.run_button = wx.Button(self, wx.ID_ANY, "Run", size=self.button_size)
         self.continue_button = wx.Button(self, wx.ID_ANY, "Continue", size=self.button_size)
@@ -452,45 +454,39 @@ class Gui(wx.Frame):
     def on_menu(self, event):
         """Handle the event when the user selects a menu item."""
         Id = event.GetId()
-        if Id == wx.ID_FILE:
-            open_file_dialog = wx.FileDialog(self, "Open", "", "", 
-                                      "Python files (*.py)|*.py", 
-                                       wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
-            open_file_dialog.ShowModal()
-            print(open_file_dialog.GetPath())
-            #path = open_file_dialog.GetPath()
-            open_file_dialog.Destroy()
-            #TODO enable file loading
-        elif Id == wx.ID_EXIT:
+        if Id == wx.ID_EXIT:
             self.Close(True)
         elif Id == wx.ID_ABOUT:
             wx.MessageBox("Logic Simulator\nCreated by Mojisola Agboola\n2017","About Logsim", wx.ICON_INFORMATION | wx.OK)
 
     def on_spin(self, event):
-        self.on_run_button(None)
+        keycode = event.GetKeyCode()
+        if keycode == wx.WXK_RETURN:
+            self.on_run_button(None)
 
     def on_run_button(self, event):
         """Handle the event when the user clicks the run button."""
         spin_value = self.spin.GetValue()
-        if spin_value > 0:
-            self.canvas.grid_big_value = spin_value/5 #since there are 5 big subdivisions in the grid
-            if spin_value > self.num_cycles: #re-start whole simulation upto new number of cycles
-                self.monitors.reset_monitors()
-                self.run_network(True, spin_value)
-                self.update_canvas_monitors()
-            self.num_cycles = spin_value #update num_cycles
-            self.canvas.render('')
+        self.canvas.grid_big_value = spin_value / 5 #since there are 5 big subdivisions in the grid
+        if spin_value > self.num_cycles: #re-start whole simulation upto new number of cycles
+            self.monitors.reset_monitors()
+            self.run_network(True, spin_value)
+            self.update_canvas_monitors()
+        self.num_cycles = spin_value #update num_cycles
+        self.canvas.render()
 
             #print(self.canvas.devices_monitored[0][2]) #DEBUG
 
     def on_continue_button(self, event):
         spin_value = self.spin.GetValue()
-        if spin_value > 0:
+        if spin_value + self.num_cycles <= self.num_cycles_max:
             self.canvas.grid_big_value = (self.num_cycles + spin_value)/5 #add these cycles to the present number of cycles
             self.run_network(False, spin_value) #don't restart clocks and dtypes
             self.update_canvas_monitors() 
             self.num_cycles = self.num_cycles + spin_value #update num_cycles
-            self.canvas.render('')
+            self.canvas.render()
+        else:
+            print('Cannot run for more than a total of ' + str(self.num_cycles_max) + ' cycles')
 
     def on_add_monitor_name(self, event):
         self.on_add_monitor(None)
@@ -500,55 +496,68 @@ class Gui(wx.Frame):
 
     def on_add_monitor(self, event): 
         device_name = self.add_monitor_name.GetValue()
-        if device_name != "":
+        if device_name:
             name_exists = self.names.query(device_name.split('.')[0]) #if device is multiple output, only query using name
-            if name_exists is None:
-                print('Name does not exist')
-            else:
+            if name_exists is not None:
                 [monitored_list, non_monitored_list] = self.monitors.get_signal_names()
                 if device_name in monitored_list:
-                    print('Device is already being monitored')
-                else: #add device to monitors
+                    print('Error - Device is already being monitored')
+                elif device_name in non_monitored_list: #add device to monitors
                     [device_id,output_id] = self.devices.get_signal_ids(device_name) 
                     self.monitors.make_monitor(device_id, output_id, 0) 
                     self.monitors.reset_monitors()
                     self.run_network(True, self.num_cycles)
                     self.update_canvas_monitors()
-                    self.canvas.render('')
+                    self.canvas.render()
+                    return    
+            print('Error - Device with such name does not exist')
 
     def on_remove_monitor(self, event):
         monitor_name = self.remove_monitor_name.GetValue()
-        if monitor_name != "":
+        if monitor_name:
             for index, device in enumerate(self.canvas.devices_monitored): 
                 if device[1] == monitor_name: #check if device is currently being monitored
                     self.canvas.devices_monitored.pop(index) #remove from canvas monitors
                     [device_id,output_id] = self.devices.get_signal_ids(monitor_name) 
                     self.monitors.remove_monitor(device_id, output_id) #remove from local monitor instance
-                    self.canvas.render('')
+                    self.canvas.render()
                     return
-            print('Device with such name is not being monitored') #searched through canvas monitors, name not found...
+            print('Error - Device with such name is not being monitored') #searched through canvas monitors, name not found...
 
     def on_set_switch_name(self, event):
         self.on_set_switch(None) #run when user presses Enter
 
     def on_set_switch(self, event):
-        input_list = self.set_switch_name.GetValue().split('=')
-        switch_name = input_list[0]
-        switch_state = int(input_list[1])
-        if switch_name != "" and switch_state in [0,1]:
-            name_exists = self.names.query(switch_name)
-            if name_exists is None:
-                print('Switch name does not exist')
-            else:
-                [device_id,output_id] = self.devices.get_signal_ids(switch_name) 
-                if self.devices.set_switch(device_id,switch_state):
-                    self.monitors.reset_monitors()
-                    self.run_network(True, self.num_cycles)
-                    self.update_canvas_monitors()
-                    self.canvas.render('')
-                    print('Switch set successfully')
+        input_list = self.set_switch_name.GetValue()
+        if input_list:
+            input_list = input_list.split('=')
+            switch_name = input_list[0]
+            if switch_name:
+                if len(input_list) == 2:
+                        if input_list[1] in ['0','1']:
+                            switch_state = int(input_list[1])
+                            name_exists = self.names.query(switch_name)
+                            if name_exists is None:
+                                print('Error - Switch name does not exist')
+                            else:
+                                [device_id,output_id] = self.devices.get_signal_ids(switch_name) 
+                                if self.devices.get_device(device_id).device_kind != self.devices.SWITCH:
+                                    print('Error - Input device is not a switch')
+                                else:
+                                    if self.devices.set_switch(device_id,switch_state):
+                                        self.monitors.reset_monitors()
+                                        self.run_network(True, self.num_cycles)
+                                        self.update_canvas_monitors()
+                                        self.canvas.render()
+                                        print('Switch set successfully')
+                                    else:
+                                        print('Error - Failed to set switch')
+                        else:
+                            print('Error - Invalid switch value. Enter 0 or 1 after "="')
                 else:
-                    print('Error - Failed to set switch')
+                    print('Error - must assign value to switch e.g. "sw1=0"')
+            else:
+                print('Invalid switch name')
 
     def run_network(self, restart, num_cycles):
         if restart:
