@@ -334,7 +334,7 @@ class Parser:
         # Next might be comma/semicolon or dot
         [self.symbol_type, self.symbol_id] = self.scanner.get_symbol()
         if self.symbol_type == self.scanner.DOT:
-            no_dot_error, first_port_id = self._parse_dot_structure(
+            no_dot_error, output_id = self._parse_dot_structure(
                                 device,
                                 [self.scanner.COMMA, self.scanner.SEMICOLON],
                                 input=False)
