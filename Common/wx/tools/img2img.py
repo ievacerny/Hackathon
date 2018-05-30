@@ -4,13 +4,13 @@
 #
 # Author:      Robin Dunn
 #
-# Copyright:   (c) 2002-2017 by Total Control Software
+# RCS-ID:      $Id$
+# Copyright:   (c) 2002 by Total Control Software
 # Licence:     wxWindows license
-# Tags:        phoenix-port, py3-port
 #----------------------------------------------------------------------
 # 12/21/2003 - Jeff Grimmett (grimmtooth@softhome.net)
 #
-# o V2.5 compatibility update
+# o V2.5 compatability update 
 #
 
 import  getopt
@@ -21,8 +21,13 @@ import  sys
 import  wx
 
 def convert(file, maskClr, outputDir, outputName, outType, outExt):
-    img = wx.Bitmap(file, wx.BITMAP_TYPE_ANY)
-    if not img.IsOk():
+    if os.path.splitext(file)[1].lower() == ".ico":
+        icon = wx.Icon(file, wx.BITMAP_TYPE_ICO)
+        img = wx.BitmapFromIcon(icon)
+    else:
+        img = wx.Bitmap(file, wx.BITMAP_TYPE_ANY)
+
+    if not img.Ok():
         return 0, file + " failed to load!"
     else:
         if maskClr:
@@ -39,7 +44,7 @@ def convert(file, maskClr, outputDir, outputName, outType, outExt):
         if img.SaveFile(newname, outType):
             return 1, file + " converted to " + newname
         else:
-            img = img.ConvertToImage()
+            img = wx.ImageFromBitmap(img)
             if img.SaveFile(newname, outType):
                 return 1, "ok"
             else:
@@ -50,7 +55,7 @@ def convert(file, maskClr, outputDir, outputName, outType, outExt):
 
 def main(args, outType, outExt, doc):
     if not args or ("-h" in args):
-        print(doc)
+        print doc
         return
 
     outputDir = ""
@@ -60,7 +65,7 @@ def main(args, outType, outExt, doc):
     try:
         opts, fileArgs = getopt.getopt(args, "m:n:o:")
     except getopt.GetoptError:
-        print(__doc__)
+        print __doc__
         return
 
     for opt, val in opts:
@@ -72,7 +77,7 @@ def main(args, outType, outExt, doc):
             outputDir = val
 
     if not fileArgs:
-        print(doc)
+        print doc
         return
 
     for arg in fileArgs:
@@ -81,5 +86,5 @@ def main(args, outType, outExt, doc):
                 continue
             ok, msg = convert(file, maskClr, outputDir, outputName,
                               outType, outExt)
-            print(msg)
+            print msg
 

@@ -6,12 +6,12 @@
 #
 # Version       0.1
 # Date:         Nov 19, 2002
+# RCS-ID:       $Id$
 # Licence:      wxWindows license
-# Tags:         phoenix-port
 #----------------------------------------------------------------------------
 # 12/07/2003 - Jeff Grimmett (grimmtooth@softhome.net)
 #
-# o 2.5 Compatibility changes
+# o 2.5 Compatability changes
 #
 # 12/18/2003 - Jeff Grimmett (grimmtooth@softhome.net)
 #
@@ -27,7 +27,7 @@ import  wx.grid
 
 #----------------------------------------------------------------------------
 # event class and macros
-#
+# 
 # New style 12/7/03
 #
 
@@ -117,11 +117,11 @@ class ColDragWindow(wx.Window):
         self.Bind(wx.EVT_PAINT, self.OnPaint)
 
     def DisplayAt(self,pos,y):
-        x = self.GetPosition()[0]
+        x = self.GetPositionTuple()[0]
         if x == pos:
             self.Refresh()              # Need to display insertion point
         else:
-            self.Move(pos,y)
+            self.MoveXY(pos,y)
 
     def GetMoveColumn(self):
         return self.moveColumn
@@ -160,7 +160,7 @@ class ColDragWindow(wx.Window):
         dc = wx.PaintDC(self)
         w,h = self.GetSize()
         dc.DrawBitmap(self.image, 0,0)
-        dc.SetPen(wx.Pen(wx.BLACK,1,wx.PENSTYLE_SOLID))
+        dc.SetPen(wx.Pen(wx.BLACK,1,wx.SOLID))
         dc.SetBrush(wx.TRANSPARENT_BRUSH)
         dc.DrawRectangle(0,0, w,h)
         iPos = self.GetInsertionPos()
@@ -184,7 +184,7 @@ class RowDragWindow(wx.Window):
         if y == pos:
             self.Refresh()              # Need to display insertion point
         else:
-            self.Move(x,pos)
+            self.MoveXY(x,pos)
 
     def GetMoveRow(self):
         return self.moveRow
@@ -223,7 +223,7 @@ class RowDragWindow(wx.Window):
         dc = wx.PaintDC(self)
         w,h = self.GetSize()
         dc.DrawBitmap(self.image, 0,0)
-        dc.SetPen(wx.Pen(wx.BLACK,1,wx.PENSTYLE_SOLID))
+        dc.SetPen(wx.Pen(wx.BLACK,1,wx.SOLID))
         dc.SetBrush(wx.TRANSPARENT_BRUSH)
         dc.DrawRectangle(0,0, w,h)
         iPos = self.GetInsertionPos()
@@ -248,13 +248,6 @@ class GridColMover(wx.EvtHandler):
         self.Bind(wx.EVT_MOTION, self.OnMouseMove)
         self.Bind(wx.EVT_LEFT_DOWN, self.OnPress)
         self.Bind(wx.EVT_LEFT_UP, self.OnRelease)
-        self.Bind(wx.EVT_WINDOW_DESTROY, self.OnDestroy)
-
-
-    def OnDestroy(self, evt):
-        assert self.lwin.GetEventHandler() is self
-        self.lwin.PopEventHandler(True)
-
 
     def OnMouseMove(self,evt):
         if not self.isDragging:
@@ -263,7 +256,7 @@ class GridColMover(wx.EvtHandler):
             _rlSize = self.grid.GetRowLabelSize()
             if abs(self.startX - evt.X) >= 3 \
                    and abs(evt.X - self.lastX) >= 3:
-                self.lastX = evt.X
+                self.lastX = evt.X 
                 self.didMove = True
                 sx,y = self.grid.GetViewStart()
                 w,h = self.lwin.GetClientSize()
@@ -283,8 +276,8 @@ class GridColMover(wx.EvtHandler):
 
                     self.grid.Scroll(x,y)
 
-                x,y = self.lwin.ClientToScreen(evt.X,0)
-                x,y = self.grid.ScreenToClient(x,y)
+                x,y = self.lwin.ClientToScreenXY(evt.X,0)
+                x,y = self.grid.ScreenToClientXY(x,y)
 
                 if not self.colWin.IsShown():
                     self.colWin.Show(True)
@@ -305,8 +298,8 @@ class GridColMover(wx.EvtHandler):
         _rlSize = self.grid.GetRowLabelSize()
         sx = self.grid.GetViewStart()[0] * self.ux
         sx -= _rlSize
-        px,py = self.lwin.ClientToScreen(evt.X,evt.Y)
-        px,py = self.grid.ScreenToClient(px,py)
+        px,py = self.lwin.ClientToScreenXY(evt.X,evt.Y)
+        px,py = self.grid.ScreenToClientXY(px,py)
 
         if self.grid.XToEdgeOfCol(px + sx) != wx.NOT_FOUND:
             evt.Skip()
@@ -334,8 +327,8 @@ class GridColMover(wx.EvtHandler):
             self.isDragging = False
 
             if not self.didMove:
-                px = self.lwin.ClientToScreen(self.startX,0)[0]
-                px = self.grid.ScreenToClient(px,0)[0]
+                px = self.lwin.ClientToScreenXY(self.startX,0)[0]
+                px = self.grid.ScreenToClientXY(px,0)[0]
                 sx = self.grid.GetViewStart()[0] * self.ux
                 sx -= self.grid.GetRowLabelSize()
                 col = self.grid.XToCol(px+sx)
@@ -354,7 +347,7 @@ class GridColMover(wx.EvtHandler):
         evt.Skip()
 
     def _CaptureImage(self,rect):
-        bmp = wx.Bitmap(rect.width,rect.height)
+        bmp = wx.EmptyBitmap(rect.width,rect.height)
         memdc = wx.MemoryDC()
         memdc.SelectObject(bmp)
         dc = wx.WindowDC(self.lwin)
@@ -380,13 +373,6 @@ class GridRowMover(wx.EvtHandler):
         self.Bind(wx.EVT_MOTION, self.OnMouseMove)
         self.Bind(wx.EVT_LEFT_DOWN, self.OnPress)
         self.Bind(wx.EVT_LEFT_UP, self.OnRelease)
-        self.Bind(wx.EVT_WINDOW_DESTROY, self.OnDestroy)
-
-
-    def OnDestroy(self, evt):
-        assert self.lwin.GetEventHandler() is self
-        self.lwin.PopEventHandler(True)
-
 
     def OnMouseMove(self,evt):
         if not self.isDragging:
@@ -398,7 +384,7 @@ class GridRowMover(wx.EvtHandler):
                 self.lastY = evt.Y
                 self.didMove = True
                 x,sy = self.grid.GetViewStart()
-                w,h = self.lwin.GetClientSize()
+                w,h = self.lwin.GetClientSizeTuple()
                 y = sy * self.uy
 
                 if (evt.Y + y) < y:
@@ -406,9 +392,9 @@ class GridRowMover(wx.EvtHandler):
                 elif evt.Y > h:
                     y += evt.Y - h
 
-                if y < 1:
+                if y < 1: 
                     y = 0
-                else:
+                else: 
                     y /= self.uy
 
                 if y != sy:
@@ -417,15 +403,15 @@ class GridRowMover(wx.EvtHandler):
 
                     self.grid.Scroll(x,y)
 
-                x,y = self.lwin.ClientToScreen(0,evt.Y)
-                x,y = self.grid.ScreenToClient(x,y)
+                x,y = self.lwin.ClientToScreenXY(0,evt.Y)
+                x,y = self.grid.ScreenToClientXY(x,y)
 
                 if not self.rowWin.IsShown():
                     self.rowWin.Show(True)
 
                 py = y - self.cellY
 
-                if py < 0 + _clSize:
+                if py < 0 + _clSize: 
                     py = 0 + _clSize
 
                 if py > h - self.rowWin.GetSize()[1] + _clSize:
@@ -440,22 +426,22 @@ class GridRowMover(wx.EvtHandler):
         _clSize = self.grid.GetColLabelSize()
         sy = self.grid.GetViewStart()[1] * self.uy
         sy -= _clSize
-        px,py = self.lwin.ClientToScreen(evt.X,evt.Y)
-        px,py = self.grid.ScreenToClient(px,py)
+        px,py = self.lwin.ClientToScreenXY(evt.X,evt.Y)
+        px,py = self.grid.ScreenToClientXY(px,py)
 
         if self.grid.YToEdgeOfRow(py + sy) != wx.NOT_FOUND:
             evt.Skip()
             return
 
         row = self.grid.YToRow(py + sy)
-
+                
         if row == wx.NOT_FOUND:
             evt.Skip()
             return
-
+     
         self.isDragging = True
         self.didMove = False
-
+                        
         rect = self.grid.RowToRect(row)
         self.cellY = py + sy - rect.y
         size = self.lwin.GetSize()
@@ -475,8 +461,8 @@ class GridRowMover(wx.EvtHandler):
             self.isDragging = False
 
             if not self.didMove:
-                py = self.lwin.ClientToScreen(0,self.startY)[1]
-                py = self.grid.ScreenToClient(0,py)[1]
+                py = self.lwin.ClientToScreenXY(0,self.startY)[1]
+                py = self.grid.ScreenToClientXY(0,py)[1]
                 sy = self.grid.GetViewStart()[1] * self.uy
                 sy -= self.grid.GetColLabelSize()
                 row = self.grid.YToRow(py + sy)
@@ -495,7 +481,7 @@ class GridRowMover(wx.EvtHandler):
         evt.Skip()
 
     def _CaptureImage(self,rect):
-        bmp = wx.Bitmap(rect.width,rect.height)
+        bmp = wx.EmptyBitmap(rect.width,rect.height)
         memdc = wx.MemoryDC()
         memdc.SelectObject(bmp)
         dc = wx.WindowDC(self.lwin)

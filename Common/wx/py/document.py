@@ -1,6 +1,8 @@
 """Document class."""
 
 __author__ = "Patrick K. O'Brien <pobrien@orbtech.com>"
+__cvsid__ = "$Id$"
+__revision__ = "$Revision$"[11:-2]
 
 import os
 
@@ -23,7 +25,7 @@ class Document:
     def read(self):
         """Return contents of file."""
         if self.filepath and os.path.exists(self.filepath):
-            f = open(self.filepath, 'rb')
+            f = file(self.filepath, 'rb')
             try:
                 return f.read()
             finally:
@@ -34,7 +36,7 @@ class Document:
     def write(self, text):
         """Write text to file."""
         try:
-            f = open(self.filepath, 'wb')
+            f = file(self.filepath, 'wb')
             f.write(text)
         finally:
             if f:

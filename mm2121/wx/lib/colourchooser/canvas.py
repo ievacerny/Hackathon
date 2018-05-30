@@ -14,14 +14,13 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 # 12/14/2003 - Jeff Grimmett (grimmtooth@softhome.net)
 #
-# o 2.5 compatibility update.
+# o 2.5 compatability update.
 #
 # 12/21/2003 - Jeff Grimmett (grimmtooth@softhome.net)
 #
 # o wxPyColorChooser -> PyColorChooser
 # o wxPyColourChooser -> PyColourChooser
 #
-# Tags:     phoenix-port
 
 import  wx
 
@@ -40,11 +39,11 @@ class BitmapBuffer(wx.MemoryDC):
         self.height = height
         self.colour = colour
 
-        self.bitmap = wx.Bitmap(self.width, self.height)
+        self.bitmap = wx.EmptyBitmap(self.width, self.height)
         self.SelectObject(self.bitmap)
 
         # Initialize the buffer to the background colour
-        self.SetBackground(wx.Brush(self.colour, wx.BRUSHSTYLE_SOLID))
+        self.SetBackground(wx.Brush(self.colour, wx.SOLID))
         self.Clear()
 
         # Make each logical unit of the buffer equal to 1 pixel
@@ -58,7 +57,7 @@ class BitmapBuffer(wx.MemoryDC):
     # on OS X so this is a workaround for that issue.
     def GetPixelColour(self, x, y):
         """Gets the color value of the pixel at the given
-        cords.
+        cords. 
 
         """
         img = self.GetAsBitmap().ConvertToImage()
@@ -80,16 +79,13 @@ class Canvas(wx.Window):
     """
     def __init__(self, parent, id,
                  pos=wx.DefaultPosition,
-                 style=wx.SIMPLE_BORDER,
-                 forceClientSize=None):
+                 size=wx.DefaultSize,
+                 style=wx.SIMPLE_BORDER):
         """Creates a canvas instance and initializes the off-screen
         buffer. Also sets the handler for rendering the canvas
         automatically via size and paint calls from the windowing
         system."""
-        wx.Window.__init__(self, parent, id, pos, style=style)
-        if forceClientSize:
-            self.SetMaxClientSize(forceClientSize)
-            self.SetMinClientSize(forceClientSize)
+        wx.Window.__init__(self, parent, id, pos, size, style)
 
         # Perform an intial sizing
         self.ReDraw()
@@ -99,7 +95,7 @@ class Canvas(wx.Window):
         self.Bind(wx.EVT_PAINT, self.onPaint)
 
     def MakeNewBuffer(self):
-        size = self.GetClientSize()
+        size = self.GetSize()
         self.buffer = BitmapBuffer(size[0], size[1],
                                    self.GetBackgroundColour())
 
@@ -129,7 +125,9 @@ class Canvas(wx.Window):
     def Blit(self, dc):
         """Performs the blit of the buffer contents on-screen."""
         width, height = self.buffer.GetSize()
+        dc.BeginDrawing()
         dc.Blit(0, 0, width, height, self.buffer, 0, 0)
+        dc.EndDrawing()
 
     def GetBoundingRect(self):
         """Returns a tuple that contains the co-ordinates of the

@@ -1,10 +1,10 @@
 #----------------------------------------------------------------------------
-# Name:         wx.lib.masked.ctrl.py
+# Name:         wxPython.lib.masked.ctrl.py
 # Author:       Will Sadkin
 # Created:      09/24/2003
 # Copyright:   (c) 2003 by Will Sadkin
+# RCS-ID:      $Id$
 # License:     wxWindows license
-# Tags:        py3-port
 #----------------------------------------------------------------------------
 # 12/09/2003 - Jeff Grimmett (grimmtooth@softhome.net)
 #
@@ -80,7 +80,7 @@ def Ctrl( *args, **kwargs):
     Actually a factory function providing a unifying
     interface for generating masked controls.
     """
-    if 'controlType' not in kwargs:
+    if not kwargs.has_key('controlType'):
         controlType = TEXT
     else:
         controlType = kwargs['controlType']

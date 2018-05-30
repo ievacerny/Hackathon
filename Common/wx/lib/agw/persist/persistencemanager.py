@@ -1,4 +1,5 @@
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-#
+#!/usr/bin/env python
 # --------------------------------------------------------------------------- #
 # PersistentControls Library wxPython IMPLEMENTATION
 #
@@ -19,28 +20,24 @@
 #
 # Or, Obviously, To The wxPython Mailing List!!!
 #
-# Tags:        phoenix-port, unittest, documented, py3-port
-#
 # End Of Comments
 # --------------------------------------------------------------------------- #
 
 """
-This module contains the definitions of :class:`~wx.lib.agw.persist.persitencemanager.PersistentObject`
-and :class:`~wx.lib.agw.persist.persitencemanager.PersistenceManager` objects.
+This module contains the definitions of `PersistentObject` and `PersistenceManager` objects.
 """
 
+import wx
 import os
 import warnings
 import datetime
 
-import wx
-import wx.adv
-import six
+import wx.gizmos
 
-from .persist_handlers import FindHandler, HasCtrlHandler
+from persist_handlers import FindHandler, HasCtrlHandler
 
-from .persist_constants import BAD_DEFAULT_NAMES, CONFIG_PATH_SEPARATOR
-from .persist_constants import PM_DEFAULT_STYLE, PM_PERSIST_CONTROL_VALUE
+from persist_constants import BAD_DEFAULT_NAMES, CONFIG_PATH_SEPARATOR
+from persist_constants import PM_DEFAULT_STYLE, PM_PERSIST_CONTROL_VALUE
 
 # ----------------------------------------------------------------------------------- #
 
@@ -64,9 +61,9 @@ class PersistentObject(object):
         """
         Default class constructor.
 
-        :param `window`: an instance of :class:`wx.Window`;
+        :param `window`: an instance of :class:`Window`;
         :param `persistenceHandler`: if not ``None``, this should a custom handler derived
-         from :class:`~wx.lib.agw.persist.persist_handlers.AbstractHandler`.
+         from :class:`~lib.agw.persist.persist_handlers.AbstractHandler`.
         """
 
         self._name = window.GetName()
@@ -77,7 +74,7 @@ class PersistentObject(object):
         klass = window.__class__
         if issubclass(klass, wx.GenericDirCtrl):
             self._window = window.GetTreeCtrl()
-        elif issubclass(klass, wx.adv.EditableListBox):
+        elif issubclass(klass, wx.gizmos.EditableListBox):
             self._window = window.GetListCtrl()
         else:
             self._window = window
@@ -246,10 +243,6 @@ class PersistenceManager(object):
           ``PM_PERSIST_CONTROL_VALUE``             If set, control values will be persisted. This is handy for e.g. applications using a database, where the data (control value) is persisted in the database and persisting it with PM again would only cause confusion.
           ``PM_DEFAULT_STYLE``                     Same as ``PM_SAVE_RESTORE_AUI_PERSPECTIVES``
           ======================================== ==================================
-
-        :note: An individual window can also set the variable `persistValue` to
-         indicate that its value should be saved/restored even so the style
-         `PM_PERSIST_CONTROL_VALUE` is not set.
 
         :note: UI settings are stored as dictionaries key <=> tuple: the tuple value
          contains two items. The first is the value *type* (i.e., float, int, bool etc...)
@@ -439,11 +432,11 @@ class PersistenceManager(object):
         Checks if the object is registered and return the associated :class:`PersistentObject`
         if it is or ``None`` otherwise.
 
-        :param `window`: an instance of :class:`wx.Window`.
+        :param `window`: an instance of :class:`Window`.
         """
 
         if window:
-            # protect for RuntimeError
+            # protect for PyDeadObjectError
             if window.GetName() in self._persistentObjects:
                 return window
 
@@ -452,9 +445,9 @@ class PersistenceManager(object):
         """
         Register an object with the manager.
 
-        :param `window`: an instance of :class:`wx.Window`;
+        :param `window`: an instance of :class:`Window`;
         :param `persistenceHandler`: if not ``None``, this should a custom handler derived
-         from :class:`~wx.lib.agw.persist.persist_handlers.AbstractHandler`.
+         from :class:`~lib.agw.persist.persist_handlers.AbstractHandler`.
 
         .. note::
 
@@ -484,7 +477,7 @@ class PersistenceManager(object):
         Unregister the object, this is called by :class:`PersistenceManager` itself so there is
         usually no need to do it explicitly.
 
-        :param `window`: an instance of :class:`wx.Window`, which must have been previously
+        :param `window`: an instance of :class:`Window`, which must have been previously
          registered with :meth:`~PersistenceManager.Register`.
 
         :note: For the persistent windows this is done automatically (via :meth:`~PersistenceManager.SaveAndUnregister`)
@@ -508,7 +501,7 @@ class PersistenceManager(object):
         """
         Saves the state of an object.
 
-        :param `window`: an instance of :class:`wx.Window`.
+        :param `window`: an instance of :class:`Window`.
 
         :note: This methods does nothing if :meth:`~PersistenceManager.DisableSaving` was called.
         """
@@ -529,7 +522,7 @@ class PersistenceManager(object):
         """
         Restores the state of an object.
 
-        :param `window`: an instance of :class:`wx.Window`.
+        :param `window`: an instance of :class:`Window`.
 
         :returns: ``True`` if the object properties were restored or ``False`` if nothing
          was found to restore or the saved settings were invalid.
@@ -599,12 +592,12 @@ class PersistenceManager(object):
         """
         Combines both :meth:`~PersistenceManager.Save` and :meth:`~PersistenceManager.Unregister` calls.
 
-        :param `window`: an instance of :class:`wx.Window`. If it is ``None``, all the
+        :param `window`: an instance of :class:`Window`. If it is ``None``, all the
          windows previously registered are saved and then unregistered.
         """
 
         if window is None:
-            for name, obj in list(self._persistentObjects.items()):
+            for name, obj in self._persistentObjects.items():
                 self.SaveAndUnregister(obj.GetWindow())
 
             return
@@ -617,7 +610,7 @@ class PersistenceManager(object):
         """
         Combines both :meth:`~PersistenceManager.Register` and :meth:`~PersistenceManager.Restore` calls.
 
-        :param `window`: an instance of :class:`wx.Window`.
+        :param `window`: an instance of :class:`Window`.
         """
 
         return self.Register(window) and self.Restore(window)
@@ -628,7 +621,7 @@ class PersistenceManager(object):
         Recursively registers and restore the state of the input `window` and of
         all of its children.
 
-        :param `window`: an instance of :class:`wx.Window`;
+        :param `window`: an instance of :class:`Window`;
         :param `children`: list of children of the input `window`, on first call it is equal to ``None``.
         """
 
@@ -657,7 +650,7 @@ class PersistenceManager(object):
         Recursively restore the state of the input `window` and of
         all of its children.
 
-        :param `window`: an instance of :class:`wx.Window`;
+        :param `window`: an instance of :class:`Window`;
         :param `children`: list of children of the input `window`, on first call it is equal to ``None``.
         """
 
@@ -707,13 +700,13 @@ class PersistenceManager(object):
 
         return self._hasRestored
 
-
+    
     @HasRestoredProp.setter
     def HasRestoredProp(self, flag):
         """
         This property keeps track if any of the windows managed by
         :class:`PersistenceManager` has had its settings restored.
-
+        
         :param boolean `flag`: True will be remembered
         """
 
@@ -740,10 +733,7 @@ class PersistenceManager(object):
 
     def SaveCtrlValue(self, obj, keyName, value):
         """
-        Check if we persist the widget value, if so pass it to :meth:`~PersistenceManager.DoSaveValue`,
-        this method checks the style `PM_PERSIST_CONTROL_VALUE` and if it is not
-        set it will also check the variable `persistValue` of the individual
-        window.
+        Check if we persist the widget value, if so pass it to :meth:`~PersistenceManager.DoSaveValue`.
 
         :param `obj`: an instance of :class:`PersistentObject`;
         :param `keyName`: a string specifying the key name;
@@ -751,9 +741,6 @@ class PersistenceManager(object):
         """
 
         if self._style & PM_PERSIST_CONTROL_VALUE:
-            return self.DoSaveValue(obj, keyName, value)
-        elif obj._window.persistValue:
-            # an individual control wants to be saved
             return self.DoSaveValue(obj, keyName, value)
 
 
@@ -785,10 +772,10 @@ class PersistenceManager(object):
         kind = repr(value.__class__).split("'")[1]
 
         if self._customConfigHandler is not None:
-            result = self._customConfigHandler.SaveValue(self.GetKey(obj, keyName), repr((kind, six.text_type(value))))
+            result = self._customConfigHandler.SaveValue(self.GetKey(obj, keyName), repr((kind, str(value))))
         else:
             config = self.GetPersistenceFile()
-            result = config.Write(self.GetKey(obj, keyName), repr((kind, six.text_type(value))))
+            result = config.Write(self.GetKey(obj, keyName), repr((kind, str(value))))
             config.Flush()
 
         return result
@@ -796,19 +783,13 @@ class PersistenceManager(object):
 
     def RestoreCtrlValue(self, obj, keyName):
         """
-        Check if we should restore the widget value, if so pass it to :meth:`~PersistenceManager.DoRestoreValue`,
-        this method checks the style `PM_PERSIST_CONTROL_VALUE` and if if it is
-        not set it will also check the variable `persistValue` of the individual
-        window.
+        Check if we persist the widget value, if so pass it to :meth:`~PersistenceManager.DoRestoreValue`.
 
         :param `obj`: an instance of :class:`PersistentObject`;
         :param `keyName`: a string specifying the key name.
         """
 
         if self._style & PM_PERSIST_CONTROL_VALUE:
-            return self.DoRestoreValue(obj, keyName)
-        elif obj._window.persistValue:
-            # an individual control wants to be saved
             return self.DoRestoreValue(obj, keyName)
 
 

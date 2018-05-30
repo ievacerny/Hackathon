@@ -11,7 +11,7 @@
 # Python Code By:
 #
 # Andrea Gavana, @ 02 Oct 2006
-# Latest Revision: 27 Dec 2012, 21.00 GMT
+# Latest Revision: 15 Feb 2014, 23.00 GMT
 #
 #
 # For All Kind Of Problems, Requests Of Enhancements And Bug Reports, Please
@@ -22,13 +22,12 @@
 #
 # Or, Obviously, To The wxPython Mailing List!!!
 #
-# Tags:        phoenix-port, unittest, documented, py3-port
 #
 # End Of Comments
 # --------------------------------------------------------------------------- #
 
 """
-:class:`~wx.lib.agw.flatnotebook.FlatNotebook` is a full, generic and owner-drawn implementation of :class:`Notebook`.
+:class:`FlatNotebook` is a full, generic and owner-drawn implementation of :class:`Notebook`.
 
 
 Description
@@ -46,7 +45,7 @@ Some features:
 - It is a generic control;
 - Currently there are 6 different styles - VC8, VC 71, Standard, Fancy, Firefox 2 and Ribbon;
 - Mouse middle click can be used to close tabs;
-- A function to add right click menu for tabs (simple as :meth:`~FlatNotebook.SetRightClickMenu`);
+- A function to add right click menu for tabs (simple as meth:~FlatNotebook.SetRightClickMenu`);
 - All styles has bottom style as well (they can be drawn in the bottom of screen);
 - An option to hide 'X' button or navigation buttons (separately);
 - Gradient colouring of the selected tabs and border;
@@ -78,18 +77,18 @@ Usage example::
 
         def __init__(self, parent):
 
-            wx.Frame.__init(self, parent, -1, "FlatNotebook Demo")
+            wx.Frame.__init(self, parent, -1, "FlatNotebook Demo")        
 
             panel = wx.Panel(self)
-
+            
             notebook = fnb.FlatNotebook(panel, -1)
-
-            for i in range(3):
+            
+            for i in xrange(3):
                 caption = "Page %d"%(i+1)
                 notebook.AddPage(self.CreatePage(notebook, caption), caption)
-
+                
             sizer = wx.BoxSizer(wx.VERTICAL)
-            sizer.Add(notebook, 1, wx.ALL | wx.EXPAND, 5)
+            sizer.Add(notebook, 1, wx.ALL|wx.EXPAND, 5)
             panel.SetSizer(sizer)
 
 
@@ -105,8 +104,8 @@ Usage example::
             wx.StaticText(p, -1, caption, (20,20))
             wx.TextCtrl(p, -1, "", (20,40), (150,-1))
             return p
-
-
+        
+        
     # our normal wxApp-derived class, as usual
 
     app = wx.App(0)
@@ -176,10 +175,12 @@ License And Version
 
 :class:`FlatNotebook` is distributed under the wxPython license.
 
-Latest Revision: Andrea Gavana @ 27 Dec 2012, 21.00 GMT
+Latest Revision: Andrea Gavana @ 15 Feb 2014, 23.00 GMT
 
 Version 3.2
 """
+
+__docformat__ = "epytext"
 
 
 #----------------------------------------------------------------------
@@ -190,18 +191,11 @@ import wx
 import random
 import math
 import weakref
-import pickle
-
-import six
+import cPickle
 
 # Used on OSX to get access to carbon api constants
 if wx.Platform == '__WXMAC__':
-    try:
-        import Carbon.Appearance
-    except ImportError:
-        CARBON = False
-    else:
-        CARBON = True
+    import Carbon.Appearance
 
 # Check for the new method in 2.7 (not present in 2.6.3.3)
 if wx.VERSION_STRING < "2.7":
@@ -368,398 +362,398 @@ EVT_FLATNOTEBOOK_PAGE_DROPPED_FOREIGN = wx.PyEventBinder(wxEVT_FLATNOTEBOOK_PAGE
 # Some icons in XPM format
 
 left_arrow_disabled_xpm = [
-    b"    16    16        8            1",
-    b"` c #008080",
-    b". c #555555",
-    b"# c #000000",
-    b"a c #000000",
-    b"b c #000000",
-    b"c c #000000",
-    b"d c #000000",
-    b"e c #000000",
-    b"````````````````",
-    b"````````````````",
-    b"````````````````",
-    b"````````.```````",
-    b"```````..```````",
-    b"``````.`.```````",
-    b"`````.``.```````",
-    b"````.```.```````",
-    b"`````.``.```````",
-    b"``````.`.```````",
-    b"```````..```````",
-    b"````````.```````",
-    b"````````````````",
-    b"````````````````",
-    b"````````````````",
-    b"````````````````"
+    "    16    16        8            1",
+    "` c #008080",
+    ". c #555555",
+    "# c #000000",
+    "a c #000000",
+    "b c #000000",
+    "c c #000000",
+    "d c #000000",
+    "e c #000000",
+    "````````````````",
+    "````````````````",
+    "````````````````",
+    "````````.```````",
+    "```````..```````",
+    "``````.`.```````",
+    "`````.``.```````",
+    "````.```.```````",
+    "`````.``.```````",
+    "``````.`.```````",
+    "```````..```````",
+    "````````.```````",
+    "````````````````",
+    "````````````````",
+    "````````````````",
+    "````````````````"
     ]
 
 x_button_pressed_xpm = [
-    b"    16    16        8            1",
-    b"` c #008080",
-    b". c #4766e0",
-    b"# c #9e9ede",
-    b"a c #000000",
-    b"b c #000000",
-    b"c c #000000",
-    b"d c #000000",
-    b"e c #000000",
-    b"````````````````",
-    b"`..............`",
-    b"`.############.`",
-    b"`.############.`",
-    b"`.############.`",
-    b"`.###aa####aa#.`",
-    b"`.####aa##aa##.`",
-    b"`.#####aaaa###.`",
-    b"`.######aa####.`",
-    b"`.#####aaaa###.`",
-    b"`.####aa##aa##.`",
-    b"`.###aa####aa#.`",
-    b"`.############.`",
-    b"`..............`",
-    b"````````````````",
-    b"````````````````"
+    "    16    16        8            1",
+    "` c #008080",
+    ". c #4766e0",
+    "# c #9e9ede",
+    "a c #000000",
+    "b c #000000",
+    "c c #000000",
+    "d c #000000",
+    "e c #000000",
+    "````````````````",
+    "`..............`",
+    "`.############.`",
+    "`.############.`",
+    "`.############.`",
+    "`.###aa####aa#.`",
+    "`.####aa##aa##.`",
+    "`.#####aaaa###.`",
+    "`.######aa####.`",
+    "`.#####aaaa###.`",
+    "`.####aa##aa##.`",
+    "`.###aa####aa#.`",
+    "`.############.`",
+    "`..............`",
+    "````````````````",
+    "````````````````"
     ]
 
 
 left_arrow_xpm = [
-    b"    16    16        8            1",
-    b"` c #008080",
-    b". c #555555",
-    b"# c #000000",
-    b"a c #000000",
-    b"b c #000000",
-    b"c c #000000",
-    b"d c #000000",
-    b"e c #000000",
-    b"````````````````",
-    b"````````````````",
-    b"````````````````",
-    b"````````.```````",
-    b"```````..```````",
-    b"``````...```````",
-    b"`````....```````",
-    b"````.....```````",
-    b"`````....```````",
-    b"``````...```````",
-    b"```````..```````",
-    b"````````.```````",
-    b"````````````````",
-    b"````````````````",
-    b"````````````````",
-    b"````````````````"
+    "    16    16        8            1",
+    "` c #008080",
+    ". c #555555",
+    "# c #000000",
+    "a c #000000",
+    "b c #000000",
+    "c c #000000",
+    "d c #000000",
+    "e c #000000",
+    "````````````````",
+    "````````````````",
+    "````````````````",
+    "````````.```````",
+    "```````..```````",
+    "``````...```````",
+    "`````....```````",
+    "````.....```````",
+    "`````....```````",
+    "``````...```````",
+    "```````..```````",
+    "````````.```````",
+    "````````````````",
+    "````````````````",
+    "````````````````",
+    "````````````````"
     ]
 
 x_button_hilite_xpm = [
-    b"    16    16        8            1",
-    b"` c #008080",
-    b". c #4766e0",
-    b"# c #c9dafb",
-    b"a c #000000",
-    b"b c #000000",
-    b"c c #000000",
-    b"d c #000000",
-    b"e c #000000",
-    b"````````````````",
-    b"`..............`",
-    b"`.############.`",
-    b"`.############.`",
-    b"`.##aa####aa##.`",
-    b"`.###aa##aa###.`",
-    b"`.####aaaa####.`",
-    b"`.#####aa#####.`",
-    b"`.####aaaa####.`",
-    b"`.###aa##aa###.`",
-    b"`.##aa####aa##.`",
-    b"`.############.`",
-    b"`.############.`",
-    b"`..............`",
-    b"````````````````",
-    b"````````````````"
+    "    16    16        8            1",
+    "` c #008080",
+    ". c #4766e0",
+    "# c #c9dafb",
+    "a c #000000",
+    "b c #000000",
+    "c c #000000",
+    "d c #000000",
+    "e c #000000",
+    "````````````````",
+    "`..............`",
+    "`.############.`",
+    "`.############.`",
+    "`.##aa####aa##.`",
+    "`.###aa##aa###.`",
+    "`.####aaaa####.`",
+    "`.#####aa#####.`",
+    "`.####aaaa####.`",
+    "`.###aa##aa###.`",
+    "`.##aa####aa##.`",
+    "`.############.`",
+    "`.############.`",
+    "`..............`",
+    "````````````````",
+    "````````````````"
     ]
 
 x_button_xpm = [
-    b"    16    16        8            1",
-    b"` c #008080",
-    b". c #555555",
-    b"# c #000000",
-    b"a c #000000",
-    b"b c #000000",
-    b"c c #000000",
-    b"d c #000000",
-    b"e c #000000",
-    b"````````````````",
-    b"````````````````",
-    b"````````````````",
-    b"````````````````",
-    b"````..````..````",
-    b"`````..``..`````",
-    b"``````....``````",
-    b"```````..```````",
-    b"``````....``````",
-    b"`````..``..`````",
-    b"````..````..````",
-    b"````````````````",
-    b"````````````````",
-    b"````````````````",
-    b"````````````````",
-    b"````````````````"
+    "    16    16        8            1",
+    "` c #008080",
+    ". c #555555",
+    "# c #000000",
+    "a c #000000",
+    "b c #000000",
+    "c c #000000",
+    "d c #000000",
+    "e c #000000",
+    "````````````````",
+    "````````````````",
+    "````````````````",
+    "````````````````",
+    "````..````..````",
+    "`````..``..`````",
+    "``````....``````",
+    "```````..```````",
+    "``````....``````",
+    "`````..``..`````",
+    "````..````..````",
+    "````````````````",
+    "````````````````",
+    "````````````````",
+    "````````````````",
+    "````````````````"
     ]
 
 left_arrow_pressed_xpm = [
-    b"    16    16        8            1",
-    b"` c #008080",
-    b". c #4766e0",
-    b"# c #9e9ede",
-    b"a c #000000",
-    b"b c #000000",
-    b"c c #000000",
-    b"d c #000000",
-    b"e c #000000",
-    b"````````````````",
-    b"`..............`",
-    b"`.############.`",
-    b"`.############.`",
-    b"`.#######a####.`",
-    b"`.######aa####.`",
-    b"`.#####aaa####.`",
-    b"`.####aaaa####.`",
-    b"`.###aaaaa####.`",
-    b"`.####aaaa####.`",
-    b"`.#####aaa####.`",
-    b"`.######aa####.`",
-    b"`.#######a####.`",
-    b"`..............`",
-    b"````````````````",
-    b"````````````````"
+    "    16    16        8            1",
+    "` c #008080",
+    ". c #4766e0",
+    "# c #9e9ede",
+    "a c #000000",
+    "b c #000000",
+    "c c #000000",
+    "d c #000000",
+    "e c #000000",
+    "````````````````",
+    "`..............`",
+    "`.############.`",
+    "`.############.`",
+    "`.#######a####.`",
+    "`.######aa####.`",
+    "`.#####aaa####.`",
+    "`.####aaaa####.`",
+    "`.###aaaaa####.`",
+    "`.####aaaa####.`",
+    "`.#####aaa####.`",
+    "`.######aa####.`",
+    "`.#######a####.`",
+    "`..............`",
+    "````````````````",
+    "````````````````"
     ]
 
 left_arrow_hilite_xpm = [
-    b"    16    16        8            1",
-    b"` c #008080",
-    b". c #4766e0",
-    b"# c #c9dafb",
-    b"a c #000000",
-    b"b c #000000",
-    b"c c #000000",
-    b"d c #000000",
-    b"e c #000000",
-    b"````````````````",
-    b"`..............`",
-    b"`.############.`",
-    b"`.######a#####.`",
-    b"`.#####aa#####.`",
-    b"`.####aaa#####.`",
-    b"`.###aaaa#####.`",
-    b"`.##aaaaa#####.`",
-    b"`.###aaaa#####.`",
-    b"`.####aaa#####.`",
-    b"`.#####aa#####.`",
-    b"`.######a#####.`",
-    b"`.############.`",
-    b"`..............`",
-    b"````````````````",
-    b"````````````````"
+    "    16    16        8            1",
+    "` c #008080",
+    ". c #4766e0",
+    "# c #c9dafb",
+    "a c #000000",
+    "b c #000000",
+    "c c #000000",
+    "d c #000000",
+    "e c #000000",
+    "````````````````",
+    "`..............`",
+    "`.############.`",
+    "`.######a#####.`",
+    "`.#####aa#####.`",
+    "`.####aaa#####.`",
+    "`.###aaaa#####.`",
+    "`.##aaaaa#####.`",
+    "`.###aaaa#####.`",
+    "`.####aaa#####.`",
+    "`.#####aa#####.`",
+    "`.######a#####.`",
+    "`.############.`",
+    "`..............`",
+    "````````````````",
+    "````````````````"
     ]
 
 right_arrow_disabled_xpm = [
-    b"    16    16        8            1",
-    b"` c #008080",
-    b". c #555555",
-    b"# c #000000",
-    b"a c #000000",
-    b"b c #000000",
-    b"c c #000000",
-    b"d c #000000",
-    b"e c #000000",
-    b"````````````````",
-    b"````````````````",
-    b"````````````````",
-    b"```````.````````",
-    b"```````..```````",
-    b"```````.`.``````",
-    b"```````.``.`````",
-    b"```````.```.````",
-    b"```````.``.`````",
-    b"```````.`.``````",
-    b"```````..```````",
-    b"```````.````````",
-    b"````````````````",
-    b"````````````````",
-    b"````````````````",
-    b"````````````````"
+    "    16    16        8            1",
+    "` c #008080",
+    ". c #555555",
+    "# c #000000",
+    "a c #000000",
+    "b c #000000",
+    "c c #000000",
+    "d c #000000",
+    "e c #000000",
+    "````````````````",
+    "````````````````",
+    "````````````````",
+    "```````.````````",
+    "```````..```````",
+    "```````.`.``````",
+    "```````.``.`````",
+    "```````.```.````",
+    "```````.``.`````",
+    "```````.`.``````",
+    "```````..```````",
+    "```````.````````",
+    "````````````````",
+    "````````````````",
+    "````````````````",
+    "````````````````"
     ]
 
 right_arrow_hilite_xpm = [
-    b"    16    16        8            1",
-    b"` c #008080",
-    b". c #4766e0",
-    b"# c #c9dafb",
-    b"a c #000000",
-    b"b c #000000",
-    b"c c #000000",
-    b"d c #000000",
-    b"e c #000000",
-    b"````````````````",
-    b"`..............`",
-    b"`.############.`",
-    b"`.####a#######.`",
-    b"`.####aa######.`",
-    b"`.####aaa#####.`",
-    b"`.####aaaa####.`",
-    b"`.####aaaaa###.`",
-    b"`.####aaaa####.`",
-    b"`.####aaa#####.`",
-    b"`.####aa######.`",
-    b"`.####a#######.`",
-    b"`.############.`",
-    b"`..............`",
-    b"````````````````",
-    b"````````````````"
+    "    16    16        8            1",
+    "` c #008080",
+    ". c #4766e0",
+    "# c #c9dafb",
+    "a c #000000",
+    "b c #000000",
+    "c c #000000",
+    "d c #000000",
+    "e c #000000",
+    "````````````````",
+    "`..............`",
+    "`.############.`",
+    "`.####a#######.`",
+    "`.####aa######.`",
+    "`.####aaa#####.`",
+    "`.####aaaa####.`",
+    "`.####aaaaa###.`",
+    "`.####aaaa####.`",
+    "`.####aaa#####.`",
+    "`.####aa######.`",
+    "`.####a#######.`",
+    "`.############.`",
+    "`..............`",
+    "````````````````",
+    "````````````````"
     ]
 
 right_arrow_pressed_xpm = [
-    b"    16    16        8            1",
-    b"` c #008080",
-    b". c #4766e0",
-    b"# c #9e9ede",
-    b"a c #000000",
-    b"b c #000000",
-    b"c c #000000",
-    b"d c #000000",
-    b"e c #000000",
-    b"````````````````",
-    b"`..............`",
-    b"`.############.`",
-    b"`.############.`",
-    b"`.#####a######.`",
-    b"`.#####aa#####.`",
-    b"`.#####aaa####.`",
-    b"`.#####aaaa###.`",
-    b"`.#####aaaaa##.`",
-    b"`.#####aaaa###.`",
-    b"`.#####aaa####.`",
-    b"`.#####aa#####.`",
-    b"`.#####a######.`",
-    b"`..............`",
-    b"````````````````",
-    b"````````````````"
+    "    16    16        8            1",
+    "` c #008080",
+    ". c #4766e0",
+    "# c #9e9ede",
+    "a c #000000",
+    "b c #000000",
+    "c c #000000",
+    "d c #000000",
+    "e c #000000",
+    "````````````````",
+    "`..............`",
+    "`.############.`",
+    "`.############.`",
+    "`.#####a######.`",
+    "`.#####aa#####.`",
+    "`.#####aaa####.`",
+    "`.#####aaaa###.`",
+    "`.#####aaaaa##.`",
+    "`.#####aaaa###.`",
+    "`.#####aaa####.`",
+    "`.#####aa#####.`",
+    "`.#####a######.`",
+    "`..............`",
+    "````````````````",
+    "````````````````"
     ]
 
 
 right_arrow_xpm = [
-    b"    16    16        8            1",
-    b"` c #008080",
-    b". c #555555",
-    b"# c #000000",
-    b"a c #000000",
-    b"b c #000000",
-    b"c c #000000",
-    b"d c #000000",
-    b"e c #000000",
-    b"````````````````",
-    b"````````````````",
-    b"````````````````",
-    b"```````.````````",
-    b"```````..```````",
-    b"```````...``````",
-    b"```````....`````",
-    b"```````.....````",
-    b"```````....`````",
-    b"```````...``````",
-    b"```````..```````",
-    b"```````.````````",
-    b"````````````````",
-    b"````````````````",
-    b"````````````````",
-    b"````````````````"
+    "    16    16        8            1",
+    "` c #008080",
+    ". c #555555",
+    "# c #000000",
+    "a c #000000",
+    "b c #000000",
+    "c c #000000",
+    "d c #000000",
+    "e c #000000",
+    "````````````````",
+    "````````````````",
+    "````````````````",
+    "```````.````````",
+    "```````..```````",
+    "```````...``````",
+    "```````....`````",
+    "```````.....````",
+    "```````....`````",
+    "```````...``````",
+    "```````..```````",
+    "```````.````````",
+    "````````````````",
+    "````````````````",
+    "````````````````",
+    "````````````````"
     ]
 
 down_arrow_hilite_xpm = [
-    b"    16    16        8            1",
-    b"` c #008080",
-    b". c #4766e0",
-    b"# c #c9dafb",
-    b"a c #000000",
-    b"b c #000000",
-    b"c c #000000",
-    b"d c #000000",
-    b"e c #000000",
-    b"````````````````",
-    b"``.............`",
-    b"``.###########.`",
-    b"``.###########.`",
-    b"``.###########.`",
-    b"``.#aaaaaaaaa#.`",
-    b"``.##aaaaaaa##.`",
-    b"``.###aaaaa###.`",
-    b"``.####aaa####.`",
-    b"``.#####a#####.`",
-    b"``.###########.`",
-    b"``.###########.`",
-    b"``.###########.`",
-    b"``.............`",
-    b"````````````````",
-    b"````````````````"
+    "    16    16        8            1",
+    "` c #008080",
+    ". c #4766e0",
+    "# c #c9dafb",
+    "a c #000000",
+    "b c #000000",
+    "c c #000000",
+    "d c #000000",
+    "e c #000000",
+    "````````````````",
+    "``.............`",
+    "``.###########.`",
+    "``.###########.`",
+    "``.###########.`",
+    "``.#aaaaaaaaa#.`",
+    "``.##aaaaaaa##.`",
+    "``.###aaaaa###.`",
+    "``.####aaa####.`",
+    "``.#####a#####.`",
+    "``.###########.`",
+    "``.###########.`",
+    "``.###########.`",
+    "``.............`",
+    "````````````````",
+    "````````````````"
     ]
 
 down_arrow_pressed_xpm = [
-    b"    16    16        8            1",
-    b"` c #008080",
-    b". c #4766e0",
-    b"# c #9e9ede",
-    b"a c #000000",
-    b"b c #000000",
-    b"c c #000000",
-    b"d c #000000",
-    b"e c #000000",
-    b"````````````````",
-    b"``.............`",
-    b"``.###########.`",
-    b"``.###########.`",
-    b"``.###########.`",
-    b"``.###########.`",
-    b"``.###########.`",
-    b"``.#aaaaaaaaa#.`",
-    b"``.##aaaaaaa##.`",
-    b"``.###aaaaa###.`",
-    b"``.####aaa####.`",
-    b"``.#####a#####.`",
-    b"``.###########.`",
-    b"``.............`",
-    b"````````````````",
-    b"````````````````"
+    "    16    16        8            1",
+    "` c #008080",
+    ". c #4766e0",
+    "# c #9e9ede",
+    "a c #000000",
+    "b c #000000",
+    "c c #000000",
+    "d c #000000",
+    "e c #000000",
+    "````````````````",
+    "``.............`",
+    "``.###########.`",
+    "``.###########.`",
+    "``.###########.`",
+    "``.###########.`",
+    "``.###########.`",
+    "``.#aaaaaaaaa#.`",
+    "``.##aaaaaaa##.`",
+    "``.###aaaaa###.`",
+    "``.####aaa####.`",
+    "``.#####a#####.`",
+    "``.###########.`",
+    "``.............`",
+    "````````````````",
+    "````````````````"
     ]
 
 
 down_arrow_xpm = [
-    b"    16    16        8            1",
-    b"` c #008080",
-    b". c #000000",
-    b"# c #000000",
-    b"a c #000000",
-    b"b c #000000",
-    b"c c #000000",
-    b"d c #000000",
-    b"e c #000000",
-    b"````````````````",
-    b"````````````````",
-    b"````````````````",
-    b"````````````````",
-    b"````````````````",
-    b"````````````````",
-    b"````.........```",
-    b"`````.......````",
-    b"``````.....`````",
-    b"```````...``````",
-    b"````````.```````",
-    b"````````````````",
-    b"````````````````",
-    b"````````````````",
-    b"````````````````",
-    b"````````````````"
+    "    16    16        8            1",
+    "` c #008080",
+    ". c #000000",
+    "# c #000000",
+    "a c #000000",
+    "b c #000000",
+    "c c #000000",
+    "d c #000000",
+    "e c #000000",
+    "````````````````",
+    "````````````````",
+    "````````````````",
+    "````````````````",
+    "````````````````",
+    "````````````````",
+    "````.........```",
+    "`````.......````",
+    "``````.....`````",
+    "```````...``````",
+    "````````.```````",
+    "````````````````",
+    "````````````````",
+    "````````````````",
+    "````````````````",
+    "````````````````"
     ]
 
 
@@ -779,7 +773,7 @@ def LightColour(colour, percent):
     """
     Brighten the input colour by a percentage.
 
-    :param `colour`: a valid :class:`wx.Colour` instance;
+    :param `colour`: a valid :class:`Colour` instance;
     :param `percent`: the percentage by which the input colour should be brightened.
     """
 
@@ -796,24 +790,25 @@ def LightColour(colour, percent):
     r = colour.Red() + ((i*rd*100)/high)/100
     g = colour.Green() + ((i*gd*100)/high)/100
     b = colour.Blue() + ((i*bd*100)/high)/100
-    a = colour.Alpha()
-    return wx.Colour(int(r), int(g), int(b), int(a))
+    return wx.Colour(r, g, b)
 
 
 def FormatColour(colour):
     """
-    Convert the input `colour` into a valid :class:`wx.Colour` instance, using whatever typemap
+    Convert the input `colour` into a valid :class:`Colour` instance, using whatever typemap
     accepted by wxWidgets/wxPython.
-
-    :param `colour`: can be an instance of :class:`wx.Colour`, a 3 or 4 integer tuple, a hex
+    
+    :param `colour`: can be an instance of :class:`Colour`, a 3 or 4 integer tuple, a hex
      string, a string representing the colour name or ``None``.
 
-    :returns: a valid instance of :class:`wx.Colour` or ``None`` if the input `colour` was ``None``
+    :returns: a valid instance of :class:`Colour` or ``None`` if the input `colour` was ``None``
      in the first place.
     """
 
-    if colour is not None:
-        colour = wx.Colour(colour)
+    if isinstance(colour, (list, tuple)):
+        colour = wx.Colour(*colour)
+    elif isinstance(colour, basestring):
+        colour = wx.NamedColour(colour)
 
     return colour
 
@@ -821,9 +816,9 @@ def FormatColour(colour):
 def RandomColour():
     """ Creates a random colour. """
 
-    r = random.randint(0, 255) # Random value between 0-255
-    g = random.randint(0, 255) # Random value between 0-255
-    b = random.randint(0, 255) # Random value between 0-255
+    r = random.randint(0, 255) # Random value betweem 0-255
+    g = random.randint(0, 255) # Random value betweem 0-255
+    b = random.randint(0, 255) # Random value betweem 0-255
 
     return wx.Colour(r, g, b)
 
@@ -832,7 +827,7 @@ def PaintStraightGradientBox(dc, rect, startColour, endColour, vertical=True):
     """
     Draws a gradient coloured box from `startColour` to `endColour`.
 
-    :param `dc`: an instance of :class:`wx.DC`;
+    :param `dc`: an instance of :class:`DC`;
     :param `rect`: the rectangle to fill with the gradient shading;
     :param `startColour`: the first colour in the gradient shading;
     :param `endColour`: the last colour in the gradient shading;
@@ -856,7 +851,7 @@ def PaintStraightGradientBox(dc, rect, startColour, endColour, vertical=True):
     if high < 1:
         return
 
-    for i in range(high+1):
+    for i in xrange(high+1):
 
         r = startColour.Red() + ((i*rd*100)/high)/100
         g = startColour.Green() + ((i*gd*100)/high)/100
@@ -879,7 +874,7 @@ def AdjustColour(colour, percent, alpha=wx.ALPHA_OPAQUE):
     """
     Brighten/darken input colour by `percent` and adjust `alpha` channel if needed.
 
-    :param `colour`: colour object to adjust, an instance of :class:`wx.Colour`;
+    :param `colour`: colour object to adjust, an instance of :class:`Colour`;
     :param `percent`: percent to adjust ``+`` (brighten) or ``-`` (darken);
     :param `alpha`: amount to adjust the alpha channel.
 
@@ -900,8 +895,10 @@ def AdjustColour(colour, percent, alpha=wx.ALPHA_OPAQUE):
     return wx.Colour(red, green, blue, alpha)
 
 
-
-from wx.lib.colourutils import AdjustColour as adjust_colour
+if wx.VERSION_STRING < "2.8.9.2":
+    adjust_colour = AdjustColour
+else:
+    from wx.lib.colourutils import AdjustColour as adjust_colour
 
 
 # -----------------------------------------------------------------------------
@@ -912,7 +909,7 @@ def DrawButton(dc, rect, focus, upperTabs):
     """
     Draws a :class:`FlatNotebook` tab.
 
-    :param `dc`: an instance of :class:`wx.DC`;
+    :param `dc`: an instance of :class:`DC`;
     :param `rect`: the tab's client rectangle;
     :param `focus`: ``True`` if the tab has focus, ``False`` otherwise;
     :param `upperTabs`: ``True`` if the tabs are at the top, ``False`` if they are
@@ -921,7 +918,7 @@ def DrawButton(dc, rect, focus, upperTabs):
 
     # Define the rounded rectangle base on the given rect
     # we need an array of 9 points for it
-    regPts = [wx.Point() for indx in range(9)]
+    regPts = [wx.Point() for indx in xrange(9)]
 
     if focus:
         if upperTabs:
@@ -935,15 +932,15 @@ def DrawButton(dc, rect, focus, upperTabs):
         rightPt = wx.Point(rect.x + rect.width - 2, rect.y + (rect.height / 2))
 
     # Define the top region
-    top = wx.Rect(rect.GetTopLeft(), rightPt)
-    bottom = wx.Rect(leftPt, rect.GetBottomRight())
+    top = wx.RectPP(rect.GetTopLeft(), rightPt)
+    bottom = wx.RectPP(leftPt, rect.GetBottomRight())
 
     topStartColour = wx.WHITE
 
     if not focus:
-        topStartColour = LightColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_3DFACE), 50)
+        topStartColour = LightColour(wx.SystemSettings_GetColour(wx.SYS_COLOUR_3DFACE), 50)
 
-    topEndColour = wx.SystemSettings.GetColour(wx.SYS_COLOUR_3DFACE)
+    topEndColour = wx.SystemSettings_GetColour(wx.SYS_COLOUR_3DFACE)
     bottomStartColour = topEndColour
     bottomEndColour = topEndColour
 
@@ -1074,7 +1071,7 @@ class FNBDropTarget(wx.DropTarget):
         wx.DropTarget.__init__(self)
 
         self._parent = parent
-        self._dataobject = wx.CustomDataObject(wx.DataFormat(six.u('FlatNotebook')))
+        self._dataobject = wx.CustomDataObject(wx.CustomDataFormat("FlatNotebook"))
         self.SetDataObject(self._dataobject)
 
 
@@ -1093,7 +1090,7 @@ class FNBDropTarget(wx.DropTarget):
             return wx.DragNone
 
         draginfo = self._dataobject.GetData()
-        drginfo = pickle.loads(draginfo)
+        drginfo = cPickle.loads(draginfo)
 
         return self._parent.OnDropTarget(x, y, drginfo.GetPageIndex(), drginfo.GetContainer())
 
@@ -1115,7 +1112,7 @@ class PageInfo(object):
 
         :param `caption`: the tab caption;
         :param `imageindex`: the tab image index based on the assigned (set)
-         :class:`wx.ImageList` (if any);
+         :class:`ImageList` (if any);
         :param `tabangle`: the tab angle (only on standard tabs, from 0 to 15
          degrees);
         :param `enabled`: sets the tab as enabled or disabled.
@@ -1154,7 +1151,7 @@ class PageInfo(object):
         """
         Sets the tab position.
 
-        :param `value`: an instance of :class:`wx.Point`.
+        :param `value`: an instance of :class:`Point`.
         """
 
         self._pos = value
@@ -1170,7 +1167,7 @@ class PageInfo(object):
         """
         Sets the tab size.
 
-        :param `value`: an instance of :class:`wx.Size`.
+        :param `value`: an instance of :class:`Size`.
         """
 
         self._size = value
@@ -1228,7 +1225,7 @@ class PageInfo(object):
         """
         Sets the tab text colour for this tab.
 
-        :param `colour`: an instance of :class:`wx.Colour`. You can pass ``None`` or
+        :param `colour`: an instance of :class:`Colour`. You can pass ``None`` or
          :class:`NullColour` to return to the default page text colour.
         """
 
@@ -1260,10 +1257,10 @@ class PageInfo(object):
         """
         Sets the tab region.
 
-        :param `points`: a Python list of :class:`wx.Point`
+        :param `points`: a Python list of :class:`Point`
         """
 
-        self._region = wx.Region(points)
+        self._region = wx.RegionFromPoints(points)
 
 
     def GetRegion(self):
@@ -1276,7 +1273,7 @@ class PageInfo(object):
         """
         Sets the button 'X' area rect.
 
-        :param `xrect`: an instance of :class:`wx.Rect`, specifying the client rectangle
+        :param `xrect`: an instance of :class:`Rect`, specifying the client rectangle
          of the 'X' button.
         """
 
@@ -1299,7 +1296,7 @@ class PageInfo(object):
         """
         Sets the tab colour.
 
-        :param `colour`: a valid :class:`wx.Colour` object or any typemap supported by wxWidgets/wxPython
+        :param `colour`: a valid :class:`Colour` object or any typemap supported by wxWidgets/wxPython
          to generate a colour (i.e., a hex string, a colour name, a 3 or 4 integer tuple).
         """
 
@@ -1479,7 +1476,7 @@ class TabNavigatorWindow(wx.Dialog):
         Used internally.
 
         :param `parent`: the :class:`TabNavigatorWindow` parent window;
-        :param `icon`: a valid :class:`wx.Bitmap` object representing the icon to be displayed
+        :param `icon`: a valid :class:`Bitmap` object representing the icon to be displayed
          in the :class:`TabNavigatorWindow`.
         """
 
@@ -1498,9 +1495,9 @@ class TabNavigatorWindow(wx.Dialog):
         self._listBox = wx.ListBox(self, wx.ID_ANY, wx.DefaultPosition, wx.Size(200, 150), [], wx.LB_SINGLE | wx.NO_BORDER)
 
         mem_dc = wx.MemoryDC()
-        mem_dc.SelectObject(wx.Bitmap(1,1))
-        font = wx.SystemSettings.GetFont(wx.SYS_DEFAULT_GUI_FONT)
-        font.SetWeight(wx.FONTWEIGHT_BOLD)
+        mem_dc.SelectObject(wx.EmptyBitmap(1,1))
+        font = wx.SystemSettings_GetFont(wx.SYS_DEFAULT_GUI_FONT)
+        font.SetWeight(wx.BOLD)
         mem_dc.SetFont(font)
 
         panelHeight = mem_dc.GetCharHeight()
@@ -1526,8 +1523,8 @@ class TabNavigatorWindow(wx.Dialog):
         self._panel.Bind(wx.EVT_PAINT, self.OnPanelPaint)
         self._panel.Bind(wx.EVT_ERASE_BACKGROUND, self.OnPanelEraseBg)
 
-        self.SetBackgroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_3DFACE))
-        self._listBox.SetBackgroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_3DFACE))
+        self.SetBackgroundColour(wx.SystemSettings_GetColour(wx.SYS_COLOUR_3DFACE))
+        self._listBox.SetBackgroundColour(wx.SystemSettings_GetColour(wx.SYS_COLOUR_3DFACE))
         self.PopulateListControl(parent)
 
         self.GetSizer().Fit(self)
@@ -1603,7 +1600,7 @@ class TabNavigatorWindow(wx.Dialog):
             self._listBox.Append(book.GetPageText(prevSel))
             self._indexMap.append(prevSel)
 
-        for c in range(count):
+        for c in xrange(count):
 
             # Skip selected page
             if c == selection:
@@ -1656,12 +1653,12 @@ class TabNavigatorWindow(wx.Dialog):
         dc = wx.PaintDC(self._panel)
         rect = self._panel.GetClientRect()
 
-        bmp = wx.Bitmap(rect.width, rect.height)
+        bmp = wx.EmptyBitmap(rect.width, rect.height)
 
         mem_dc = wx.MemoryDC()
         mem_dc.SelectObject(bmp)
 
-        endColour = wx.SystemSettings.GetColour(wx.SYS_COLOUR_BTNSHADOW)
+        endColour = wx.SystemSettings_GetColour(wx.SYS_COLOUR_BTNSHADOW)
         startColour = LightColour(endColour, 50)
         PaintStraightGradientBox(mem_dc, rect, startColour, endColour)
 
@@ -1673,8 +1670,8 @@ class TabNavigatorWindow(wx.Dialog):
         mem_dc.DrawBitmap(self._bmp, bmpPt.x, bmpPt.y, True)
 
         # get the text position, and draw it
-        font = wx.SystemSettings.GetFont(wx.SYS_DEFAULT_GUI_FONT)
-        font.SetWeight(wx.FONTWEIGHT_BOLD)
+        font = wx.SystemSettings_GetFont(wx.SYS_DEFAULT_GUI_FONT)
+        font.SetWeight(wx.BOLD)
         mem_dc.SetFont(font)
         fontHeight = mem_dc.GetCharHeight()
 
@@ -1715,19 +1712,18 @@ class FNBRenderer(object):
         self._tabHeight = None
 
         if wx.Platform == "__WXMAC__":
-            k = Carbon.Appearance.kThemeBrushFocusHighlight if CARBON else 19
             # Get proper highlight colour for focus rectangle from the
             # current Mac theme.  kThemeBrushFocusHighlight is
             # available on Mac OS 8.5 and higher
             if hasattr(wx, 'MacThemeColour'):
-                c = wx.MacThemeColour(k)
+                c = wx.MacThemeColour(Carbon.Appearance.kThemeBrushFocusHighlight)
             else:
                 brush = wx.Brush(wx.BLACK)
-                brush.MacSetTheme(k)
+                brush.MacSetTheme(Carbon.Appearance.kThemeBrushFocusHighlight)
                 c = brush.GetColour()
-            self._focusPen = wx.Pen(c, 2, wx.PENSTYLE_SOLID)
+            self._focusPen = wx.Pen(c, 2, wx.SOLID)
         else:
-            self._focusPen = wx.Pen(wx.BLACK, 1, wx.PENSTYLE_USER_DASH)
+            self._focusPen = wx.Pen(wx.BLACK, 1, wx.USER_DASH)
             self._focusPen.SetDashes([1, 1])
             self._focusPen.SetCap(wx.CAP_BUTT)
 
@@ -1834,7 +1830,7 @@ class FNBRenderer(object):
         """
         Draws the left and right scrolling arrows.
 
-        :param `dc`: an instance of :class:`wx.DC`;
+        :param `dc`: an instance of :class:`DC`;
         :param `pc`: an instance of :class:`FlatNotebook`;
         :param `rect`: the client rectangle containing the scrolling arrows.
         """
@@ -1848,7 +1844,7 @@ class FNBRenderer(object):
         Draws the left navigation arrow.
 
         :param `pageContainer`: an instance of :class:`FlatNotebook`;
-        :param `dc`: an instance of :class:`wx.DC`.
+        :param `dc`: an instance of :class:`DC`.
         """
 
         pc = pageContainer
@@ -1867,15 +1863,15 @@ class FNBRenderer(object):
 
         # Set the bitmap according to the button status
         if pc._nLeftButtonStatus == FNB_BTN_HOVER:
-            arrowBmp = wx.Bitmap(left_arrow_hilite_xpm)
+            arrowBmp = wx.BitmapFromXPMData(left_arrow_hilite_xpm)
         elif pc._nLeftButtonStatus == FNB_BTN_PRESSED:
-            arrowBmp = wx.Bitmap(left_arrow_pressed_xpm)
+            arrowBmp = wx.BitmapFromXPMData(left_arrow_pressed_xpm)
         else:
-            arrowBmp = wx.Bitmap(left_arrow_xpm)
+            arrowBmp = wx.BitmapFromXPMData(left_arrow_xpm)
 
         if pc._nFrom == 0:
             # Handle disabled arrow
-            arrowBmp = wx.Bitmap(left_arrow_disabled_xpm)
+            arrowBmp = wx.BitmapFromXPMData(left_arrow_disabled_xpm)
 
         arrowBmp.SetMask(wx.Mask(arrowBmp, MASK_COLOUR))
 
@@ -1892,7 +1888,7 @@ class FNBRenderer(object):
         Draws the right navigation arrow.
 
         :param `pageContainer`: an instance of :class:`FlatNotebook`;
-        :param `dc`: an instance of :class:`wx.DC`.
+        :param `dc`: an instance of :class:`DC`.
         """
 
         pc = pageContainer
@@ -1908,19 +1904,19 @@ class FNBRenderer(object):
         if agwStyle & FNB_NAV_BUTTONS_WHEN_NEEDED:
             if pc._pagesInfoVec[-1].GetPosition() != wx.Point(-1, -1) and pc._nFrom == 0:
                 return
-
+            
         # Set the bitmap according to the button status
         if pc._nRightButtonStatus == FNB_BTN_HOVER:
-            arrowBmp = wx.Bitmap(right_arrow_hilite_xpm)
+            arrowBmp = wx.BitmapFromXPMData(right_arrow_hilite_xpm)
         elif pc._nRightButtonStatus == FNB_BTN_PRESSED:
-            arrowBmp = wx.Bitmap(right_arrow_pressed_xpm)
+            arrowBmp = wx.BitmapFromXPMData(right_arrow_pressed_xpm)
         else:
-            arrowBmp = wx.Bitmap(right_arrow_xpm)
+            arrowBmp = wx.BitmapFromXPMData(right_arrow_xpm)
 
         # Check if the right most tab is visible, if it is
         # don't rotate right anymore
         if pc._pagesInfoVec[-1].GetPosition() != wx.Point(-1, -1):
-            arrowBmp = wx.Bitmap(right_arrow_disabled_xpm)
+            arrowBmp = wx.BitmapFromXPMData(right_arrow_disabled_xpm)
 
         arrowBmp.SetMask(wx.Mask(arrowBmp, MASK_COLOUR))
 
@@ -1937,7 +1933,7 @@ class FNBRenderer(object):
         Draws the drop-down arrow in the navigation area.
 
         :param `pageContainer`: an instance of :class:`FlatNotebook`;
-        :param `dc`: an instance of :class:`wx.DC`.
+        :param `dc`: an instance of :class:`DC`.
         """
 
         pc = pageContainer
@@ -1952,11 +1948,11 @@ class FNBRenderer(object):
             return
 
         if pc._nArrowDownButtonStatus == FNB_BTN_HOVER:
-            downBmp = wx.Bitmap(down_arrow_hilite_xpm)
+            downBmp = wx.BitmapFromXPMData(down_arrow_hilite_xpm)
         elif pc._nArrowDownButtonStatus == FNB_BTN_PRESSED:
-            downBmp = wx.Bitmap(down_arrow_pressed_xpm)
+            downBmp = wx.BitmapFromXPMData(down_arrow_pressed_xpm)
         else:
-            downBmp = wx.Bitmap(down_arrow_xpm)
+            downBmp = wx.BitmapFromXPMData(down_arrow_xpm)
 
         downBmp.SetMask(wx.Mask(downBmp, MASK_COLOUR))
 
@@ -1973,7 +1969,7 @@ class FNBRenderer(object):
         Draw the 'X' navigation button in the navigation area.
 
         :param `pageContainer`: an instance of :class:`FlatNotebook`;
-        :param `dc`: an instance of :class:`wx.DC`.
+        :param `dc`: an instance of :class:`DC`.
         """
 
         pc = pageContainer
@@ -1989,11 +1985,11 @@ class FNBRenderer(object):
 
         # Set the bitmap according to the button status
         if pc._nXButtonStatus == FNB_BTN_HOVER:
-            xbmp = wx.Bitmap(x_button_hilite_xpm)
+            xbmp = wx.BitmapFromXPMData(x_button_hilite_xpm)
         elif pc._nXButtonStatus == FNB_BTN_PRESSED:
-            xbmp = wx.Bitmap(x_button_pressed_xpm)
+            xbmp = wx.BitmapFromXPMData(x_button_pressed_xpm)
         else:
-            xbmp = wx.Bitmap(x_button_xpm)
+            xbmp = wx.BitmapFromXPMData(x_button_xpm)
 
         xbmp.SetMask(wx.Mask(xbmp, MASK_COLOUR))
 
@@ -2010,7 +2006,7 @@ class FNBRenderer(object):
         Draws the 'X' in the selected tab.
 
         :param `pageContainer`: an instance of :class:`FlatNotebook`;
-        :param `dc`: an instance of :class:`wx.DC`;
+        :param `dc`: an instance of :class:`DC`;
         :param `rect`: the current tab client rectangle;
         :param `tabIdx`: the index of the current tab;
         :param `btnStatus`: the status of the 'X' button in the current tab.
@@ -2027,11 +2023,11 @@ class FNBRenderer(object):
         # Set the bitmap according to the button status
 
         if btnStatus == FNB_BTN_HOVER:
-            xBmp = wx.Bitmap(x_button_hilite_xpm)
+            xBmp = wx.BitmapFromXPMData(x_button_hilite_xpm)
         elif btnStatus == FNB_BTN_PRESSED:
-            xBmp = wx.Bitmap(x_button_pressed_xpm)
+            xBmp = wx.BitmapFromXPMData(x_button_pressed_xpm)
         else:
-            xBmp = wx.Bitmap(x_button_xpm)
+            xBmp = wx.BitmapFromXPMData(x_button_xpm)
 
         # Set the masking
         xBmp.SetMask(wx.Mask(xBmp, MASK_COLOUR))
@@ -2049,7 +2045,7 @@ class FNBRenderer(object):
         Draws a line over the tabs.
 
         :param `pageContainer`: an instance of :class:`FlatNotebook`;
-        :param `dc`: an instance of :class:`wx.DC`;
+        :param `dc`: an instance of :class:`DC`;
         :param `selTabX1`: first x coordinate of the tab line;
         :param `selTabX2`: second x coordinate of the tab line.
         """
@@ -2061,7 +2057,7 @@ class FNBRenderer(object):
 
         if pc.HasAGWFlag(FNB_FF2):
             if not pc.HasAGWFlag(FNB_BOTTOM):
-                fillColour = wx.SystemSettings.GetColour(wx.SYS_COLOUR_3DFACE)
+                fillColour = wx.SystemSettings_GetColour(wx.SYS_COLOUR_3DFACE)
             else:
                 fillColour = wx.WHITE
 
@@ -2072,7 +2068,7 @@ class FNBRenderer(object):
                 dc.DrawLine(1, 0, clntRect.width-1, 0)
                 dc.DrawLine(1, 1, clntRect.width-1, 1)
 
-                dc.SetPen(wx.Pen(wx.SystemSettings.GetColour(wx.SYS_COLOUR_BTNSHADOW)))
+                dc.SetPen(wx.Pen(wx.SystemSettings_GetColour(wx.SYS_COLOUR_BTNSHADOW)))
                 dc.DrawLine(1, 2, clntRect.width-1, 2)
 
                 dc.SetPen(wx.Pen(fillColour))
@@ -2083,10 +2079,10 @@ class FNBRenderer(object):
                 dc.DrawLine(1, clntRect.height, clntRect.width-1, clntRect.height)
                 dc.DrawLine(1, clntRect.height-1, clntRect.width-1, clntRect.height-1)
 
-                dc.SetPen(wx.Pen(wx.SystemSettings.GetColour(wx.SYS_COLOUR_BTNSHADOW)))
+                dc.SetPen(wx.Pen(wx.SystemSettings_GetColour(wx.SYS_COLOUR_BTNSHADOW)))
                 dc.DrawLine(1, clntRect.height-2, clntRect.width-1, clntRect.height-2)
 
-                dc.SetPen(wx.Pen(wx.SystemSettings.GetColour(wx.SYS_COLOUR_3DFACE)))
+                dc.SetPen(wx.Pen(wx.SystemSettings_GetColour(wx.SYS_COLOUR_3DFACE)))
                 dc.DrawLine(selTabX1 + 2, clntRect.height-2, selTabX2-1, clntRect.height-2)
 
         else:
@@ -2103,11 +2099,11 @@ class FNBRenderer(object):
 
             dc.SetBrush(wx.TRANSPARENT_BRUSH)
             dc.SetPen(wx.Pen(pc.GetSingleLineBorderColour()))
-            dc.DrawRectangle(clientRect2)
-            dc.DrawRectangle(clientRect3)
+            dc.DrawRectangleRect(clientRect2)
+            dc.DrawRectangleRect(clientRect3)
 
-            dc.SetPen(wx.Pen(wx.SystemSettings.GetColour(wx.SYS_COLOUR_BTNSHADOW)))
-            dc.DrawRectangle(clientRect)
+            dc.SetPen(wx.Pen(wx.SystemSettings_GetColour(wx.SYS_COLOUR_BTNSHADOW)))
+            dc.DrawRectangleRect(clientRect)
 
             if not pc.HasAGWFlag(FNB_TABS_BORDER_SIMPLE):
 
@@ -2136,9 +2132,9 @@ class FNBRenderer(object):
 
         pc = pageContainer
         dc = wx.MemoryDC()
-        dc.SelectObject(wx.Bitmap(1,1))
+        dc.SelectObject(wx.EmptyBitmap(1,1))
 
-        boldFont = wx.SystemSettings.GetFont(wx.SYS_DEFAULT_GUI_FONT)
+        boldFont = wx.SystemSettings_GetFont(wx.SYS_DEFAULT_GUI_FONT)
         boldFont.SetWeight(wx.FONTWEIGHT_BOLD)
 
         if pc.IsDefaultTabs():
@@ -2195,12 +2191,12 @@ class FNBRenderer(object):
 
         pc = pageContainer
         dc = wx.MemoryDC()
-        dc.SelectObject(wx.Bitmap(1,1))
+        dc.SelectObject(wx.EmptyBitmap(1,1))
 
         # For GTK it seems that we must do this steps in order
         # for the tabs will get the proper height on initialization
         # on MSW, preforming these steps yields wierd results
-        normalFont = wx.SystemSettings.GetFont(wx.SYS_DEFAULT_GUI_FONT)
+        normalFont = wx.SystemSettings_GetFont(wx.SYS_DEFAULT_GUI_FONT)
         boldFont = normalFont
 
         if "__WXGTK__" in wx.PlatformInfo:
@@ -2224,7 +2220,7 @@ class FNBRenderer(object):
         Actually draws the tabs in :class:`FlatNotebook`.
 
         :param `pageContainer`: an instance of :class:`FlatNotebook`;
-        :param `dc`: an instance of :class:`wx.DC`.
+        :param `dc`: an instance of :class:`DC`.
         """
 
         pc = pageContainer
@@ -2244,14 +2240,14 @@ class FNBRenderer(object):
 
         # Set the maximum client size
         pc.SetSizeHints(self.GetButtonsAreaLength(pc), tabHeight)
-        borderPen = wx.Pen(wx.SystemSettings.GetColour(wx.SYS_COLOUR_BTNSHADOW))
+        borderPen = wx.Pen(wx.SystemSettings_GetColour(wx.SYS_COLOUR_BTNSHADOW))
 
         if agwStyle & FNB_VC71:
             backBrush = wx.Brush(wx.Colour(247, 243, 233))
         else:
             backBrush = wx.Brush(pc._tabAreaColour)
 
-        noselBrush = wx.Brush(wx.SystemSettings.GetColour(wx.SYS_COLOUR_BTNFACE))
+        noselBrush = wx.Brush(wx.SystemSettings_GetColour(wx.SYS_COLOUR_BTNFACE))
         selBrush = wx.Brush(pc._activeTabColour)
 
         size = pc.GetSize()
@@ -2290,12 +2286,12 @@ class FNBRenderer(object):
             greyLineYVal  = (pc.HasAGWFlag(FNB_BOTTOM) and [0] or [size.y - 2])[0]
             whiteLineYVal = (pc.HasAGWFlag(FNB_BOTTOM) and [3] or [size.y - 3])[0]
 
-            pen = wx.Pen(wx.SystemSettings.GetColour(wx.SYS_COLOUR_3DFACE))
+            pen = wx.Pen(wx.SystemSettings_GetColour(wx.SYS_COLOUR_3DFACE))
             dc.SetPen(pen)
 
             # Draw thik grey line between the windows area and
             # the tab area
-            for num in range(3):
+            for num in xrange(3):
                 dc.DrawLine(0, greyLineYVal + num, size.x, greyLineYVal + num)
 
             wbPen = (pc.HasAGWFlag(FNB_BOTTOM) and [wx.BLACK_PEN] or [wx.WHITE_PEN])[0]
@@ -2306,15 +2302,15 @@ class FNBRenderer(object):
             dc.SetPen(borderPen)
 
         # Draw labels
-        normalFont = wx.SystemSettings.GetFont(wx.SYS_DEFAULT_GUI_FONT)
-        boldFont = wx.SystemSettings.GetFont(wx.SYS_DEFAULT_GUI_FONT)
+        normalFont = wx.SystemSettings_GetFont(wx.SYS_DEFAULT_GUI_FONT)
+        boldFont = wx.SystemSettings_GetFont(wx.SYS_DEFAULT_GUI_FONT)
         boldFont.SetWeight(wx.FONTWEIGHT_BOLD)
         dc.SetFont(boldFont)
 
         posx = pc._pParent.GetPadding()
 
         # Update all the tabs from 0 to 'pc._nFrom' to be non visible
-        for i in range(pc._nFrom):
+        for i in xrange(pc._nFrom):
 
             pc._pagesInfoVec[i].SetPosition(wx.Point(-1, -1))
             pc._pagesInfoVec[i].GetRegion().Clear()
@@ -2325,7 +2321,7 @@ class FNBRenderer(object):
         # Go over and draw the visible tabs
         #----------------------------------------------------------
         x1 = x2 = -1
-        for i in range(pc._nFrom, len(pc._pagesInfoVec)):
+        for i in xrange(pc._nFrom, len(pc._pagesInfoVec)):
 
             dc.SetPen(borderPen)
 
@@ -2376,7 +2372,7 @@ class FNBRenderer(object):
             posx += tabWidth
 
         # Update all tabs that can not fit into the screen as non-visible
-        for i in range(count, len(pc._pagesInfoVec)):
+        for i in xrange(count, len(pc._pagesInfoVec)):
             pc._pagesInfoVec[i].SetPosition(wx.Point(-1, -1))
             pc._pagesInfoVec[i].GetRegion().Clear()
 
@@ -2395,7 +2391,7 @@ class FNBRenderer(object):
         """
         Draws a focus rectangle like the native :class:`Notebook`.
 
-        :param `dc`: an instance of :class:`wx.DC`;
+        :param `dc`: an instance of :class:`DC`;
         :param `pageContainer`: an instance of :class:`FlatNotebook`;
         :param `page`: an instance of :class:`PageInfo`, representing a page in the notebook.
         """
@@ -2408,7 +2404,7 @@ class FNBRenderer(object):
             vc8ShapeLen = self.CalcTabHeight(pageContainer) - VERTICAL_BORDER_PADDING - 2
             tabPos.x += vc8ShapeLen
 
-        rect = wx.Rect(tabPos, page.GetSize())
+        rect = wx.RectPS(tabPos, page.GetSize())
         rect = wx.Rect(rect.x+2, rect.y+2, rect.width-4, rect.height-8)
 
         if wx.Platform == '__WXMAC__':
@@ -2416,7 +2412,7 @@ class FNBRenderer(object):
 
         dc.SetBrush(wx.TRANSPARENT_BRUSH)
         dc.SetPen(self._focusPen)
-        dc.DrawRoundedRectangle(rect, 2)
+        dc.DrawRoundedRectangleRect(rect, 2)
 
 
     def DrawDragHint(self, pc, tabIdx):
@@ -2457,7 +2453,7 @@ class FNBRenderer(object):
         if fr < 0:
             fr = pc._nFrom
 
-        for i in range(fr, len(pc._pagesInfoVec)):
+        for i in xrange(fr, len(pc._pagesInfoVec)):
 
             tabWidth = self.CalcTabWidth(pageContainer, i, tabHeight)
             if posx + tabWidth + self.GetButtonsAreaLength(pc) >= clientWidth:
@@ -2557,7 +2553,7 @@ class FNBRendererDefault(FNBRenderer):
         Draws a tab using the `Standard` style.
 
         :param `pageContainer`: an instance of :class:`FlatNotebook`;
-        :param `dc`: an instance of :class:`wx.DC`;
+        :param `dc`: an instance of :class:`DC`;
         :param `posx`: the x position of the tab;
         :param `tabIdx`: the index of the tab;
         :param `tabWidth`: the tab's width;
@@ -2566,10 +2562,10 @@ class FNBRendererDefault(FNBRenderer):
         """
 
         # Default style
-        borderPen = wx.Pen(wx.SystemSettings.GetColour(wx.SYS_COLOUR_BTNSHADOW))
+        borderPen = wx.Pen(wx.SystemSettings_GetColour(wx.SYS_COLOUR_BTNSHADOW))
         pc = pageContainer
 
-        tabPoints = [wx.Point() for ii in range(7)]
+        tabPoints = [wx.Point() for ii in xrange(7)]
         tabPoints[0].x = posx
         tabPoints[0].y = (pc.HasAGWFlag(FNB_BOTTOM) and [2] or [tabHeight - 2])[0]
 
@@ -2692,7 +2688,7 @@ class FNBRendererFirefox2(FNBRenderer):
         Draws a tab using the `Firefox 2` style.
 
         :param `pageContainer`: an instance of :class:`FlatNotebook`;
-        :param `dc`: an instance of :class:`wx.DC`;
+        :param `dc`: an instance of :class:`DC`;
         :param `posx`: the x position of the tab;
         :param `tabIdx`: the index of the tab;
         :param `tabWidth`: the tab's width;
@@ -2700,10 +2696,10 @@ class FNBRendererFirefox2(FNBRenderer):
         :param `btnStatus`: the status of the 'X' button inside this tab.
         """
 
-        borderPen = wx.Pen(wx.SystemSettings.GetColour(wx.SYS_COLOUR_BTNSHADOW))
+        borderPen = wx.Pen(wx.SystemSettings_GetColour(wx.SYS_COLOUR_BTNSHADOW))
         pc = pageContainer
 
-        tabPoints = [wx.Point() for indx in range(7)]
+        tabPoints = [wx.Point() for indx in xrange(7)]
         tabPoints[0].x = posx + 2
         tabPoints[0].y = (pc.HasAGWFlag(FNB_BOTTOM) and [2] or [tabHeight - 2])[0]
 
@@ -2728,7 +2724,7 @@ class FNBRendererFirefox2(FNBRenderer):
         #------------------------------------
         # Paint the tab with gradient
         #------------------------------------
-        rr = wx.Rect(tabPoints[2], tabPoints[5])
+        rr = wx.RectPP(tabPoints[2], tabPoints[5])
         DrawButton(dc, rr, pc.GetSelection() == tabIdx , not pc.HasAGWFlag(FNB_BOTTOM))
 
         dc.SetBrush(wx.TRANSPARENT_BRUSH)
@@ -2806,7 +2802,7 @@ class FNBRendererVC71(FNBRenderer):
         Draws a tab using the `VC71` style.
 
         :param `pageContainer`: an instance of :class:`FlatNotebook`;
-        :param `dc`: an instance of :class:`wx.DC`;
+        :param `dc`: an instance of :class:`DC`;
         :param `posx`: the x position of the tab;
         :param `tabIdx`: the index of the tab;
         :param `tabWidth`: the tab's width;
@@ -2815,11 +2811,11 @@ class FNBRendererVC71(FNBRenderer):
         """
 
         # Visual studio 7.1 style
-        borderPen = wx.Pen(wx.SystemSettings.GetColour(wx.SYS_COLOUR_BTNSHADOW))
+        borderPen = wx.Pen(wx.SystemSettings_GetColour(wx.SYS_COLOUR_BTNSHADOW))
         pc = pageContainer
 
-        dc.SetPen((tabIdx == pc.GetSelection() and [wx.Pen(wx.SystemSettings.GetColour(wx.SYS_COLOUR_3DFACE))] or [borderPen])[0])
-        dc.SetBrush((tabIdx == pc.GetSelection() and [wx.Brush(wx.SystemSettings.GetColour(wx.SYS_COLOUR_3DFACE))] or [wx.Brush(wx.Colour(247, 243, 233))])[0])
+        dc.SetPen((tabIdx == pc.GetSelection() and [wx.Pen(wx.SystemSettings_GetColour(wx.SYS_COLOUR_3DFACE))] or [borderPen])[0])
+        dc.SetBrush((tabIdx == pc.GetSelection() and [wx.Brush(wx.SystemSettings_GetColour(wx.SYS_COLOUR_3DFACE))] or [wx.Brush(wx.Colour(247, 243, 233))])[0])
 
         if tabIdx == pc.GetSelection():
 
@@ -2931,7 +2927,7 @@ class FNBRendererFancy(FNBRenderer):
         Draws a tab using the `Fancy` style, similar to the `VC71` one but with gradients.
 
         :param `pageContainer`: an instance of :class:`FlatNotebook`;
-        :param `dc`: an instance of :class:`wx.DC`;
+        :param `dc`: an instance of :class:`DC`;
         :param `posx`: the x position of the tab;
         :param `tabIdx`: the index of the tab;
         :param `tabWidth`: the tab's width;
@@ -2941,10 +2937,10 @@ class FNBRendererFancy(FNBRenderer):
 
         # Fancy tabs - like with VC71 but with the following differences:
         # - The Selected tab is coloured with gradient colour
-        borderPen = wx.Pen(wx.SystemSettings.GetColour(wx.SYS_COLOUR_BTNSHADOW))
+        borderPen = wx.Pen(wx.SystemSettings_GetColour(wx.SYS_COLOUR_BTNSHADOW))
         pc = pageContainer
 
-        pen = (tabIdx == pc.GetSelection() and [wx.Pen(pc._pParent.GetBorderColour())] or [wx.Pen(wx.SystemSettings.GetColour(wx.SYS_COLOUR_3DFACE))])[0]
+        pen = (tabIdx == pc.GetSelection() and [wx.Pen(pc._pParent.GetBorderColour())] or [wx.Pen(wx.SystemSettings_GetColour(wx.SYS_COLOUR_3DFACE))])[0]
 
         if tabIdx == pc.GetSelection():
 
@@ -2959,7 +2955,7 @@ class FNBRendererFancy(FNBRenderer):
             PaintStraightGradientBox(dc, rect, col1, col2)
             dc.SetBrush(wx.TRANSPARENT_BRUSH)
             dc.SetPen(pen)
-            dc.DrawRectangle(rect)
+            dc.DrawRectangleRect(rect)
 
             # erase the bottom/top line of the rectangle
             dc.SetPen(wx.Pen(pc._pParent.GetGradientColourFrom()))
@@ -3049,7 +3045,7 @@ class FNBRendererVC8(FNBRenderer):
         Draws all the tabs using `VC8` style.
 
         :param `pageContainer`: an instance of :class:`FlatNotebook`;
-        :param `dc`: an instance of :class:`wx.DC`.
+        :param `dc`: an instance of :class:`DC`.
         """
 
         pc = pageContainer
@@ -3064,8 +3060,8 @@ class FNBRendererVC8(FNBRenderer):
         tabHeight = self.CalcTabHeight(pageContainer)
 
         # Set the font for measuring the tab height
-        normalFont = wx.SystemSettings.GetFont(wx.SYS_DEFAULT_GUI_FONT)
-        boldFont = wx.SystemSettings.GetFont(wx.SYS_DEFAULT_GUI_FONT)
+        normalFont = wx.SystemSettings_GetFont(wx.SYS_DEFAULT_GUI_FONT)
+        boldFont = wx.SystemSettings_GetFont(wx.SYS_DEFAULT_GUI_FONT)
         boldFont.SetWeight(wx.FONTWEIGHT_BOLD)
 
         # Calculate the number of rows required for drawing the tabs
@@ -3073,11 +3069,11 @@ class FNBRendererVC8(FNBRenderer):
 
         # Set the maximum client size
         pc.SetSizeHints(self.GetButtonsAreaLength(pc), tabHeight)
-        borderPen = wx.Pen(wx.SystemSettings.GetColour(wx.SYS_COLOUR_BTNSHADOW))
+        borderPen = wx.Pen(wx.SystemSettings_GetColour(wx.SYS_COLOUR_BTNSHADOW))
 
         # Create brushes
         backBrush = wx.Brush(pc._tabAreaColour)
-        noselBrush = wx.Brush(wx.SystemSettings.GetColour(wx.SYS_COLOUR_BTNFACE))
+        noselBrush = wx.Brush(wx.SystemSettings_GetColour(wx.SYS_COLOUR_BTNFACE))
         selBrush = wx.Brush(pc._activeTabColour)
         size = pc.GetSize()
 
@@ -3112,7 +3108,7 @@ class FNBRendererVC8(FNBRenderer):
         dc.SetFont(boldFont)
 
         # Update all the tabs from 0 to 'pc.self._nFrom' to be non visible
-        for i in range(pc._nFrom):
+        for i in xrange(pc._nFrom):
 
             pc._pagesInfoVec[i].SetPosition(wx.Point(-1, -1))
             pc._pagesInfoVec[i].GetRegion().Clear()
@@ -3124,7 +3120,7 @@ class FNBRendererVC8(FNBRenderer):
         activeTabWidth = 0
         activeTabHeight = 0
 
-        for cur in range(len(vTabsInfo)-1, -1, -1):
+        for cur in xrange(len(vTabsInfo)-1, -1, -1):
 
             # 'i' points to the index of the currently drawn tab
             # in pc.GetPageInfoVector() vector
@@ -3184,7 +3180,7 @@ class FNBRendererVC8(FNBRenderer):
             self.DrawTab(pc, dc, activeTabPosx, pc.GetSelection(), activeTabWidth, activeTabHeight, pc._nTabXButtonStatus)
 
         # Update all tabs that can not fit into the screen as non-visible
-        for xx in range(pc._nFrom + len(vTabsInfo), len(pc._pagesInfoVec)):
+        for xx in xrange(pc._nFrom + len(vTabsInfo), len(pc._pagesInfoVec)):
 
             pc._pagesInfoVec[xx].SetPosition(wx.Point(-1, -1))
             pc._pagesInfoVec[xx].GetRegion().Clear()
@@ -3202,7 +3198,7 @@ class FNBRendererVC8(FNBRenderer):
         Draws a tab using the `VC8` style.
 
         :param `pageContainer`: an instance of :class:`FlatNotebook`;
-        :param `dc`: an instance of :class:`wx.DC`;
+        :param `dc`: an instance of :class:`DC`;
         :param `posx`: the x position of the tab;
         :param `tabIdx`: the index of the tab;
         :param `tabWidth`: the tab's width;
@@ -3212,7 +3208,7 @@ class FNBRendererVC8(FNBRenderer):
 
         pc = pageContainer
         borderPen = wx.Pen(pc._pParent.GetBorderColour())
-        tabPoints = [wx.Point() for ii in range(8)]
+        tabPoints = [wx.Point() for ii in xrange(8)]
 
         # If we draw the first tab or the active tab,
         # we draw a full tab, else we draw a truncated tab
@@ -3255,7 +3251,7 @@ class FNBRendererVC8(FNBRenderer):
         # Draw the polygon
         br = dc.GetBrush()
         dc.SetBrush(wx.Brush((tabIdx == pc.GetSelection() and [pc._activeTabColour] or [pc._colourTo])[0]))
-        dc.SetPen(wx.Pen((tabIdx == pc.GetSelection() and [wx.SystemSettings.GetColour(wx.SYS_COLOUR_BTNSHADOW)] or [pc._colourBorder])[0]))
+        dc.SetPen(wx.Pen((tabIdx == pc.GetSelection() and [wx.SystemSettings_GetColour(wx.SYS_COLOUR_BTNSHADOW)] or [pc._colourBorder])[0]))
         dc.DrawPolygon(tabPoints)
 
         # Restore the brush
@@ -3276,7 +3272,7 @@ class FNBRendererVC8(FNBRenderer):
         # but without the bottom (upper line incase of wxBOTTOM)
         if tabIdx == pc.GetSelection():
 
-            borderPen = wx.Pen(wx.SystemSettings.GetColour(wx.SYS_COLOUR_BTNSHADOW))
+            borderPen = wx.Pen(wx.SystemSettings_GetColour(wx.SYS_COLOUR_BTNSHADOW))
             dc.SetPen(borderPen)
             dc.SetBrush(wx.TRANSPARENT_BRUSH)
             dc.DrawPolygon(tabPoints)
@@ -3290,7 +3286,7 @@ class FNBRendererVC8(FNBRenderer):
         # Draw a thin line to the right of the non-selected tab
         if tabIdx != pc.GetSelection():
 
-            dc.SetPen(wx.Pen(wx.SystemSettings.GetColour(wx.SYS_COLOUR_3DFACE)))
+            dc.SetPen(wx.Pen(wx.SystemSettings_GetColour(wx.SYS_COLOUR_3DFACE)))
             dc.DrawLine(tabPoints[4].x-1, tabPoints[4].y, tabPoints[5].x-1, tabPoints[5].y)
             dc.DrawLine(tabPoints[5].x-1, tabPoints[5].y, tabPoints[6].x-1, tabPoints[6].y)
 
@@ -3314,7 +3310,7 @@ class FNBRendererVC8(FNBRenderer):
                                      posx + imageXOffset, imageYCoord,
                                      wx.IMAGELIST_DRAW_TRANSPARENT, True)
 
-        boldFont = wx.SystemSettings.GetFont(wx.SYS_DEFAULT_GUI_FONT)
+        boldFont = wx.SystemSettings_GetFont(wx.SYS_DEFAULT_GUI_FONT)
 
         # if selected tab, draw text in bold
         if tabIdx == pc.GetSelection():
@@ -3349,8 +3345,8 @@ class FNBRendererVC8(FNBRenderer):
         Fills a tab with a gradient shading.
 
         :param `pageContainer`: an instance of :class:`FlatNotebook`;
-        :param `dc`: an instance of :class:`wx.DC`;
-        :param `tabPoints`: a Python list of :class:`wx.Point` representing the tab outline;
+        :param `dc`: an instance of :class:`DC`;
+        :param `tabPoints`: a Python list of :class:`Point` representing the tab outline;
         :param `bSelectedTab`: ``True`` if the tab is selected, ``False`` otherwise;
         :param `tabIdx`: the index of the tab;
         """
@@ -3360,8 +3356,8 @@ class FNBRendererVC8(FNBRenderer):
 
         if self._first:
             self._first = False
-            pc._colourTo   = LightColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_3DFACE), 0)
-            pc._colourFrom = LightColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_3DFACE), 60)
+            pc._colourTo   = LightColour(wx.SystemSettings_GetColour(wx.SYS_COLOUR_3DFACE), 0)
+            pc._colourFrom = LightColour(wx.SystemSettings_GetColour(wx.SYS_COLOUR_3DFACE), 60)
 
         col2 = pc._pParent.GetGradientColourTo()
         col1 = pc._pParent.GetGradientColourFrom()
@@ -3413,7 +3409,7 @@ class FNBRendererVC8(FNBRenderer):
                 if y < tabPoints[0].y - size:
                     break
 
-            currCol = wx.Colour(col1.Red() + int(rf), col1.Green() + int(gf), col1.Blue() + int(bf))
+            currCol = wx.Colour(col1.Red() + rf, col1.Green() + gf, col1.Blue() + bf)
 
             dc.SetPen((bSelectedTab and [wx.Pen(pc._activeTabColour)] or [wx.Pen(currCol)])[0])
             startX = self.GetStartX(tabPoints, y, pc.GetParent().GetAGWWindowStyleFlag())
@@ -3421,7 +3417,7 @@ class FNBRendererVC8(FNBRenderer):
             dc.DrawLine(startX, y, endX, y)
 
             # Draw the border using the 'edge' point
-            dc.SetPen(wx.Pen((bSelectedTab and [wx.SystemSettings.GetColour(wx.SYS_COLOUR_BTNSHADOW)] or [pc._colourBorder])[0]))
+            dc.SetPen(wx.Pen((bSelectedTab and [wx.SystemSettings_GetColour(wx.SYS_COLOUR_BTNSHADOW)] or [pc._colourBorder])[0]))
 
             dc.DrawPoint(startX, y)
             dc.DrawPoint(endX, y)
@@ -3441,7 +3437,7 @@ class FNBRendererVC8(FNBRenderer):
         """
         Returns the `x` start position of a tab.
 
-        :param `tabPoints`: a Python list of :class:`wx.Point` representing the tab outline;
+        :param `tabPoints`: a Python list of :class:`Point` representing the tab outline;
         :param `y`: the y start position of the tab;
         :param `style`: can be ``FNB_BOTTOM`` or the default (tabs at top).
         """
@@ -3455,7 +3451,7 @@ class FNBRendererVC8(FNBRenderer):
 
         if bBottomStyle:
 
-            for i in range(3):
+            for i in xrange(3):
 
                 if y >= tabPoints[i].y and y < tabPoints[i+1].y:
 
@@ -3468,7 +3464,7 @@ class FNBRendererVC8(FNBRenderer):
 
         else:
 
-            for i in range(3):
+            for i in xrange(3):
 
                 if y <= tabPoints[i].y and y > tabPoints[i+1].y:
 
@@ -3485,7 +3481,7 @@ class FNBRendererVC8(FNBRenderer):
         # According to the equation y = ax + b => x = (y-b)/a
         # We know the first 2 points
 
-        x1, x2, y1, y2 = list(map(float, (x1, x2, y1, y2)))
+        x1, x2, y1, y2 = map(float, (x1, x2, y1, y2))
 
         if abs(x2 - x1) < 1e-6:
             return x2
@@ -3506,7 +3502,7 @@ class FNBRendererVC8(FNBRenderer):
         """
         Returns the `x` end position of a tab.
 
-        :param `tabPoints`: a Python list of :class:`wx.Point` representing the tab outline;
+        :param `tabPoints`: a Python list of :class:`Point` representing the tab outline;
         :param `y`: the y end position of the tab;
         :param `style`: can be ``FNB_BOTTOM`` or the default (tabs at top).
         """
@@ -3519,7 +3515,7 @@ class FNBRendererVC8(FNBRenderer):
 
         if bBottomStyle:
 
-            for i in range(7, 3, -1):
+            for i in xrange(7, 3, -1):
 
                 if y >= tabPoints[i].y and y < tabPoints[i-1].y:
 
@@ -3532,7 +3528,7 @@ class FNBRendererVC8(FNBRenderer):
 
         else:
 
-            for i in range(7, 3, -1):
+            for i in xrange(7, 3, -1):
 
                 if y <= tabPoints[i].y and y > tabPoints[i-1].y:
 
@@ -3587,7 +3583,7 @@ class FNBRendererVC8(FNBRenderer):
         if fr < 0:
             fr = pc._nFrom
 
-        for i in range(fr, len(pc._pagesInfoVec)):
+        for i in xrange(fr, len(pc._pagesInfoVec)):
 
             vc8glitch = tabHeight + FNB_HEIGHT_SPACER
             tabWidth = self.CalcTabWidth(pageContainer, i, tabHeight)
@@ -3631,9 +3627,9 @@ class FNBRendererRibbonTabs(FNBRenderer):
 
         pc = pageContainer
         dc = wx.MemoryDC()
-        dc.SelectObject(wx.Bitmap(1,1))
+        dc.SelectObject(wx.EmptyBitmap(1,1))
 
-        font = wx.SystemSettings.GetFont(wx.SYS_DEFAULT_GUI_FONT)
+        font = wx.SystemSettings_GetFont(wx.SYS_DEFAULT_GUI_FONT)
 
         if pc.IsDefaultTabs():
             shapePoints = int(tabHeight*math.tan(float(pc._pagesInfoVec[tabIdx].GetTabAngle())/180.0*math.pi))
@@ -3680,7 +3676,7 @@ class FNBRendererRibbonTabs(FNBRenderer):
         Draws a tab using the `Ribbon Tabs` style.
 
         :param `pageContainer`: an instance of :class:`FlatNotebook`;
-        :param `dc`: an instance of :class:`wx.DC`;
+        :param `dc`: an instance of :class:`DC`;
         :param `posx`: the x position of the tab;
         :param `tabIdx`: the index of the tab;
         :param `tabWidth`: the tab's width;
@@ -3760,7 +3756,7 @@ class FNBRendererRibbonTabs(FNBRenderer):
         Actually draws the tabs in :class:`FlatNotebook`.
 
         :param `pageContainer`: an instance of :class:`FlatNotebook`;
-        :param `dc`: an instance of :class:`wx.DC`.
+        :param `dc`: an instance of :class:`DC`.
         """
 
         pc = pageContainer
@@ -3788,7 +3784,7 @@ class FNBRendererRibbonTabs(FNBRenderer):
         dc.SetTextBackground(pc.GetBackgroundColour())
         dc.SetTextForeground(pc._activeTextColour)
 
-        borderPen = wx.Pen(wx.SystemSettings.GetColour(wx.SYS_COLOUR_BTNSHADOW))
+        borderPen = wx.Pen(wx.SystemSettings_GetColour(wx.SYS_COLOUR_BTNSHADOW))
         backBrush = wx.Brush(pc._tabAreaColour)
 
         # If border style is set, set the pen to be border pen
@@ -3801,13 +3797,13 @@ class FNBRendererRibbonTabs(FNBRenderer):
         dc.DrawRectangle(0, 0, size.x, size.y)
 
         # Draw labels
-        font = wx.SystemSettings.GetFont(wx.SYS_DEFAULT_GUI_FONT)
+        font = wx.SystemSettings_GetFont(wx.SYS_DEFAULT_GUI_FONT)
         dc.SetFont(font)
 
         posx = pc._pParent.GetPadding()
 
         # Update all the tabs from 0 to 'pc._nFrom' to be non visible
-        for i in range(pc._nFrom):
+        for i in xrange(pc._nFrom):
             pc._pagesInfoVec[i].SetPosition(wx.Point(-1, -1))
 
         count = pc._nFrom
@@ -3820,7 +3816,7 @@ class FNBRendererRibbonTabs(FNBRenderer):
         noselBrush = wx.Brush(pc._tabAreaColour)
         selBrush = wx.Brush(LightColour(pc._tabAreaColour,60))
 
-        for i in range(pc._nFrom, len(pc._pagesInfoVec)):
+        for i in xrange(pc._nFrom, len(pc._pagesInfoVec)):
 
             # This style highlights the selected tab and the tab the mouse is over
             highlight = (i==pc.GetSelection()) or pc.IsMouseHovering(i)
@@ -3863,7 +3859,7 @@ class FNBRendererRibbonTabs(FNBRenderer):
             posx += tabWidth
 
         # Update all tabs that can not fit into the screen as non-visible
-        for i in range(count, len(pc._pagesInfoVec)):
+        for i in xrange(count, len(pc._pagesInfoVec)):
             pc._pagesInfoVec[i].SetPosition(wx.Point(-1, -1))
             pc._pagesInfoVec[i].GetRegion().Clear()
 
@@ -3878,7 +3874,7 @@ class FNBRendererRibbonTabs(FNBRenderer):
 # Class FlatNotebook
 # ---------------------------------------------------------------------------- #
 
-class FlatNotebook(wx.Panel):
+class FlatNotebook(wx.PyPanel):
     """
     The :class:`FlatNotebook` is a full implementation of the :class:`Notebook`, and designed to be
     a drop-in replacement for :class:`Notebook`. The API functions are similar so one can
@@ -3896,7 +3892,7 @@ class FlatNotebook(wx.Panel):
          chosen by either the windowing system or wxPython, depending on platform;
         :param `size`: the control size. A value of (-1, -1) indicates a default size,
          chosen by either the windowing system or wxPython, depending on platform;
-        :param `style`: the underlying :class:`Panel` window style;
+        :param `style`: the underlying :class:`PyPanel` window style;
         :param `agwStyle`: the AGW-specific window style. This can be a combination of the
          following bits:
 
@@ -3943,7 +3939,7 @@ class FlatNotebook(wx.Panel):
         self._orientation = None
         self._customPanel = None
 
-        wx.Panel.__init__(self, parent, id, pos, size, style)
+        wx.PyPanel.__init__(self, parent, id, pos, size, style)
         attr = self.GetDefaultAttributes()
         self.SetOwnForegroundColour(attr.colFg)
         self.SetOwnBackgroundColour(attr.colBg)
@@ -3958,13 +3954,13 @@ class FlatNotebook(wx.Panel):
     def Init(self):
         """ Initializes all the class attributes. """
 
-        self._pages._colourBorder = wx.SystemSettings.GetColour(wx.SYS_COLOUR_BTNSHADOW)
+        self._pages._colourBorder = wx.SystemSettings_GetColour(wx.SYS_COLOUR_BTNSHADOW)
 
         self._mainSizer = wx.BoxSizer(wx.VERTICAL)
         self.SetSizer(self._mainSizer)
 
         # The child panels will inherit this bg colour, so leave it at the default value
-        #self.SetBackgroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_APPWORKSPACE))
+        #self.SetBackgroundColour(wx.SystemSettings_GetColour(wx.SYS_COLOUR_APPWORKSPACE))
 
         # Set default page height
         dc = wx.ClientDC(self)
@@ -3973,7 +3969,7 @@ class FlatNotebook(wx.Panel):
             # For GTK it seems that we must do this steps in order
             # for the tabs will get the proper height on initialization
             # on MSW, preforming these steps yields wierd results
-            boldFont = wx.SystemSettings.GetFont(wx.SYS_DEFAULT_GUI_FONT)
+            boldFont = wx.SystemSettings_GetFont(wx.SYS_DEFAULT_GUI_FONT)
             boldFont.SetWeight(wx.FONTWEIGHT_BOLD)
             dc.SetFont(boldFont)
 
@@ -4000,7 +3996,7 @@ class FlatNotebook(wx.Panel):
         minimal size which doesn't truncate the control, for a panel - the same
         size as it would have after a call to `Fit()`.
 
-        :note: Overridden from :class:`Panel`.
+        :note: Overridden from :class:`PyPanel`.
         """
 
         if not self._windows:
@@ -4028,6 +4024,9 @@ class FlatNotebook(wx.Panel):
          :class:`FlatNotebook` behaviour with tabs.
         """
 
+        if orient == self._orientation:
+            return
+        
         self.Freeze()
         self._orientation = orient
 
@@ -4091,7 +4090,7 @@ class FlatNotebook(wx.Panel):
         """
         Sets a custom panel to show when there are no pages left in :class:`FlatNotebook`.
 
-        :param `panel`: any subclass of :class:`wx.Window` will do, as long as it is suitable
+        :param `panel`: any subclass of :class:`Window` will do, as long as it is suitable
          to be used as a notebook page. Examples include :class:`Panel`, :class:`ScrolledWindow`,
          and so on.
         """
@@ -4148,7 +4147,7 @@ class FlatNotebook(wx.Panel):
         """
         Sets the text colour for the active tab.
 
-        :param `textColour`: a valid :class:`wx.Colour` object or any typemap supported by wxWidgets/wxPython
+        :param `textColour`: a valid :class:`Colour` object or any typemap supported by wxWidgets/wxPython
          to generate a colour (i.e., a hex string, a colour name, a 3 or 4 integer tuple).
         """
 
@@ -4269,7 +4268,7 @@ class FlatNotebook(wx.Panel):
         """
         Sets the image list for the page control.
 
-        :param `imageList`: an instance of :class:`wx.ImageList`.
+        :param `imageList`: an instance of :class:`ImageList`.
         """
 
         self._pages.SetImageList(imageList)
@@ -4279,7 +4278,7 @@ class FlatNotebook(wx.Panel):
         """
         Assigns the image list for the page control.
 
-        :param `imageList`: an instance of :class:`wx.ImageList`.
+        :param `imageList`: an instance of :class:`ImageList`.
         """
 
         self._pages.AssignImageList(imageList)
@@ -4533,7 +4532,7 @@ class FlatNotebook(wx.Panel):
         """
         Returns the index at which the window is found.
 
-        :param `win`: an instance of :class:`wx.Window`.
+        :param `win`: an instance of :class:`Window`.
         """
 
         try:
@@ -4571,7 +4570,7 @@ class FlatNotebook(wx.Panel):
         """
         Set the icon used by the :class:`TabNavigatorWindow`.
 
-        :param `bmp`: a valid :class:`wx.Bitmap` object.
+        :param `bmp`: a valid :class:`Bitmap` object.
         """
 
         if isinstance(bmp, wx.Bitmap) and bmp.IsOk():
@@ -4579,7 +4578,7 @@ class FlatNotebook(wx.Panel):
             if bmp.GetSize() != (16, 16):
                 img = bmp.ConvertToImage()
                 img.Rescale(16, 16, wx.IMAGE_QUALITY_HIGH)
-                bmp = wx.Bitmap(img)
+                bmp = wx.BitmapFromImage(img)
             self._naviIcon = bmp
         else:
             raise TypeError("SetNavigatorIcon requires a valid bitmap")
@@ -4656,7 +4655,7 @@ class FlatNotebook(wx.Panel):
         if angle > 15:
             return
 
-        for ii in range(len(self._pages._pagesInfoVec)):
+        for ii in xrange(len(self._pages._pagesInfoVec)):
             self._pages._pagesInfoVec[ii].SetTabAngle(angle)
 
         self.Refresh()
@@ -4852,7 +4851,7 @@ class FlatNotebook(wx.Panel):
         """
         Sets the popup menu associated to a right click on a tab.
 
-        :param `menu`: an instance of :class:`wx.Menu`.
+        :param `menu`: an instance of :class:`Menu`.
         """
 
         self._pages._pRightClickMenu = menu
@@ -4872,9 +4871,9 @@ class FlatNotebook(wx.Panel):
         """
         Sets the gradient colours for the tab.
 
-        :param `fr`: the first gradient colour, an instance of :class:`wx.Colour`;
-        :param `to`: the second gradient colour, an instance of :class:`wx.Colour`;
-        :param `border`: the border colour, an instance of :class:`wx.Colour`.
+        :param `fr`: the first gradient colour, an instance of :class:`Colour`;
+        :param `to`: the second gradient colour, an instance of :class:`Colour`;
+        :param `border`: the border colour, an instance of :class:`Colour`.
         """
 
         self._pages._colourFrom = fr
@@ -4886,7 +4885,7 @@ class FlatNotebook(wx.Panel):
         """
         Sets the starting colour for the gradient.
 
-        :param `fr`: the first gradient colour, an instance of :class:`wx.Colour`.
+        :param `fr`: the first gradient colour, an instance of :class:`Colour`.
         """
 
         self._pages._colourFrom = fr
@@ -4896,7 +4895,7 @@ class FlatNotebook(wx.Panel):
         """
         Sets the ending colour for the gradient.
 
-        :param `to`: the second gradient colour, an instance of :class:`wx.Colour`;
+        :param `to`: the second gradient colour, an instance of :class:`Colour`;
         """
 
         self._pages._colourTo = to
@@ -4906,7 +4905,7 @@ class FlatNotebook(wx.Panel):
         """
         Sets the tab border colour.
 
-        :param `border`: the border colour, an instance of :class:`wx.Colour`.
+        :param `border`: the border colour, an instance of :class:`Colour`.
         """
 
         self._pages._colourBorder = border
@@ -4998,7 +4997,7 @@ class FlatNotebook(wx.Panel):
         """
         Sets the non active tabs text colour.
 
-        :param `colour`: a valid :class:`wx.Colour` object or any typemap supported by wxWidgets/wxPython
+        :param `colour`: a valid :class:`Colour` object or any typemap supported by wxWidgets/wxPython
          to generate a colour (i.e., a hex string, a colour name, a 3 or 4 integer tuple).
         """
 
@@ -5020,7 +5019,7 @@ class FlatNotebook(wx.Panel):
         Sets the tab text colour individually.
 
         :param `page`: an integer specifying the page index;
-        :param `colour`: a valid :class:`wx.Colour` object or any typemap supported by wxWidgets/wxPython
+        :param `colour`: a valid :class:`Colour` object or any typemap supported by wxWidgets/wxPython
          to generate a colour (i.e., a hex string, a colour name, a 3 or 4 integer tuple). You can
          pass ``None`` or :class:`NullColour` to return to the default page text colour.
         """
@@ -5032,7 +5031,7 @@ class FlatNotebook(wx.Panel):
         """
         Sets the area behind the tabs colour.
 
-        :param `colour`: a valid :class:`wx.Colour` object or any typemap supported by wxWidgets/wxPython
+        :param `colour`: a valid :class:`Colour` object or any typemap supported by wxWidgets/wxPython
          to generate a colour (i.e., a hex string, a colour name, a 3 or 4 integer tuple).
         """
 
@@ -5049,7 +5048,7 @@ class FlatNotebook(wx.Panel):
         """
         Sets the active tab colour.
 
-        :param `colour`: a valid :class:`wx.Colour` object or any typemap supported by wxWidgets/wxPython
+        :param `colour`: a valid :class:`Colour` object or any typemap supported by wxWidgets/wxPython
          to generate a colour (i.e., a hex string, a colour name, a 3 or 4 integer tuple).
         """
 
@@ -5077,7 +5076,7 @@ class FlatNotebook(wx.Panel):
 # Acts as a container for the pages you add to FlatNotebook
 # ---------------------------------------------------------------------------- #
 
-class PageContainer(wx.Panel):
+class PageContainer(wx.PyPanel):
     """
     This class acts as a container for the pages you add to :class:`FlatNotebook`.
     """
@@ -5119,29 +5118,29 @@ class PageContainer(wx.Panel):
 
         self._pagesInfoVec = []
 
-        self._colourTo = wx.SystemSettings.GetColour(wx.SYS_COLOUR_ACTIVECAPTION)
+        self._colourTo = wx.SystemSettings_GetColour(wx.SYS_COLOUR_ACTIVECAPTION)
         self._colourFrom = wx.WHITE
         self._activeTabColour = wx.WHITE
-        self._activeTextColour = wx.SystemSettings.GetColour(wx.SYS_COLOUR_BTNTEXT)
-        self._nonActiveTextColour = wx.SystemSettings.GetColour(wx.SYS_COLOUR_BTNTEXT)
-        self._tabAreaColour = wx.SystemSettings.GetColour(wx.SYS_COLOUR_BTNFACE)
+        self._activeTextColour = wx.SystemSettings_GetColour(wx.SYS_COLOUR_BTNTEXT)
+        self._nonActiveTextColour = wx.SystemSettings_GetColour(wx.SYS_COLOUR_BTNTEXT)
+        self._tabAreaColour = wx.SystemSettings_GetColour(wx.SYS_COLOUR_BTNFACE)
 
         self._nFrom = 0
         self._isdragging = False
 
         # Set default page height, this is done according to the system font
         memDc = wx.MemoryDC()
-        memDc.SelectObject(wx.Bitmap(1,1))
+        memDc.SelectObject(wx.EmptyBitmap(1,1))
 
         if "__WXGTK__" in wx.PlatformInfo:
-            boldFont = wx.SystemSettings.GetFont(wx.SYS_DEFAULT_GUI_FONT)
-            boldFont.SetWeight(wx.FONTWEIGHT_BOLD)
+            boldFont = wx.SystemSettings_GetFont(wx.SYS_DEFAULT_GUI_FONT)
+            boldFont.SetWeight(wx.BOLD)
             memDc.SetFont(boldFont)
 
         height = memDc.GetCharHeight()
         tabHeight = height + FNB_HEIGHT_SPACER # We use 10 pixels as padding
 
-        wx.Panel.__init__(self, parent, id, pos, wx.Size(size.x, tabHeight),
+        wx.PyPanel.__init__(self, parent, id, pos, wx.Size(size.x, tabHeight),
                             style|wx.NO_BORDER|wx.NO_FULL_REPAINT_ON_RESIZE|wx.WANTS_CHARS)
 
         attr = self.GetDefaultAttributes()
@@ -5259,7 +5258,7 @@ class PageContainer(wx.Panel):
         """
         Handles the ``wx.EVT_SIZE`` event for :class:`PageContainer`.
 
-        :param `event`: a :class:`wx.SizeEvent` event to be processed.
+        :param `event`: a :class:`SizeEvent` event to be processed.
         """
 
         # When resizing the control, try to fit to screen as many tabs as we can
@@ -5269,7 +5268,7 @@ class PageContainer(wx.Panel):
         fr = 0
         page = self.GetSelection()
 
-        for fr in range(self._nFrom):
+        for fr in xrange(self._nFrom):
             vTabInfo = renderer.NumberTabsCanFit(self, fr)
             if page - fr >= len(vTabInfo):
                 continue
@@ -5313,7 +5312,7 @@ class PageContainer(wx.Panel):
         delta = event.GetWheelDelta()
         steps = int(rotation/delta)
 
-        for tab in range(abs(steps)):
+        for tab in xrange(abs(steps)):
             if steps > 0:
                 before = self._nLeftButtonStatus
                 self._nLeftButtonStatus = FNB_BTN_PRESSED
@@ -5506,7 +5505,7 @@ class PageContainer(wx.Panel):
         """
         HitTest method for :class:`PageContainer`.
 
-        :param `pt`: an instance of :class:`wx.Point`, to test for hits.
+        :param `pt`: an instance of :class:`Point`, to test for hits.
 
         :return: The hit test flag (if any) and the hit page index (if any). The return
          value can be one of the following bits:
@@ -5558,7 +5557,7 @@ class PageContainer(wx.Panel):
         # Test whether a left click was made on a tab
         bFoundMatch = False
 
-        for cur in range(self._nFrom, len(self._pagesInfoVec)):
+        for cur in xrange(self._nFrom, len(self._pagesInfoVec)):
 
             pgInfo = self._pagesInfoVec[cur]
 
@@ -5826,12 +5825,12 @@ class PageContainer(wx.Panel):
 
                 if not self.GetEnabled(tabIdx):
                     # Set the cursor to be 'No-entry'
-                    self.SetCursor(wx.Cursor(wx.CURSOR_NO_ENTRY))
+                    wx.SetCursor(wx.StockCursor(wx.CURSOR_NO_ENTRY))
                     self._setCursor = True
                 else:
                     self._nHoveringOverTabIndex = tabIdx
                     if self._setCursor:
-                        self.SetCursor(wx.Cursor(wx.CURSOR_ARROW))
+                        wx.SetCursor(wx.StockCursor(wx.CURSOR_ARROW))
                         self._setCursor = False
 
                 # Support for drag and drop
@@ -5839,8 +5838,8 @@ class PageContainer(wx.Panel):
 
                     self._isdragging = True
                     draginfo = FNBDragInfo(self, tabIdx)
-                    drginfo = pickle.dumps(draginfo)
-                    dataobject = wx.CustomDataObject(wx.DataFormat(six.u('FlatNotebook')))
+                    drginfo = cPickle.dumps(draginfo)
+                    dataobject = wx.CustomDataObject(wx.CustomDataFormat("FlatNotebook"))
                     dataobject.SetData(drginfo)
                     dragSource = FNBDropSource(self)
                     dragSource.SetData(dataobject)
@@ -5894,7 +5893,7 @@ class PageContainer(wx.Panel):
 
         ii = 0
 
-        for ii in range(self._nFrom, len(self._pagesInfoVec)):
+        for ii in xrange(self._nFrom, len(self._pagesInfoVec)):
 
             if self._pagesInfoVec[ii].GetPosition() == wx.Point(-1, -1):
                 break
@@ -6016,7 +6015,7 @@ class PageContainer(wx.Panel):
         if pWindow:
             pToolTip = pWindow.GetToolTip()
             if pToolTip and pToolTip.GetWindow() == pWindow:
-                self.SetToolTip(pToolTip.GetTip())
+                self.SetToolTipString(pToolTip.GetTip())
 
 
     def SetPageImage(self, page, image):
@@ -6063,7 +6062,7 @@ class PageContainer(wx.Panel):
         Sets the tab text colour individually.
 
         :param `page`: an integer specifying the page index;
-        :param `colour`: a valid :class:`wx.Colour` object or any typemap supported by wxWidgets/wxPython
+        :param `colour`: a valid :class:`Colour` object or any typemap supported by wxWidgets/wxPython
          to generate a colour (i.e., a hex string, a colour name, a 3 or 4 integer tuple). You can
          pass ``None`` or :class:`NullColour` to return to the default page text colour.
         """
@@ -6236,7 +6235,7 @@ class PageContainer(wx.Panel):
         """ Returns the number of visible tabs. """
 
         count = 0
-        for ii in range(self._nFrom, len(self._pagesInfoVec)):
+        for ii in xrange(self._nFrom, len(self._pagesInfoVec)):
             if self._pagesInfoVec[ii].GetPosition() == wx.Point(-1, -1):
                 break
             count = count + 1
@@ -6445,7 +6444,7 @@ class PageContainer(wx.Panel):
 
         popupMenu = wx.Menu()
 
-        for i in range(len(self._pagesInfoVec)):
+        for i in xrange(len(self._pagesInfoVec)):
             pi = self._pagesInfoVec[i]
             item = wx.MenuItem(popupMenu, i+1, pi.GetCaption(), pi.GetCaption(), wx.ITEM_NORMAL)
             self.Bind(wx.EVT_MENU, self.OnTabMenuSelection, item)
@@ -6455,7 +6454,7 @@ class PageContainer(wx.Panel):
             if wx.VERSION > (2, 6, 3, 0) and self.TabHasImage(i):
                 item.SetBitmap(self.GetImageList().GetBitmap(pi.GetImageIndex()))
 
-            popupMenu.Append(item)
+            popupMenu.AppendItem(item)
             item.Enable(pi.GetEnabled())
 
         self.PopupMenu(popupMenu)
@@ -6465,7 +6464,7 @@ class PageContainer(wx.Panel):
         """
         Handles the ``wx.EVT_MENU`` event for :class:`PageContainer`.
 
-        :param `event`: a :class:`wx.MenuEvent` event to be processed.
+        :param `event`: a :class:`MenuEvent` event to be processed.
         """
 
         selection = event.GetId() - 1
@@ -6509,7 +6508,7 @@ class PageContainer(wx.Panel):
         """
         Sets the image list for the :class:`PageContainer`.
 
-        :param `imageList`: an instance of :class:`wx.ImageList`.
+        :param `imageList`: an instance of :class:`ImageList`.
         """
 
         self._ImageList = imglist
@@ -6519,7 +6518,7 @@ class PageContainer(wx.Panel):
         """
         Assigns the image list for the :class:`PageContainer`.
 
-        :param `imageList`: an instance of :class:`wx.ImageList`.
+        :param `imageList`: an instance of :class:`ImageList`.
         """
 
         self._ImageList = imglist
@@ -6553,7 +6552,7 @@ class PageContainer(wx.Panel):
         if page < len(self._pagesInfoVec):
             return self._pagesInfoVec[page].GetCaption()
         else:
-            return six.u('')
+            return u''
 
 
     def SetPageText(self, page, text):
@@ -6604,7 +6603,7 @@ class FlatNotebookCompatible(FlatNotebook):
          chosen by either the windowing system or wxPython, depending on platform;
         :param `size`: the control size. A value of (-1, -1) indicates a default size,
          chosen by either the windowing system or wxPython, depending on platform;
-        :param `style`: the underlying :class:`Panel` window style;
+        :param `style`: the underlying :class:`PyPanel` window style;
         :param `agwStyle`: the AGW-specific window style. This can be a combination of the
          following bits:
 

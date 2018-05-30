@@ -1,15 +1,4 @@
-#----------------------------------------------------------------------------
-# Name:         GUIMode.py
-# Purpose:
-#
-# Author:
-#
-# Created:
-# Version:
-# Date:
-# Licence:
-# Tags:         phoenix-port
-#----------------------------------------------------------------------------
+#!/usr/bin/env python
 """
 
 Module that holds the GUI modes used by FloatCanvas
@@ -22,44 +11,44 @@ version of the code.
 """
 
 import wx
+## fixme: events should live in their own module, so all of FloatCanvas
+##        wouldn't have to be imported here.
+import FloatCanvas, Resources
+from Utilities import BBox
 import numpy as N
-
-from . import FCEvents, Resources
-from .Utilities import BBox
-
 
 class Cursors(object):
     """
     Class to hold the standard Cursors
-
+    
     """
     def __init__(self):
         if "wxMac" in wx.PlatformInfo: # use 16X16 cursors for wxMac
-            self.HandCursor = wx.Cursor(Resources.getHand16Image())
-            self.GrabHandCursor = wx.Cursor(Resources.getGrabHand16Image())
-
+            self.HandCursor = wx.CursorFromImage(Resources.getHand16Image())
+            self.GrabHandCursor = wx.CursorFromImage(Resources.getGrabHand16Image())
+        
             img = Resources.getMagPlus16Image()
-            img.SetOption(wx.IMAGE_OPTION_CUR_HOTSPOT_X, 6)
-            img.SetOption(wx.IMAGE_OPTION_CUR_HOTSPOT_Y, 6)
-            self.MagPlusCursor = wx.Cursor(img)
-
+            img.SetOptionInt(wx.IMAGE_OPTION_CUR_HOTSPOT_X, 6)
+            img.SetOptionInt(wx.IMAGE_OPTION_CUR_HOTSPOT_Y, 6)
+            self.MagPlusCursor = wx.CursorFromImage(img)
+        
             img = Resources.getMagMinus16Image()
-            img.SetOption(wx.IMAGE_OPTION_CUR_HOTSPOT_X, 6)
-            img.SetOption(wx.IMAGE_OPTION_CUR_HOTSPOT_Y, 6)
-            self.MagMinusCursor = wx.Cursor(img)
+            img.SetOptionInt(wx.IMAGE_OPTION_CUR_HOTSPOT_X, 6)
+            img.SetOptionInt(wx.IMAGE_OPTION_CUR_HOTSPOT_Y, 6)
+            self.MagMinusCursor = wx.CursorFromImage(img)
         else: # use 24X24 cursors for GTK and Windows
-            self.HandCursor = wx.Cursor(Resources.getHandImage())
-            self.GrabHandCursor = wx.Cursor(Resources.getGrabHandImage())
-
+            self.HandCursor = wx.CursorFromImage(Resources.getHandImage())
+            self.GrabHandCursor = wx.CursorFromImage(Resources.getGrabHandImage())
+        
             img = Resources.getMagPlusImage()
-            img.SetOption(wx.IMAGE_OPTION_CUR_HOTSPOT_X, 9)
-            img.SetOption(wx.IMAGE_OPTION_CUR_HOTSPOT_Y, 9)
-            self.MagPlusCursor = wx.Cursor(img)
-
+            img.SetOptionInt(wx.IMAGE_OPTION_CUR_HOTSPOT_X, 9)
+            img.SetOptionInt(wx.IMAGE_OPTION_CUR_HOTSPOT_Y, 9)
+            self.MagPlusCursor = wx.CursorFromImage(img)
+        
             img = Resources.getMagMinusImage()
-            img.SetOption(wx.IMAGE_OPTION_CUR_HOTSPOT_X, 9)
-            img.SetOption(wx.IMAGE_OPTION_CUR_HOTSPOT_Y, 9)
-            self.MagMinusCursor = wx.Cursor(img)
+            img.SetOptionInt(wx.IMAGE_OPTION_CUR_HOTSPOT_X, 9)
+            img.SetOptionInt(wx.IMAGE_OPTION_CUR_HOTSPOT_Y, 9)
+            self.MagMinusCursor = wx.CursorFromImage(img)
 
 
 class GUIBase(object):
@@ -70,12 +59,6 @@ class GUIBase(object):
 
     """
     def __init__(self, Canvas=None):
-        """
-        Default class constructor.
-
-        :param `Canvas`: the canvas the GUI mode is attached too
-
-        """
         self.Canvas = Canvas # set the FloatCanvas for the mode
                              # it gets set when the Mode is set on the Canvas.
         self.Cursors = Cursors()
@@ -121,7 +104,6 @@ class GUIBase(object):
         """
         pass
 
-
 ## some mix-ins for use with the other modes:
 class ZoomWithMouseWheel():
     def OnWheel(self, event):
@@ -144,57 +126,57 @@ class GUIMouse(GUIBase):
 
     # Handlers
     def OnLeftDown(self, event):
-        EventType = FCEvents.EVT_FC_LEFT_DOWN
+        EventType = FloatCanvas.EVT_FC_LEFT_DOWN
         if not self.Canvas.HitTest(event, EventType):
             self.Canvas._RaiseMouseEvent(event, EventType)
 
     def OnLeftUp(self, event):
-        EventType = FCEvents.EVT_FC_LEFT_UP
+        EventType = FloatCanvas.EVT_FC_LEFT_UP
         if not self.Canvas.HitTest(event, EventType):
             self.Canvas._RaiseMouseEvent(event, EventType)
 
     def OnLeftDouble(self, event):
-        EventType = FCEvents.EVT_FC_LEFT_DCLICK
+        EventType = FloatCanvas.EVT_FC_LEFT_DCLICK
         if not self.Canvas.HitTest(event, EventType):
                 self.Canvas._RaiseMouseEvent(event, EventType)
 
     def OnMiddleDown(self, event):
-        EventType = FCEvents.EVT_FC_MIDDLE_DOWN
+        EventType = FloatCanvas.EVT_FC_MIDDLE_DOWN
         if not self.Canvas.HitTest(event, EventType):
             self.Canvas._RaiseMouseEvent(event, EventType)
 
     def OnMiddleUp(self, event):
-        EventType = FCEvents.EVT_FC_MIDDLE_UP
+        EventType = FloatCanvas.EVT_FC_MIDDLE_UP
         if not self.Canvas.HitTest(event, EventType):
             self.Canvas._RaiseMouseEvent(event, EventType)
 
     def OnMiddleDouble(self, event):
-        EventType = FCEvents.EVT_FC_MIDDLE_DCLICK
+        EventType = FloatCanvas.EVT_FC_MIDDLE_DCLICK
         if not self.Canvas.HitTest(event, EventType):
             self.Canvas._RaiseMouseEvent(event, EventType)
 
     def OnRightDown(self, event):
-        EventType = FCEvents.EVT_FC_RIGHT_DOWN
+        EventType = FloatCanvas.EVT_FC_RIGHT_DOWN
         if not self.Canvas.HitTest(event, EventType):
             self.Canvas._RaiseMouseEvent(event, EventType)
 
     def OnRightUp(self, event):
-        EventType = FCEvents.EVT_FC_RIGHT_UP
+        EventType = FloatCanvas.EVT_FC_RIGHT_UP
         if not self.Canvas.HitTest(event, EventType):
             self.Canvas._RaiseMouseEvent(event, EventType)
 
     def OnRightDouble(self, event):
-        EventType = FCEvents.EVT_FC_RIGHT_DCLICK
+        EventType = FloatCanvas.EVT_FC_RIGHT_DCLICK
         if not self.Canvas.HitTest(event, EventType):
             self.Canvas._RaiseMouseEvent(event, EventType)
 
     def OnWheel(self, event):
-        EventType = FCEvents.EVT_FC_MOUSEWHEEL
+        EventType = FloatCanvas.EVT_FC_MOUSEWHEEL
         self.Canvas._RaiseMouseEvent(event, EventType)
 
     def OnMove(self, event):
         ## The Move event always gets raised, even if there is a hit-test
-        EventType = FCEvents.EVT_FC_MOTION
+        EventType = FloatCanvas.EVT_FC_MOTION
         # process the object hit test for EVT_MOTION bindings
         self.Canvas.HitTest(event, EventType)
         # process enter and leave events
@@ -215,7 +197,7 @@ class GUIMove(ZoomWithMouseWheel, GUIBase):
         self.StartMove = None
         self.MidMove = None
         self.PrevMoveXY = None
-
+        
         ## timer to give a delay when moving so that buffers aren't re-built too many times.
         self.MoveTimer = wx.PyTimer(self.OnMoveTimer)
 
@@ -235,7 +217,7 @@ class GUIMove(ZoomWithMouseWheel, GUIBase):
 
     def OnMove(self, event):
         # Always raise the Move event.
-        self.Canvas._RaiseMouseEvent(event, FCEvents.EVT_FC_MOTION)
+        self.Canvas._RaiseMouseEvent(event, FloatCanvas.EVT_FC_MOTION)
         if event.Dragging() and event.LeftIsDown() and not self.StartMove is None:
             self.EndMove = N.array(event.GetPosition())
             self.MoveImage(event)
@@ -257,6 +239,7 @@ class GUIMove(ZoomWithMouseWheel, GUIBase):
         wh = self.Canvas.PanelSize
         xy_tl = xy1 - self.StartMove
         dc = wx.ClientDC(self.Canvas)
+        dc.BeginDrawing()
         x1,y1 = self.PrevMoveXY
         x2,y2 = xy_tl
         w,h = self.Canvas.PanelSize
@@ -304,16 +287,14 @@ class GUIMove(ZoomWithMouseWheel, GUIBase):
         dc.DrawRectangle(xb, yb, wb, hb)
         self.PrevMoveXY = xy_tl
         if self.Canvas._ForeDrawList:
-            dc.DrawBitmap(self.Canvas._ForegroundBuffer,xy_tl)
+            dc.DrawBitmapPoint(self.Canvas._ForegroundBuffer,xy_tl)
         else:
-            dc.DrawBitmap(self.Canvas._Buffer,xy_tl)
+            dc.DrawBitmapPoint(self.Canvas._Buffer,xy_tl)
+        dc.EndDrawing()
         #self.Canvas.Update()
 
-
 class GUIZoomIn(ZoomWithMouseWheel, GUIBase):
-    """
-    Mode to zoom in.
-    """
+ 
     def __init__(self, canvas=None):
         GUIBase.__init__(self, canvas)
         self.StartRBBox = None
@@ -343,7 +324,7 @@ class GUIZoomIn(ZoomWithMouseWheel, GUIBase):
 
     def OnMove(self, event):
         # Always raise the Move event.
-        self.Canvas._RaiseMouseEvent(event,FCEvents.EVT_FC_MOTION)
+        self.Canvas._RaiseMouseEvent(event,FloatCanvas.EVT_FC_MOTION)
         if event.Dragging() and event.LeftIsDown() and not (self.StartRBBox is None):
             xy0 = self.StartRBBox
             xy1 = N.array( event.GetPosition() )
@@ -352,14 +333,16 @@ class GUIZoomIn(ZoomWithMouseWheel, GUIBase):
             wh[1] = int(wh[0] / self.Canvas.AspectRatio)
             xy_c = (xy0 + xy1) / 2
             dc = wx.ClientDC(self.Canvas)
+            dc.BeginDrawing()
             dc.SetPen(wx.Pen('WHITE', 2, wx.SHORT_DASH))
             dc.SetBrush(wx.TRANSPARENT_BRUSH)
             dc.SetLogicalFunction(wx.XOR)
             if self.PrevRBBox:
-                dc.DrawRectangle(*self.PrevRBBox)
+                dc.DrawRectanglePointSize(*self.PrevRBBox)
             self.PrevRBBox = ( xy_c - wh/2, wh )
-            dc.DrawRectangle( *self.PrevRBBox )
-
+            dc.DrawRectanglePointSize( *self.PrevRBBox )
+            dc.EndDrawing()
+            
     def UpdateScreen(self):
         """
         Update gets called if the screen has been repainted in the middle of a zoom in
@@ -371,20 +354,18 @@ class GUIZoomIn(ZoomWithMouseWheel, GUIBase):
             dc.SetPen(wx.Pen('WHITE', 2, wx.SHORT_DASH))
             dc.SetBrush(wx.TRANSPARENT_BRUSH)
             dc.SetLogicalFunction(wx.XOR)
-            dc.DrawRectangle(*self.PrevRBBox)
+            dc.DrawRectanglePointSize(*self.PrevRBBox)
 
     def OnRightDown(self, event):
         self.Canvas.Zoom(1/1.5, event.GetPosition(), centerCoords="pixel")
 
 
 class GUIZoomOut(ZoomWithMouseWheel, GUIBase):
-    """
-    Mode to zoom out.
-    """
+
     def __init__(self, Canvas=None):
         GUIBase.__init__(self, Canvas)
         self.Cursor = self.Cursors.MagMinusCursor
-
+        
     def OnLeftDown(self, event):
         self.Canvas.Zoom(1/1.5, event.GetPosition(), centerCoords="pixel")
 
@@ -393,4 +374,5 @@ class GUIZoomOut(ZoomWithMouseWheel, GUIBase):
 
     def OnMove(self, event):
         # Always raise the Move event.
-        self.Canvas._RaiseMouseEvent(event,FCEvents.EVT_FC_MOTION)
+        self.Canvas._RaiseMouseEvent(event,FloatCanvas.EVT_FC_MOTION)
+

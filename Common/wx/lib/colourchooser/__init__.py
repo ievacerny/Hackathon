@@ -12,11 +12,9 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 """
 
-from __future__ import absolute_import
-
 # 12/14/2003 - Jeff Grimmett (grimmtooth@softhome.net)
 #
-# o 2.5 compatibility update.
+# o 2.5 compatability update.
 #
 # 12/21/2003 - Jeff Grimmett (grimmtooth@softhome.net)
 #
@@ -24,7 +22,7 @@ from __future__ import absolute_import
 # o wxPyColourChooser -> PyColourChooser
 #
 
-from .pycolourchooser import *
+from pycolourchooser import *
 
 # For the American in you
 PyColorChooser = PyColourChooser

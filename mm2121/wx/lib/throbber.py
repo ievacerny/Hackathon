@@ -14,12 +14,12 @@ can continue unencumbered.
 # Thanks to Harald Massa <harald.massa@suedvers.de> for
 # suggestions and sample code.
 #
+# $Id$
 #
 # 12/12/2003 - Jeff Grimmett (grimmtooth@softhome.net)
 #
-# o 2.5 compatibility update.
+# o 2.5 compatability update.
 #
-# Tags:        phoenix-port, unittest, py3-port, documented
 
 
 import os
@@ -37,7 +37,7 @@ class UpdateThrobberEvent(wx.PyEvent):
 
 # ------------------------------------------------------------------------------
 
-class Throbber(wx.Panel):
+class Throbber(wx.PyPanel):
     """
     The first argument is either the name of a file that will be split into frames
     (a composite image) or a list of  strings of image names that will be treated
@@ -49,48 +49,23 @@ class Throbber(wx.Panel):
     animation. A label may also be specified to show on top of the animation.
     """
     def __init__(self, parent, id,
-                 bitmap,
+                 bitmap,          # single (composite) bitmap or list of bitmaps
                  pos = wx.DefaultPosition,
                  size = wx.DefaultSize,
-                 frameDelay = 0.1,
-                 frames = 0,
-                 frameWidth = 0,
-                 label = None,
-                 overlay = None,
-                 reverse = 0,
-                 style = 0,
+                 frameDelay = 0.1,# time between frames
+                 frames = 0,      # number of frames (only necessary for composite image)
+                 frameWidth = 0,  # width of each frame (only necessary for composite image)
+                 label = None,    # optional text to be displayed
+                 overlay = None,  # optional image to overlay on animation
+                 reverse = 0,     # reverse direction at end of animation
+                 style = 0,       # window style
                  name = "throbber",
                  rest = 0,
                  current = 0,
                  direction = 1,
                  sequence = None
                  ):
-        """
-        Default class constructor.
-
-        :param `parent`: parent window, must not be ``None``
-        :param integer `id`: window identifier. A value of -1 indicates a default value
-        :param `bitmap`: a :class:`wx.Bitmap` to be used
-        :param `pos`: the control position. A value of (-1, -1) indicates a default position,
-         chosen by either the windowing system or wxPython, depending on platform
-        :param `size`: the control size. A value of (-1, -1) indicates a default size,
-         chosen by either the windowing system or wxPython, depending on platform
-        :param `frameDelay`: time delay between frames
-        :param `frames`: number of frames (only necessary for composite image)
-        :param `frameWidth`: width of each frame (only necessary for composite image)
-        :param string `label`: optional text to be displayed
-        :param `overlay`: optional :class:`wx.Bitmap` to overlay on animation
-        :param boolean `reverse`: reverse direction at end of animation
-        :param integer `style`: the underlying :class:`wx.Control` style
-        :param string `name`: the widget name.
-        :param `rest`: the rest frame
-        :param `current`: the current frame
-        :param `direction`: 1 advances = -1 reverses
-        :param `sequence`: sequence of frames, defaults to range(self.frames)
-
-        """
-
-        super(Throbber, self).__init__(parent, id, pos, size, style, name)
+        wx.PyPanel.__init__(self, parent, id, pos, size, style, name)
         self.name = name
         self.label = label
         self.running = (1 != 1)
@@ -161,43 +136,19 @@ class Throbber(wx.Panel):
 
 
     def DoGetBestSize(self):
-        """
-        Get the best size of the widget.
-
-        :returns: the width and height
-
-        """
         return (self.width, self.height)
-
+    
 
     def OnTimer(self, event):
-        """
-        Handles the ``wx.EVT_TIMER`` event for :class:`Throbber`.
-
-        :param `event`: a :class:`TimerEvent` event to be processed.
-
-        """
         wx.PostEvent(self, UpdateThrobberEvent())
 
 
     def OnDestroyWindow(self, event):
-        """
-        Handles the ``wx.EVT_WINDOW_DESTROY`` event for :class:`Throbber`.
-
-        :param `event`: a :class:`wx.WindowDestroyEvent` event to be processed.
-
-        """
         self.Stop()
         event.Skip()
 
 
     def Draw(self, dc):
-        """
-        Draw the widget.
-
-        :param `dc`: the :class:`wx.DC` to draw on
-
-        """
         dc.DrawBitmap(self.submaps[self.sequence[self.current]], 0, 0, True)
         if self.overlay and self.showOverlay:
             dc.DrawBitmap(self.overlay, self.overlayX, self.overlayY, True)
@@ -208,28 +159,15 @@ class Throbber(wx.Panel):
 
 
     def OnPaint(self, event):
-        """
-        Handles the ``wx.EVT_PAINT`` event for :class:`Throbber`.
-
-        :param `event`: a :class:`PaintEvent` event to be processed.
-
-        """
         self.Draw(wx.PaintDC(self))
         event.Skip()
 
 
     def Update(self, event):
-        """
-        Handles the ``EVT_UPDATE_THROBBER`` event for :class:`ResizeWidget`.
-
-        :param `event`: a :class:`UpdateThrobberEvent` event to be processed.
-
-        """
         self.Next()
 
 
     def Wrap(self):
-        """Wrap the throbber around."""
         if self.current >= len(self.sequence):
             if self.autoReverse:
                 self.Reverse()
@@ -247,55 +185,45 @@ class Throbber(wx.Panel):
 
     # --------- public methods ---------
     def SetFont(self, font):
-        """
-        Set the font for the label.
-
-        :param `font`: the :class:`wx.Font` to use
-
-        """
+        """Set the font for the label"""
         wx.Panel.SetFont(self, font)
         self.SetLabel(self.label)
         self.Draw(wx.ClientDC(self))
 
 
     def Rest(self):
-        """Stop the animation and return to frame 0."""
+        """Stop the animation and return to frame 0"""
         self.Stop()
         self.current = self.rest
         self.Draw(wx.ClientDC(self))
 
 
     def Reverse(self):
-        """Change the direction of the animation."""
+        """Change the direction of the animation"""
         self.direction = -self.direction
 
 
     def Running(self):
-        """Returns True if the animation is running."""
+        """Returns True if the animation is running"""
         return self.running
 
 
     def Start(self):
-        """Start the animation."""
+        """Start the animation"""
         if not self.running:
             self.running = not self.running
             self.timer.Start(int(self.frameDelay * 1000))
 
 
     def Stop(self):
-        """Stop the animation."""
+        """Stop the animation"""
         if self.running:
             self.timer.Stop()
             self.running = not self.running
 
 
     def SetCurrent(self, current):
-        """
-        Set current image.
-
-        :param int `current`: the index to the current image
-
-        """
+        """Set current image"""
         running = self.Running()
         if not running:
             #FIXME: need to make sure value is within range!!!
@@ -304,22 +232,12 @@ class Throbber(wx.Panel):
 
 
     def SetRest(self, rest):
-        """
-        Set rest image.
-
-        :param int `rest`: the index for the rest frame.
-
-        """
+        """Set rest image"""
         self.rest = rest
 
 
     def SetSequence(self, sequence = None):
-        """
-        Order to display images in.
-
-        :param `sequence`: a sequence containing the order to display images in.
-
-        """
+        """Order to display images"""
 
         # self.sequence can be changed, but it's not recommended doing it
         # while the throbber is running.  self.sequence[0] should always
@@ -337,39 +255,34 @@ class Throbber(wx.Panel):
 
         if running:
             self.Start()
-
+            
 
     def Increment(self):
-        """Display next image in sequence."""
+        """Display next image in sequence"""
         self.current += 1
         self.Wrap()
 
 
     def Decrement(self):
-        """Display previous image in sequence."""
+        """Display previous image in sequence"""
         self.current -= 1
         self.Wrap()
 
 
     def Next(self):
-        """Display next image in sequence according to direction."""
+        """Display next image in sequence according to direction"""
         self.current += self.direction
         self.Wrap()
 
 
     def Previous(self):
-        """Display previous image in sequence according to direction."""
+        """Display previous image in sequence according to direction"""
         self.current -= self.direction
         self.Wrap()
 
 
     def SetFrameDelay(self, frameDelay = 0.05):
-        """
-        Delay between each frame.
-
-        :param float `frameDelay`: the delay between frames.
-
-        """
+        """Delay between each frame"""
         self.frameDelay = frameDelay
         if self.running:
             self.Stop()
@@ -377,12 +290,7 @@ class Throbber(wx.Panel):
 
 
     def ToggleOverlay(self, state = None):
-        """
-        Toggle the overlay image.
-
-        :param boolean `state`: set the overlay state or if None toggle state.
-
-        """
+        """Toggle the overlay image"""
         if state is None:
             self.showOverlay = not self.showOverlay
         else:
@@ -391,12 +299,7 @@ class Throbber(wx.Panel):
 
 
     def ToggleLabel(self, state = None):
-        """
-        Toggle the label.
-
-        :param boolean `state`: set the label state or if None toggle state.
-
-        """
+        """Toggle the label"""
         if state is None:
             self.showLabel = not self.showLabel
         else:
@@ -405,12 +308,7 @@ class Throbber(wx.Panel):
 
 
     def SetLabel(self, label):
-        """
-        Change the text of the label.
-
-        :param string `label`: the label text.
-
-        """
+        """Change the text of the label"""
         self.label = label
         if label:
             extentX, extentY = self.GetTextExtent(label)

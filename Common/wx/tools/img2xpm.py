@@ -4,12 +4,13 @@
 #
 # Author:      Robin Dunn
 #
-# Copyright:   (c) 2002-2017 by Total Control Software
+# RCS-ID:      $Id$
+# Copyright:   (c) 2002 by Total Control Software
 # Licence:     wxWindows license
 #----------------------------------------------------------------------
 # 12/21/2003 - Jeff Grimmett (grimmtooth@softhome.net)
 #
-# o V2.5 compatibility update
+# o V2.5 compatability update 
 #
 
 """
@@ -36,7 +37,7 @@ Options:
 
 import  sys
 import  wx
-from . import img2img
+import  img2img
 
 app = None
 def main():

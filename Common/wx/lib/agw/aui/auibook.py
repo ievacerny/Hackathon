@@ -1,16 +1,3 @@
-# -*- coding: utf-8 -*-
-#----------------------------------------------------------------------------
-# Name:         auibook.py
-# Purpose:
-#
-# Author:       Andrea Gavana <andrea.gavana@gmail.com>
-#
-# Created:
-# Version:
-# Date:         31 March 2009
-# Licence:      wxWindows license
-# Tags:         phoenix-port, unittest, documented, py3-port
-#----------------------------------------------------------------------------
 """
 `auibook.py` contains a notebook control which implements many features common in
 applications with dockable panes. Specifically, :class:`AuiNotebook` implements functionality
@@ -20,7 +7,7 @@ customize the control's look and feel.
 
 An effort has been made to try to maintain an API as similar to that of :class:`Notebook`.
 
-The default theme that is used is :class:`~wx.lib.agw.aui.tabart.AuiDefaultTabArt`, which provides a modern, glossy
+The default theme that is used is :class:`~lib.agw.aui.tabart.AuiDefaultTabArt`, which provides a modern, glossy
 look and feel. The theme can be changed by calling :meth:`AuiNotebook.SetArtProvider() <AuiNotebook.SetArtProvider>`.
 """
 
@@ -29,17 +16,18 @@ __date__ = "31 March 2009"
 
 
 import wx
+import types
 import datetime
 
 from wx.lib.expando import ExpandoTextCtrl
-import six
 
-from . import tabart as TA
+import framemanager
+import tabart as TA
 
-from .aui_utilities import LightColour, MakeDisabledBitmap, TabDragImage
-from .aui_utilities import TakeScreenShot, RescaleScreenShot
+from aui_utilities import LightColour, MakeDisabledBitmap, TabDragImage
+from aui_utilities import TakeScreenShot, RescaleScreenShot
 
-from .aui_constants import *
+from aui_constants import *
 
 # AuiNotebook events
 wxEVT_COMMAND_AUINOTEBOOK_PAGE_CLOSE = wx.NewEventType()
@@ -168,7 +156,7 @@ class TabTextCtrl(ExpandoTextCtrl):
             image_w += 6
 
         dc = wx.ClientDC(self._owner)
-        h = max(image_h, dc.GetFullMultiLineTextExtent(tab.caption)[1])
+        h = max(image_h, dc.GetMultiLineTextExtent(tab.caption)[1])
         h = h + 2
 
         # FIXME: what are all these hardcoded 4, 8 and 11s really?
@@ -277,7 +265,7 @@ class TabTextCtrl(ExpandoTextCtrl):
             mySize = self.GetSize()
 
             dc = wx.ClientDC(self)
-            sx, sy, dummy = dc.GetFullMultiLineTextExtent(self.GetValue() + "M")
+            sx, sy, dummy = dc.GetMultiLineTextExtent(self.GetValue() + "M")
 
             self.SetSize((sx, -1))
             self._currentValue = self.GetValue()
@@ -391,7 +379,7 @@ class CommandNotebookEvent(wx.PyCommandEvent):
         :param integer `win_id`: the window identification number.
         """
 
-        if type(command_type) in six.integer_types:
+        if type(command_type) == types.IntType:
             wx.PyCommandEvent.__init__(self, command_type, win_id)
         else:
             wx.PyCommandEvent.__init__(self, command_type.GetEventType(), command_type.GetId())
@@ -524,7 +512,7 @@ class AuiNotebookEvent(CommandNotebookEvent):
 
         CommandNotebookEvent.__init__(self, command_type, win_id)
 
-        if type(command_type) in six.integer_types:
+        if type(command_type) == types.IntType:
             self.notify = wx.NotifyEvent(command_type, win_id)
         else:
             self.notify = wx.NotifyEvent(command_type.GetEventType(), command_type.GetId())
@@ -587,13 +575,13 @@ class TabNavigatorProps(object):
     # Accessors
     Icon = property(lambda self: self._icon,
                     lambda self, icon: setattr(self, '_icon', icon),
-                    doc='Sets/Gets the icon for the L{TabNavigatorWindow}, an instance of :class:`wx.Bitmap`.')
+                    doc='Sets/Gets the icon for the L{TabNavigatorWindow}, an instance of :class:`Bitmap`.')
     Font = property(lambda self: self._font,
                     lambda self, font: setattr(self, '_font', font),
-                    doc='Sets/Gets the font for the L{TabNavigatorWindow}, an instance of :class:`wx.Font`.')
+                    doc='Sets/Gets the font for the L{TabNavigatorWindow}, an instance of :class:`Font`.')
     MinSize = property(lambda self: self._minsize,
                        lambda self, size: setattr(self, '_minsize', size),
-                       doc='Sets/Gets the minimum size for the L{TabNavigatorWindow}, an instance of :class:`wx.Size`.')
+                       doc='Sets/Gets the minimum size for the L{TabNavigatorWindow}, an instance of :class:`Size`.')
 
 # ---------------------------------------------------------------------------- #
 # Class TabNavigatorWindow
@@ -625,7 +613,7 @@ class TabNavigatorWindow(wx.Dialog):
         if props.Icon.GetSize() != (16, 16):
             img = self._props.Icon.ConvertToImage()
             img.Rescale(16, 16, wx.IMAGE_QUALITY_HIGH)
-            self._props.Icon = wx.Bitmap(img)
+            self._props.Icon = wx.BitmapFromImage(img)
 
         if self._props.Font.IsOk():
             self.Font = self._props.Font
@@ -638,9 +626,9 @@ class TabNavigatorWindow(wx.Dialog):
                                    wx.LB_SINGLE | wx.NO_BORDER)
 
         mem_dc = wx.MemoryDC()
-        mem_dc.SelectObject(wx.Bitmap(1, 1))
-        font = wx.SystemSettings.GetFont(wx.SYS_DEFAULT_GUI_FONT)
-        font.SetWeight(wx.FONTWEIGHT_BOLD)
+        mem_dc.SelectObject(wx.EmptyBitmap(1,1))
+        font = wx.SystemSettings_GetFont(wx.SYS_DEFAULT_GUI_FONT)
+        font.SetWeight(wx.BOLD)
         mem_dc.SetFont(font)
 
         panelHeight = mem_dc.GetCharHeight()
@@ -667,8 +655,8 @@ class TabNavigatorWindow(wx.Dialog):
         self._panel.Bind(wx.EVT_PAINT, self.OnPanelPaint)
         self._panel.Bind(wx.EVT_ERASE_BACKGROUND, self.OnPanelEraseBg)
 
-        self.SetBackgroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_3DFACE))
-        self._listBox.SetBackgroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_3DFACE))
+        self.SetBackgroundColour(wx.SystemSettings_GetColour(wx.SYS_COLOUR_3DFACE))
+        self._listBox.SetBackgroundColour(wx.SystemSettings_GetColour(wx.SYS_COLOUR_3DFACE))
         self.PopulateListControl(parent)
 
         self.SetInitialSize(props.MinSize)
@@ -791,12 +779,12 @@ class TabNavigatorWindow(wx.Dialog):
         dc = wx.PaintDC(self._panel)
         rect = self._panel.GetClientRect()
 
-        bmp = wx.Bitmap(rect.width, rect.height)
+        bmp = wx.EmptyBitmap(rect.width, rect.height)
 
         mem_dc = wx.MemoryDC()
         mem_dc.SelectObject(bmp)
 
-        endColour = wx.SystemSettings.GetColour(wx.SYS_COLOUR_BTNSHADOW)
+        endColour = wx.SystemSettings_GetColour(wx.SYS_COLOUR_BTNSHADOW)
         startColour = LightColour(endColour, 50)
         mem_dc.GradientFillLinear(rect, startColour, endColour, wx.SOUTH)
 
@@ -808,8 +796,8 @@ class TabNavigatorWindow(wx.Dialog):
         mem_dc.DrawBitmap(self._props.Icon, bmpPt.x, bmpPt.y, True)
 
         # get the text position, and draw it
-        font = wx.SystemSettings.GetFont(wx.SYS_DEFAULT_GUI_FONT)
-        font.SetWeight(wx.FONTWEIGHT_BOLD)
+        font = wx.SystemSettings_GetFont(wx.SYS_DEFAULT_GUI_FONT)
+        font.SetWeight(wx.BOLD)
         mem_dc.SetFont(font)
         fontHeight = mem_dc.GetCharHeight()
 
@@ -845,7 +833,7 @@ class AuiTabContainer(object):
     the :class:`AuiNotebook`, where it is disadvantageous to have separate
     windows for each tab control in the case of "docked tabs".
 
-    A derived class, :class:`AuiTabCtrl`, is an actual :class:`wx.Window` - derived window
+    A derived class, :class:`AuiTabCtrl`, is an actual :class:`Window` - derived window
     which can be used as a tab control in the normal sense.
     """
 
@@ -921,7 +909,7 @@ class AuiTabContainer(object):
          ``AUI_NB_CLOSE_ON_ACTIVE_TAB``       With this style, a close button is available on the active tab
          ``AUI_NB_CLOSE_ON_ALL_TABS``         With this style, a close button is available on all tabs
          ``AUI_NB_MIDDLE_CLICK_CLOSE``        Allows to close :class:`AuiNotebook` tabs by mouse middle button click
-         ``AUI_NB_SUB_NOTEBOOK``              This style is used by :class:`~wx.lib.agw.aui.framemanager.AuiManager` to create automatic AuiNotebooks
+         ``AUI_NB_SUB_NOTEBOOK``              This style is used by :class:`~lib.agw.aui.framemanager.AuiManager` to create automatic AuiNotebooks
          ``AUI_NB_HIDE_ON_SINGLE_TAB``        Hides the tab window if only one tab is present
          ``AUI_NB_SMART_TABS``                Use Smart Tabbing, like ``Alt`` + ``Tab`` on Windows
          ``AUI_NB_USE_IMAGES_DROPDOWN``       Uses images on dropdown window list menu instead of check items
@@ -973,7 +961,7 @@ class AuiTabContainer(object):
         """
         Sets the normal font for drawing tab labels.
 
-        :param wx.Font `font`: the new font to use to draw tab labels in their normal, un-selected state.
+        :param Font `font`: the new font to use to draw tab labels in their normal, un-selected state.
         """
 
         self._art.SetNormalFont(font)
@@ -983,7 +971,7 @@ class AuiTabContainer(object):
         """
         Sets the selected tab font for drawing tab labels.
 
-        :param wx.Font `font`: the new font to use to draw tab labels in their selected state.
+        :param Font `font`: the new font to use to draw tab labels in their selected state.
         """
 
         self._art.SetSelectedFont(font)
@@ -993,7 +981,7 @@ class AuiTabContainer(object):
         """
         Sets the font for calculating text measurements.
 
-        :param wx.Font `font`: the new font to use to measure tab label text extents.
+        :param Font `font`: the new font to use to measure tab label text extents.
         """
 
         self._art.SetMeasuringFont(font)
@@ -1003,7 +991,7 @@ class AuiTabContainer(object):
         """
         Sets the tab area rectangle.
 
-        :param wx.Rect `rect`: the available area for :class:`AuiTabContainer`.
+        :param Rect `rect`: the available area for :class:`AuiTabContainer`.
         """
 
         self._rect = rect
@@ -1017,7 +1005,7 @@ class AuiTabContainer(object):
         """
         Adds a page to the tab control.
 
-        :param wx.Window `page`: the window associated with this tab;
+        :param Window `page`: the window associated with this tab;
         :param `info`: an instance of :class:`AuiNotebookPage`.
         """
 
@@ -1038,7 +1026,7 @@ class AuiTabContainer(object):
         """
         Inserts a page in the tab control in the position specified by `idx`.
 
-        :param wx.Window `page`: the window associated with this tab;
+        :param Window `page`: the window associated with this tab;
         :param `info`: an instance of :class:`AuiNotebookPage`;
         :param integer `idx`: the page insertion index.
         """
@@ -1063,7 +1051,7 @@ class AuiTabContainer(object):
         """
         Moves a page in a new position specified by `new_idx`.
 
-        :param wx.Window `page`: the window associated with this tab;
+        :param Window `page`: the window associated with this tab;
         :param integer `new_idx`: the new page position.
         """
 
@@ -1087,7 +1075,7 @@ class AuiTabContainer(object):
         """
         Removes a page from the tab control.
 
-        :param `wnd`: an instance of :class:`wx.Window`, a window associated with this tab.
+        :param `wnd`: an instance of :class:`Window`, a window associated with this tab.
         """
 
         minMaxTabWidth = self._auiNotebook.GetMinMaxTabWidth()
@@ -1110,10 +1098,10 @@ class AuiTabContainer(object):
         """
         Sets the :class:`AuiNotebook` active page.
 
-        :param `wndOrInt`: an instance of :class:`wx.Window` or an integer specifying a tab index.
+        :param `wndOrInt`: an instance of :class:`Window` or an integer specifying a tab index.
         """
 
-        if type(wndOrInt) in six.integer_types:
+        if type(wndOrInt) == types.IntType:
 
             if wndOrInt >= len(self._pages):
                 return False
@@ -1169,7 +1157,7 @@ class AuiTabContainer(object):
         """
         Returns the tab index based on the window `wnd` associated with it.
 
-        :param `wnd`: an instance of :class:`wx.Window`.
+        :param `wnd`: an instance of :class:`Window`.
         """
 
         for indx, page in enumerate(self._pages):
@@ -1249,8 +1237,8 @@ class AuiTabContainer(object):
          ==============================  =================================
 
         :param integer `location`: the button location. Can be ``wx.LEFT`` or ``wx.RIGHT``;
-        :param wx.Bitmap `normal_bitmap`: the bitmap for an enabled tab;
-        :param wx.Bitmap `disabled_bitmap`: the bitmap for a disabled tab;
+        :param Bitmap `normal_bitmap`: the bitmap for an enabled tab;
+        :param Bitmap `disabled_bitmap`: the bitmap for a disabled tab;
         :param string `name`: the button name.
         """
 
@@ -1322,13 +1310,13 @@ class AuiTabContainer(object):
 
     def Render(self, raw_dc, wnd):
         """
-        Renders the tab catalog to the specified :class:`wx.DC`.
+        Renders the tab catalog to the specified :class:`DC`.
 
         It is a virtual function and can be overridden to provide custom drawing
         capabilities.
 
-        :param `raw_dc`: a :class:`wx.DC` device context;
-        :param `wnd`: an instance of :class:`wx.Window`.
+        :param `raw_dc`: a :class:`DC` device context;
+        :param `wnd`: an instance of :class:`Window`.
         """
 
         if not raw_dc or not raw_dc.IsOk():
@@ -1344,7 +1332,7 @@ class AuiTabContainer(object):
         button_count = len(self._buttons)
 
         # create off-screen bitmap
-        bmp = wx.Bitmap(self._rect.GetWidth(), self._rect.GetHeight())
+        bmp = wx.EmptyBitmap(self._rect.GetWidth(), self._rect.GetHeight())
         dc.SelectObject(bmp)
 
         if not dc.IsOk():
@@ -1352,7 +1340,7 @@ class AuiTabContainer(object):
 
         # prepare the tab-close-button array
         # make sure tab button entries which aren't used are marked as hidden
-        for i in range(page_count, len(self._tab_close_buttons)):
+        for i in xrange(page_count, len(self._tab_close_buttons)):
             self._tab_close_buttons[i].cur_state = AUI_BUTTON_STATE_HIDDEN
 
         # make sure there are enough tab button entries to accommodate all tabs
@@ -1368,7 +1356,7 @@ class AuiTabContainer(object):
         total_width = visible_width = 0
         tab_width = [0] * page_count
 
-        for i in range(page_count):
+        for i in xrange(page_count):
             page = self._pages[i]
 
             # determine if a close button is on this tab
@@ -1382,7 +1370,7 @@ class AuiTabContainer(object):
             if control:
                 try:
                     control.GetSize()
-                except RuntimeError:
+                except wx.PyDeadObjectError:
                     page.control = None
 
             size, x_extent = self._art.GetTabSize(dc, wnd, page.caption, page.bitmap, page.active,
@@ -1465,7 +1453,7 @@ class AuiTabContainer(object):
         # draw the buttons on the right side
         offset = self._rect.x + self._rect.width
 
-        for i in range(button_count):
+        for i in xrange(button_count):
             button = self._buttons[button_count - i - 1]
 
             if button.location != wx.RIGHT:
@@ -1485,7 +1473,7 @@ class AuiTabContainer(object):
         offset = 0
 
         # draw the buttons on the left side
-        for i in range(button_count):
+        for i in xrange(button_count):
             button = self._buttons[button_count - i - 1]
 
             if button.location != wx.LEFT:
@@ -1500,13 +1488,11 @@ class AuiTabContainer(object):
             offset += button.rect.GetWidth()
             left_buttons_width += button.rect.GetWidth()
 
-        offset = left_buttons_width
-
         if offset == 0:
             offset += self._art.GetIndentSize()
 
         # buttons before the tab offset must be set to hidden
-        for i in range(self._tab_offset):
+        for i in xrange(self._tab_offset):
             self._tab_close_buttons[i].cur_state = AUI_BUTTON_STATE_HIDDEN
             if self._pages[i].control:
                 if self._pages[i].control.IsShown():
@@ -1522,7 +1508,7 @@ class AuiTabContainer(object):
             clip_rect = wx.Rect(*self._rect)
             clip_rect.x = offset
 
-            dc.SetClippingRegion(clip_rect)
+            dc.SetClippingRect(clip_rect)
             self._art.DrawTab(dc, wnd, page, rect, tab_button.cur_state)
             dc.DestroyClippingRegion()
 
@@ -1534,7 +1520,7 @@ class AuiTabContainer(object):
         rect.y = 0
         rect.height = self._rect.height
 
-        for i in range(self._tab_offset, page_count):
+        for i in xrange(self._tab_offset, page_count):
 
             page = self._pages[i]
             tab_button = self._tab_close_buttons[i]
@@ -1570,7 +1556,7 @@ class AuiTabContainer(object):
 
         lenPages = len(self._pages)
         # make sure to deactivate buttons which are off the screen to the right
-        for j in range(i+1, len(self._tab_close_buttons)):
+        for j in xrange(i+1, len(self._tab_close_buttons)):
             self._tab_close_buttons[j].cur_state = AUI_BUTTON_STATE_HIDDEN
             if j > 0 and j <= lenPages:
                 if self._pages[j-1].control:
@@ -1595,8 +1581,8 @@ class AuiTabContainer(object):
 
         :param integer `tabPage`: the tab index;
         :param integer `tabOffset`: the tab offset;
-        :param `dc`: a :class:`wx.DC` device context;
-        :param `wnd`: an instance of :class:`wx.Window` derived window.
+        :param `dc`: a :class:`DC` device context;
+        :param `wnd`: an instance of :class:`Window` derived window.
         """
 
         if not dc or not dc.IsOk():
@@ -1614,7 +1600,7 @@ class AuiTabContainer(object):
             # First check if both buttons are disabled - if so, there's no need to
             # check further for visibility.
             arrowButtonVisibleCount = 0
-            for i in range(button_count):
+            for i in xrange(button_count):
 
                 button = self._buttons[i]
                 if button.id == AUI_BUTTON_LEFT or \
@@ -1636,9 +1622,7 @@ class AuiTabContainer(object):
         right_buttons_width = 0
 
         # calculate size of the buttons on the right side
-        offset = self._rect.x + self._rect.width
-
-        for i in range(button_count):
+        for i in xrange(button_count):
             button = self._buttons[button_count - i - 1]
 
             if button.location != wx.RIGHT:
@@ -1646,13 +1630,12 @@ class AuiTabContainer(object):
             if button.cur_state & AUI_BUTTON_STATE_HIDDEN:
                 continue
 
-            offset -= button.rect.GetWidth()
             right_buttons_width += button.rect.GetWidth()
 
         offset = 0
 
         # calculate size of the buttons on the left side
-        for i in range(button_count):
+        for i in xrange(button_count):
             button = self._buttons[button_count - i - 1]
 
             if button.location != wx.LEFT:
@@ -1663,8 +1646,6 @@ class AuiTabContainer(object):
             offset += button.rect.GetWidth()
             left_buttons_width += button.rect.GetWidth()
 
-        offset = left_buttons_width
-
         if offset == 0:
             offset += self._art.GetIndentSize()
 
@@ -1673,7 +1654,7 @@ class AuiTabContainer(object):
         rect.height = self._rect.height
 
         # See if the given page is visible at the given tab offset (effectively scroll position)
-        for i in range(tabOffset, page_count):
+        for i in xrange(tabOffset, page_count):
 
             page = self._pages[i]
             tab_button = self._tab_close_buttons[i]
@@ -1706,13 +1687,13 @@ class AuiTabContainer(object):
         Make the tab visible if it wasn't already.
 
         :param integer `tabPage`: the tab index;
-        :param `win`: an instance of :class:`wx.Window` derived window.
+        :param `win`: an instance of :class:`Window` derived window.
         """
 
         dc = wx.ClientDC(win)
 
         if not self.IsTabVisible(tabPage, self.GetTabOffset(), dc, win):
-            for i in range(len(self._pages)):
+            for i in xrange(len(self._pages)):
                 if self.IsTabVisible(tabPage, i, dc, win):
                     self.SetTabOffset(i)
                     win.Refresh()
@@ -1736,7 +1717,7 @@ class AuiTabContainer(object):
             if btn in self._buttons:
                 return None
 
-        for i in range(self._tab_offset, len(self._pages)):
+        for i in xrange(self._tab_offset, len(self._pages)):
             page = self._pages[i]
             if page.rect.Contains((x,y)):
                 return page.window
@@ -1794,9 +1775,9 @@ class AuiTabContainer(object):
 # ----------------------------------------------------------------------
 # -- AuiTabCtrl class implementation --
 
-class AuiTabCtrl(wx.Control, AuiTabContainer):
+class AuiTabCtrl(wx.PyControl, AuiTabContainer):
     """
-    This is an actual :class:`wx.Window` - derived window which can be used as a tab control in the normal sense.
+    This is an actual :class:`Window` - derived window which can be used as a tab control in the normal sense.
     """
 
     def __init__(self, parent, id=wx.ID_ANY, pos=wx.DefaultPosition, size=wx.DefaultSize,
@@ -1807,14 +1788,14 @@ class AuiTabCtrl(wx.Control, AuiTabContainer):
 
         :param `parent`: the :class:`AuiNotebook` parent;
         :param integer `id`: an identifier for the control: a value of -1 is taken to mean a default;
-        :param wx.Point `pos`: the control position. A value of (-1, -1) indicates a default position,
+        :param Point `pos`: the control position. A value of (-1, -1) indicates a default position,
          chosen by either the windowing system or wxPython, depending on platform;
-        :param wx.Size `size`: the control size. A value of (-1, -1) indicates a default size,
+        :param Size `size`: the control size. A value of (-1, -1) indicates a default size,
          chosen by either the windowing system or wxPython, depending on platform;
         :param integer `style`: the window style.
         """
 
-        wx.Control.__init__(self, parent, id, pos, size, style, name="AuiTabCtrl")
+        wx.PyControl.__init__(self, parent, id, pos, size, style, name="AuiTabCtrl")
         AuiTabContainer.__init__(self, parent)
 
         self._click_pt = wx.Point(-1, -1)
@@ -1891,7 +1872,7 @@ class AuiTabCtrl(wx.Control, AuiTabContainer):
         minimal size which doesn't truncate the control, for a panel - the same
         size as it would have after a call to `Fit()`.
 
-        :note: Overridden from :class:`wx.Control`.
+        :note: Overridden from :class:`PyControl`.
         """
 
         return wx.Size(self._rect.width, self._rect.height)
@@ -1901,7 +1882,7 @@ class AuiTabCtrl(wx.Control, AuiTabContainer):
         """
         Handles the ``wx.EVT_SIZE`` event for :class:`AuiTabCtrl`.
 
-        :param `event`: a :class:`wx.SizeEvent` event to be processed.
+        :param `event`: a :class:`SizeEvent` event to be processed.
         """
 
         s = event.GetSize()
@@ -2019,15 +2000,15 @@ class AuiTabCtrl(wx.Control, AuiTabContainer):
 
         if self._is_dragging:
 
+            if self.HasCapture():
+                self.ReleaseMouse()
+
             self._is_dragging = False
             if self._drag_image:
                 self._drag_image.EndDrag()
                 del self._drag_image
                 self._drag_image = None
                 self.GetParent().Refresh()
-
-            if self.HasCapture():
-                self.ReleaseMouse()
 
             evt = AuiNotebookEvent(wxEVT_COMMAND_AUINOTEBOOK_END_DRAG, self.GetId())
             evt.SetSelection(self.GetIdxFromWindow(self._click_tab))
@@ -2287,11 +2268,11 @@ class AuiTabCtrl(wx.Control, AuiTabContainer):
 
                     if self.HasCapture():
                         self.ReleaseMouse()
-
+                        
                     if self._agwFlags & AUI_NB_TAB_FLOAT:
                         self._drag_image.BeginDrag(wx.Point(0,0), self, fullScreen=True)
                     else:
-                        self._drag_image.BeginDrag(wx.Point(0,0), self, self.GetParent())
+                        self._drag_image.BeginDragBounded(wx.Point(0,0), self, self.GetParent())
 
                     # Capture the mouse cursor position offset relative to
                     # The tab image location
@@ -2325,9 +2306,9 @@ class AuiTabCtrl(wx.Control, AuiTabContainer):
         """
         Returns the page at which the mouse is pointing (if any).
 
-        :rtype: :class:`wx.Window`.
+        :rtype: :class:`Window`.
         """
-
+        
         screen_pt = wx.GetMousePosition()
         client_pt = self.ScreenToClient(screen_pt)
         return self.TabHitTest(client_pt.x, client_pt.y)
@@ -2338,9 +2319,9 @@ class AuiTabCtrl(wx.Control, AuiTabContainer):
         Starts a timer: when it fires, a tooltip will be shown on the notebook tab
         the mouse is pointing at.
 
-        :param wx.Window `wnd`: the window pointed by the mouse.
+        :param Window `wnd`: the window pointed by the mouse.
         """
-
+        
         self._tooltip_wnd = wnd
         if (wnd is None and self._hover_button is None) or not wx.GetApp().IsActive():
             self.StopTooltipTimer()
@@ -2352,7 +2333,7 @@ class AuiTabCtrl(wx.Control, AuiTabContainer):
 
     def StopTooltipTimer(self):
         """ Stops the timer keeping track of tooltips and mouse movements on the tab area. """
-
+        
         if self._tooltip_timer:
             self._tooltip_timer.Stop()
             self._tooltip_timer = None
@@ -2364,13 +2345,13 @@ class AuiTabCtrl(wx.Control, AuiTabContainer):
 
         :param `event`: a :class:`MouseEvent` event to be processed.
         """
-
+        
         self.RestartTooltipTimer(self.GetPointedToTab())
 
 
     def ShowTooltip(self):
         """ Shows the tooltip on the tab. """
-
+        
         wnd = self.GetPointedToTab()
         if wnd != self._tooltip_wnd:
             self.RestartTooltipTimer(wnd)
@@ -2380,7 +2361,7 @@ class AuiTabCtrl(wx.Control, AuiTabContainer):
                 page = self._pages[idx]
                 if page.tooltip:
                     pos = self.ClientToScreen(page.rect.GetPosition())
-                    rect = wx.Rect(pos, page.rect.GetSize())
+                    rect = wx.RectPS(pos, page.rect.GetSize())
                     tooltip = wx.TipWindow(self, page.tooltip)
                     tooltip.SetBoundingRect(rect)
             else:
@@ -2388,7 +2369,7 @@ class AuiTabCtrl(wx.Control, AuiTabContainer):
                 button = self.ButtonHitTest(pos.x, pos.y)
                 if button:
                     pos = self.ClientToScreen(button.rect.GetPosition())
-                    rect = wx.Rect(pos, button.rect.GetSize())
+                    rect = wx.RectPS(pos, button.rect.GetSize())
                     tooltip = wx.TipWindow(self, button.name)
                     tooltip.SetBoundingRect(rect)
 
@@ -2640,7 +2621,7 @@ class AuiTabCtrl(wx.Control, AuiTabContainer):
 
 # ----------------------------------------------------------------------
 
-class TabFrame(wx.Window):
+class TabFrame(wx.PyWindow):
     """
     TabFrame is an interesting case. It's important that all child pages
     of the multi-notebook control are all actually children of that control
@@ -2658,7 +2639,7 @@ class TabFrame(wx.Window):
         Used internally, do not call it in your code!
         """
 
-        pre = wx.Window.__init__(self)
+        pre = wx.PrePyWindow()
 
         self._tabs = None
         self._rect = wx.Rect(0, 0, 200, 200)
@@ -2666,7 +2647,7 @@ class TabFrame(wx.Window):
         self._tab_rect = wx.Rect()
         self._parent = parent
 
-        self.Create(parent, size=(0, 0))
+        self.PostCreate(pre)
 
 
     def SetTabCtrlHeight(self, h):
@@ -2705,7 +2686,7 @@ class TabFrame(wx.Window):
                                               for MSW and ignored elsewhere currently)
          ===================================  ======================================
 
-        :note: Overridden from :class:`wx.Control`.
+        :note: Overridden from :class:`PyControl`.
         """
 
         self._rect = wx.Rect(x, y, max(1, width), max(1, height))
@@ -2716,7 +2697,7 @@ class TabFrame(wx.Window):
         """
         Returns the window size.
 
-        :note: Overridden from :class:`wx.Control`.
+        :note: Overridden from :class:`PyControl`.
         """
 
         return self._rect.width, self._rect.height
@@ -2726,7 +2707,7 @@ class TabFrame(wx.Window):
         """
         Returns the window client size.
 
-        :note: Overridden from :class:`wx.Control`.
+        :note: Overridden from :class:`PyControl`.
         """
 
         return self._rect.width, self._rect.height
@@ -2740,7 +2721,7 @@ class TabFrame(wx.Window):
 
         :note:
 
-         Overridden from :class:`wx.Control`, this method always returns ``False`` as
+         Overridden from :class:`PyControl`, this method always returns ``False`` as
          :class:`TabFrame` should never be phisically shown on screen.
         """
 
@@ -2764,14 +2745,14 @@ class TabFrame(wx.Window):
             if self._tabs.GetAGWFlags() & AUI_NB_BOTTOM:
                 self._tab_rect = wx.Rect(self._rect.x, self._rect.y + self._rect.height - tab_height,
                                          self._rect.width, tab_height)
-                self._tabs.SetSize(self._rect.x, self._rect.y + self._rect.height - tab_height,
-                                   self._rect.width, tab_height)
+                self._tabs.SetDimensions(self._rect.x, self._rect.y + self._rect.height - tab_height,
+                                         self._rect.width, tab_height)
                 self._tabs.SetTabRect(wx.Rect(0, 0, self._rect.width, tab_height))
 
             else:
 
                 self._tab_rect = wx.Rect(self._rect.x, self._rect.y, self._rect.width, tab_height)
-                self._tabs.SetSize(self._rect.x, self._rect.y, self._rect.width, tab_height)
+                self._tabs.SetDimensions(self._rect.x, self._rect.y, self._rect.width, tab_height)
                 self._tabs.SetTabRect(wx.Rect(0, 0, self._rect.width, tab_height))
 
             # TODO: elif (GetAGWFlags() & AUI_NB_LEFT)
@@ -2783,7 +2764,7 @@ class TabFrame(wx.Window):
         else:
 
             tab_height = 0
-            self._tabs.SetSize(self._rect.x, self._rect.y, self._rect.width, tab_height)
+            self._tabs.SetDimensions(self._rect.x, self._rect.y, self._rect.width, tab_height)
             self._tabs.SetTabRect(wx.Rect(0, 0, self._rect.width, tab_height))
 
         pages = self._tabs.GetPages()
@@ -2798,10 +2779,10 @@ class TabFrame(wx.Window):
                 height = 0
 
             if self._tabs.GetAGWFlags() & AUI_NB_BOTTOM:
-                page.window.SetSize(self._rect.x, self._rect.y, self._rect.width, height)
+                page.window.SetDimensions(self._rect.x, self._rect.y, self._rect.width, height)
 
             else:
-                page.window.SetSize(self._rect.x, self._rect.y + tab_height,
+                page.window.SetDimensions(self._rect.x, self._rect.y + tab_height,
                                           self._rect.width, height)
 
             # TODO: elif (GetAGWFlags() & AUI_NB_LEFT)
@@ -2821,7 +2802,7 @@ class TabFrame(wx.Window):
          nothing happens if nothing has been invalidated (i.e. marked as requiring a redraw).
          Use `Refresh` first if you want to immediately redraw the window unconditionally.
 
-        :note: Overridden from :class:`wx.Control`.
+        :note: Overridden from :class:`PyControl`.
         """
 
         # does nothing
@@ -2831,7 +2812,7 @@ class TabFrame(wx.Window):
 # ----------------------------------------------------------------------
 # -- AuiNotebook class implementation --
 
-class AuiNotebook(wx.Panel):
+class AuiNotebook(wx.PyPanel):
     """
     AuiNotebook is a notebook control which implements many features common in applications with dockable panes.
     Specifically, AuiNotebook implements functionality which allows the user to rearrange tab
@@ -2840,7 +2821,7 @@ class AuiNotebook(wx.Panel):
 
     An effort has been made to try to maintain an API as similar to that of :class:`Notebook`.
 
-    The default theme that is used is :class:`~wx.lib.agw.aui.tabart.AuiDefaultTabArt`, which provides a modern, glossy
+    The default theme that is used is :class:`~lib.agw.aui.tabart.AuiDefaultTabArt`, which provides a modern, glossy
     look and feel. The theme can be changed by calling :meth:`AuiNotebook.SetArtProvider`.
     """
 
@@ -2849,13 +2830,13 @@ class AuiNotebook(wx.Panel):
         """
         Default class constructor.
 
-        :param wx.Window `parent`: the :class:`AuiNotebook` parent;
+        :param Window `parent`: the :class:`AuiNotebook` parent;
         :param integer `id`: an identifier for the control: a value of -1 is taken to mean a default;
-        :param wx.Point `pos`: the control position. A value of (-1, -1) indicates a default position,
+        :param Point `pos`: the control position. A value of (-1, -1) indicates a default position,
          chosen by either the windowing system or wxPython, depending on platform;
-        :param wx.Size `size`: the control size. A value of (-1, -1) indicates a default size,
+        :param Size `size`: the control size. A value of (-1, -1) indicates a default size,
          chosen by either the windowing system or wxPython, depending on platform;
-        :param integer `style`: the underlying :class:`Panel` window style;
+        :param integer `style`: the underlying :class:`PyPanel` window style;
         :param integer `agwStyle`: the AGW-specific window style. This can be a combination of the following bits:
 
          ==================================== ==================================
@@ -2875,7 +2856,7 @@ class AuiNotebook(wx.Panel):
          ``AUI_NB_CLOSE_ON_ACTIVE_TAB``       With this style, a close button is available on the active tab
          ``AUI_NB_CLOSE_ON_ALL_TABS``         With this style, a close button is available on all tabs
          ``AUI_NB_MIDDLE_CLICK_CLOSE``        Allows to close :class:`AuiNotebook` tabs by mouse middle button click
-         ``AUI_NB_SUB_NOTEBOOK``              This style is used by :class:`~wx.lib.agw.aui.framemanager.AuiManager` to create automatic AuiNotebooks
+         ``AUI_NB_SUB_NOTEBOOK``              This style is used by :class:`~lib.agw.aui.framemanager.AuiManager` to create automatic AuiNotebooks
          ``AUI_NB_HIDE_ON_SINGLE_TAB``        Hides the tab window if only one tab is present
          ``AUI_NB_SMART_TABS``                Use Smart Tabbing, like ``Alt`` + ``Tab`` on Windows
          ``AUI_NB_USE_IMAGES_DROPDOWN``       Uses images on dropdown window list menu instead of check items
@@ -2904,8 +2885,7 @@ class AuiNotebook(wx.Panel):
         self._textCtrl = None
         self._tabBounds = (-1, -1)
 
-        wx.Panel.__init__(self, parent, id, pos, size, style|wx.BORDER_NONE|wx.TAB_TRAVERSAL, name=name)
-        from . import framemanager
+        wx.PyPanel.__init__(self, parent, id, pos, size, style|wx.BORDER_NONE|wx.TAB_TRAVERSAL, name=name)
         self._mgr = framemanager.AuiManager()
         self._tabs = AuiTabContainer(self)
 
@@ -2930,13 +2910,13 @@ class AuiNotebook(wx.Panel):
         .. note::
 
            This method has been added to safely un-initialize the underlying
-           :class:`~wx.lib.agw.aui.framemanager.AuiManager` which manages the :class:`AuiNotebook`
+           :class:`~lib.agw.aui.framemanager.AuiManager` which manages the :class:`AuiNotebook`
            layout (i.e., tab split, re-ordering, tab floating etc...).
 
         """
 
         self._mgr.UnInit()
-        return wx.Panel.Destroy(self)
+        return wx.PyPanel.Destroy(self)
 
 
     def __getitem__(self, index):
@@ -2978,8 +2958,6 @@ class AuiNotebook(wx.Panel):
         :see: :meth:`~AuiNotebook.__init__` for a list of available `agwStyle` bits.
         """
 
-        from . import framemanager
-
         self._agwFlags = agwStyle
 
         self._popupWin = None
@@ -2989,7 +2967,7 @@ class AuiNotebook(wx.Panel):
 
         self._normal_font = wx.SystemSettings.GetFont(wx.SYS_DEFAULT_GUI_FONT)
         self._selected_font = wx.SystemSettings.GetFont(wx.SYS_DEFAULT_GUI_FONT)
-        self._selected_font.SetWeight(wx.FONTWEIGHT_BOLD)
+        self._selected_font.SetWeight(wx.BOLD)
 
         self.SetArtProvider(TA.AuiDefaultTabArt())
 
@@ -3048,7 +3026,7 @@ class AuiNotebook(wx.Panel):
     def SavePerspective(self):
         """
         Saves the entire user interface layout into an encoded string, which can then
-        be stored by the application (probably using :class:`Config <ConfigBase>`). When a perspective
+        be stored by the application (probably using :class:`Config`). When a perspective
         is restored using :meth:`LoadPerspective`, the entire user interface will return
         to the state it was when the perspective was saved.
         """
@@ -3072,7 +3050,7 @@ class AuiNotebook(wx.Panel):
             # add tab id's
             page_count = tabframe._tabs.GetPageCount()
 
-            for p in range(page_count):
+            for p in xrange(page_count):
 
                 page = tabframe._tabs.GetPage(p)
                 page_idx = self._tabs.GetIdxFromWindow(page.window)
@@ -3101,11 +3079,10 @@ class AuiNotebook(wx.Panel):
 
         :param string `layout`: a string which contains a saved :class:`AuiNotebook` layout.
         """
-        from . import framemanager
 
         # Remove all tab ctrls (but still keep them in main index)
         tab_count = self._tabs.GetPageCount()
-        for i in range(tab_count):
+        for i in xrange(tab_count):
             wnd = self._tabs.GetWindowFromIdx(i)
 
             # find out which onscreen tab ctrl owns this tab
@@ -3241,7 +3218,7 @@ class AuiNotebook(wx.Panel):
         large bitmap is added, the tab control's height will automatically increase to accommodate
         the larger bitmap.
 
-        :param wx.Size `size`: the tab bitmap size.
+        :param Size `size`: the tab bitmap size.
         """
 
         self._requested_bmp_size = wx.Size(*size)
@@ -3283,7 +3260,7 @@ class AuiNotebook(wx.Panel):
 
 
     def UpdateHintWindowSize(self):
-        """ Updates the :class:`~wx.lib.agw.aui.framemanager.AuiManager` hint window size. """
+        """ Updates the :class:`~lib.agw.aui.framemanager.AuiManager` hint window size. """
 
         size = self.CalculateNewSplitSize()
 
@@ -3369,7 +3346,7 @@ class AuiNotebook(wx.Panel):
          ``AUI_NB_CLOSE_ON_ACTIVE_TAB``       With this style, a close button is available on the active tab
          ``AUI_NB_CLOSE_ON_ALL_TABS``         With this style, a close button is available on all tabs
          ``AUI_NB_MIDDLE_CLICK_CLOSE``        Allows to close :class:`AuiNotebook` tabs by mouse middle button click
-         ``AUI_NB_SUB_NOTEBOOK``              This style is used by :class:`~wx.lib.agw.aui.framemanager.AuiManager` to create automatic AuiNotebooks
+         ``AUI_NB_SUB_NOTEBOOK``              This style is used by :class:`~lib.agw.aui.framemanager.AuiManager` to create automatic AuiNotebooks
          ``AUI_NB_HIDE_ON_SINGLE_TAB``        Hides the tab window if only one tab is present
          ``AUI_NB_SMART_TABS``                Use Smart Tabbing, like ``Alt`` + ``Tab`` on Windows
          ``AUI_NB_USE_IMAGES_DROPDOWN``       Uses images on dropdown window list menu instead of check items
@@ -3423,12 +3400,12 @@ class AuiNotebook(wx.Panel):
         Adds a page. If the `select` parameter is ``True``, calling this will generate a
         page change event.
 
-        :param wx.Window `page`: the page to be added;
+        :param Window `page`: the page to be added;
         :param string `caption`: specifies the text for the new page;
         :param bool `select`: specifies whether the page should be selected;
-        :param wx.Bitmap `bitmap`: the bitmap to display in the enabled tab;
-        :param wx.Bitmap `disabled_bitmap`: the bitmap to display in the disabled tab;
-        :param wx.Window `control`: almost any :class:`wx.Window` -derived instance to be located
+        :param Bitmap `bitmap`: the bitmap to display in the enabled tab;
+        :param Bitmap `disabled_bitmap`: the bitmap to display in the disabled tab;
+        :param Window `control`: almost any :class:`Window` -derived instance to be located
          inside a tab;
         :param string `tooltip`: the tooltip to display when the mouse hovers over the tab.
         """
@@ -3442,16 +3419,15 @@ class AuiNotebook(wx.Panel):
         This is similar to :meth:`AddPage`, but allows the ability to specify the insert location.
 
         :param integer `page_idx`: specifies the position for the new page;
-        :param wx.Window `page`: the page to be added;
+        :param Window `page`: the page to be added;
         :param string `caption`: specifies the text for the new page;
         :param bool `select`: specifies whether the page should be selected;
-        :param wx.Bitmap `bitmap`: the bitmap to display in the enabled tab;
-        :param wx.Bitmap `disabled_bitmap`: the bitmap to display in the disabled tab;
-        :param wx.Window `control`: almost any :class:`wx.Window` -derived instance to be located
+        :param Bitmap `bitmap`: the bitmap to display in the enabled tab;
+        :param Bitmap `disabled_bitmap`: the bitmap to display in the disabled tab;
+        :param Window `control`: almost any :class:`Window` -derived instance to be located
          inside a ;
         :param string `tooltip`: the tooltip to display when the mouse hovers over the tab.
         """
-        from . import framemanager
 
         if not page:
             return False
@@ -3652,11 +3628,11 @@ class AuiNotebook(wx.Panel):
         if self.GetEnabled(ctrl_idx):
             return ctrl_idx
 
-        for indx in range(ctrl_idx, ctrl.GetPageCount()):
+        for indx in xrange(ctrl_idx, ctrl.GetPageCount()):
             if self.GetEnabled(indx):
                 return indx
 
-        for indx in range(ctrl_idx, -1, -1):
+        for indx in xrange(ctrl_idx, -1, -1):
             if self.GetEnabled(indx):
                 return indx
 
@@ -3733,7 +3709,7 @@ class AuiNotebook(wx.Panel):
         Returns the page index for the specified window. If the window is not
         found in the notebook, ``wx.NOT_FOUND`` is returned.
 
-        :param wx.Window `page_wnd`: the window we are looking for.
+        :param Window `page_wnd`: the window we are looking for.
         """
 
         return self._tabs.GetIdxFromWindow(page_wnd)
@@ -3793,7 +3769,7 @@ class AuiNotebook(wx.Panel):
         Sets the tab bitmap for the page.
 
         :param integer `page_idx`: the page index;
-        :param wx.Bitmap `bitmap`: the bitmap to display on the page tab.
+        :param Bitmap `bitmap`: the bitmap to display on the page tab.
         """
 
         if page_idx >= self._tabs.GetPageCount():
@@ -3879,7 +3855,7 @@ class AuiNotebook(wx.Panel):
         """
         Sets the image list for the :class:`AuiNotebook` control.
 
-        :param wx.ImageList `imageList`: the bitmap image list to associate to :class:`AuiNotebook`.
+        :param ImageList `imageList`: the bitmap image list to associate to :class:`AuiNotebook`.
         """
 
         self._imageList = imageList
@@ -3889,7 +3865,7 @@ class AuiNotebook(wx.Panel):
         """
         Sets the image list for the :class:`AuiNotebook` control.
 
-        :param `imageList`: an instance of :class:`wx.ImageList`.
+        :param `imageList`: an instance of :class:`ImageList`.
         """
 
         self.SetImageList(imageList)
@@ -3912,7 +3888,7 @@ class AuiNotebook(wx.Panel):
         if page >= self._tabs.GetPageCount():
             return False
 
-        if not isinstance(image, six.integer_types):
+        if not isinstance(image, types.IntType):
             raise Exception("The image parameter must be an integer, you passed " \
                             "%s"%repr(image))
 
@@ -3945,7 +3921,7 @@ class AuiNotebook(wx.Panel):
         bitmap = self.GetPageBitmap(page)
         bmpData1 = bitmap.ConvertToImage().GetData()
 
-        for indx in range(self._imageList.GetImageCount()):
+        for indx in xrange(self._imageList.GetImageCount()):
             imgListBmp = self._imageList.GetBitmap(indx)
             bmpData2 = imgListBmp.ConvertToImage().GetData()
             if bmpData1 == bmpData2:
@@ -3959,7 +3935,7 @@ class AuiNotebook(wx.Panel):
         Sets the tab text colour for the page.
 
         :param integer `page_idx`: the page index;
-        :param wx.Colour `colour`: the new tab label text colour.
+        :param Colour `colour`: the new tab label text colour.
         """
 
         if page_idx >= self._tabs.GetPageCount():
@@ -4006,7 +3982,7 @@ class AuiNotebook(wx.Panel):
         Adds a control inside a tab (not in the tab area).
 
         :param integer `page_idx`: the page index;
-        :param wx.Window `control`: almost any :class:`wx.Window` -derived instance to be located
+        :param Window `control`: almost any :class:`Window` -derived instance to be located
          inside a tab.
         """
 
@@ -4222,7 +4198,7 @@ class AuiNotebook(wx.Panel):
         """
         Sets the selection based on the input window `win`.
 
-        :param `win`: a :class:`wx.Window` derived window.
+        :param `win`: a :class:`Window` derived window.
         """
 
         idx = self._tabs.GetIdxFromWindow(win)
@@ -4324,7 +4300,7 @@ class AuiNotebook(wx.Panel):
 
 
     def GetAuiManager(self):
-        """ Returns the associated :class:`~wx.lib.agw.aui.framemanager.AuiManager`. """
+        """ Returns the associated :class:`~lib.agw.aui.framemanager.AuiManager`. """
 
         return self._mgr
 
@@ -4334,7 +4310,6 @@ class AuiNotebook(wx.Panel):
         Returns the active tab control. It is called to determine which control
         gets new windows being added.
         """
-        from . import framemanager
 
         if self._curpage >= 0 and self._curpage < self._tabs.GetPageCount():
 
@@ -4404,7 +4379,6 @@ class AuiNotebook(wx.Panel):
         :param integer `direction`: specifies where the pane should go, it should be one of the
          following: ``wx.TOP``, ``wx.BOTTOM``, ``wx.LEFT``, or ``wx.RIGHT``.
         """
-        from . import framemanager
 
         cli_size = self.GetClientSize()
 
@@ -4437,7 +4411,7 @@ class AuiNotebook(wx.Panel):
 
         # create a new tab frame
         new_tabs = TabFrame(self)
-        new_tabs._rect = wx.Rect(wx.Point(0, 0), split_size)
+        new_tabs._rect = wx.RectPS(wx.Point(0, 0), split_size)
         new_tabs.SetTabCtrlHeight(self._tab_ctrl_height)
         self._tab_id_counter += 1
         new_tabs._tabs = AuiTabCtrl(self, self._tab_id_counter)
@@ -4455,7 +4429,7 @@ class AuiNotebook(wx.Panel):
             dest_tabs.AddButton(clone.id, clone.location, clone.bitmap, clone.dis_bitmap)
         # create a pane info structure with the information
         # about where the pane should be added
-        pane_info = framemanager.AuiPaneInfo().Bottom().CaptionVisible(False).BestSize(self.CalculateNewSplitSize())
+        pane_info = framemanager.AuiPaneInfo().Bottom().CaptionVisible(False)
 
         if direction == wx.LEFT:
 
@@ -4527,7 +4501,7 @@ class AuiNotebook(wx.Panel):
         # select first tab as destination
         self.SetSelection(0)
         # iterate all other tabs
-        for idx in range(1, self.GetPageCount()):
+        for idx in xrange(1, self.GetPageCount()):
             # get win reference
             win = self.GetPage(idx)
             # get tab title
@@ -4548,7 +4522,7 @@ class AuiNotebook(wx.Panel):
         """
         Reparents a control added inside a tab.
 
-        :param wx.Window `control`: almost any :class:`wx.Window` -derived instance to be located
+        :param Window `control`: almost any :class:`Window` -derived instance to be located
          inside a tab;
         :param `dest_tabs`: the destination :class:`AuiTabCtrl`.
         """
@@ -4563,7 +4537,7 @@ class AuiNotebook(wx.Panel):
 
         :param `part`: an UI part representing the sash;
         :param integer `sash_size`: the sash size;
-        :param wx.Point `pos`: the double-click mouse position.
+        :param Point `pos`: the double-click mouse position.
 
         .. warning::
 
@@ -4640,7 +4614,7 @@ class AuiNotebook(wx.Panel):
         selection = -1
         page_count = dest_tabs.GetPageCount()
 
-        for page in range(src_tabs.GetPageCount()-1, -1, -1):
+        for page in xrange(src_tabs.GetPageCount()-1, -1, -1):
             # remove the page from the source tabs
             page_info = src_tabs.GetPage(page)
             if page_info.active:
@@ -4666,7 +4640,7 @@ class AuiNotebook(wx.Panel):
         """
         Handles the ``wx.EVT_SIZE`` event for :class:`AuiNotebook`.
 
-        :param `event`: a :class:`wx.SizeEvent` event to be processed.
+        :param `event`: a :class:`SizeEvent` event to be processed.
         """
 
         self.UpdateHintWindowSize()
@@ -4814,7 +4788,7 @@ class AuiNotebook(wx.Panel):
             if not tab_ctrl:
                 if self._agwFlags & AUI_NB_TAB_FLOAT:
                     if self.IsMouseWellOutsideWindow():
-                        hintRect = wx.Rect(screen_pt, (400, 300))
+                        hintRect = wx.RectPS(screen_pt, (400, 300))
                         # Use CallAfter so we overwrite the hint that might be
                         # shown by our superclass:
                         wx.CallAfter(self._mgr.ShowHint, hintRect)
@@ -4834,7 +4808,7 @@ class AuiNotebook(wx.Panel):
                     if nb != self:
 
                         hint_rect = tab_ctrl.GetClientRect()
-                        hint_rect.x, hint_rect.y = tab_ctrl.ClientToScreen((hint_rect.x, hint_rect.y))
+                        hint_rect.x, hint_rect.y = tab_ctrl.ClientToScreenXY(hint_rect.x, hint_rect.y)
                         self._mgr.ShowHint(hint_rect)
                         return
 
@@ -4847,7 +4821,7 @@ class AuiNotebook(wx.Panel):
 
         if self._agwFlags & AUI_NB_TAB_FLOAT:
             if self.IsMouseWellOutsideWindow():
-                hintRect = wx.Rect(screen_pt, (400, 300))
+                hintRect = wx.RectPS(screen_pt, (400, 300))
                 # Use CallAfter so we overwrite the hint that might be
                 # shown by our superclass:
                 wx.CallAfter(self._mgr.ShowHint, hintRect)
@@ -4864,7 +4838,7 @@ class AuiNotebook(wx.Panel):
         if dest_tabs:
 
             hint_rect = dest_tabs.GetRect()
-            hint_rect.x, hint_rect.y = self.ClientToScreen((hint_rect.x, hint_rect.y))
+            hint_rect.x, hint_rect.y = self.ClientToScreenXY(hint_rect.x, hint_rect.y)
             self._mgr.ShowHint(hint_rect)
 
         else:
@@ -4878,7 +4852,7 @@ class AuiNotebook(wx.Panel):
                 tab_frame = self.GetTabFrameFromWindow(hit_wnd)
                 if tab_frame:
                     hint_rect = wx.Rect(*tab_frame._rect)
-                    hint_rect.x, hint_rect.y = self.ClientToScreen((hint_rect.x, hint_rect.y))
+                    hint_rect.x, hint_rect.y = self.ClientToScreenXY(hint_rect.x, hint_rect.y)
                     rect.Intersect(hint_rect)
                     self._mgr.ShowHint(rect)
                 else:
@@ -4893,7 +4867,6 @@ class AuiNotebook(wx.Panel):
 
         :param `event`: a :class:`AuiNotebookEvent` event to be processed.
         """
-        from . import framemanager
 
         tabs = event.GetEventObject()
         if not tabs.GetEnabled(event.GetSelection()):
@@ -5054,15 +5027,14 @@ class AuiNotebook(wx.Panel):
 
                 # If there is no tabframe at all, create one
                 new_tabs = TabFrame(self)
-                new_tabs._rect = wx.Rect(wx.Point(0, 0), self.CalculateNewSplitSize())
+                new_tabs._rect = wx.RectPS(wx.Point(0, 0), self.CalculateNewSplitSize())
                 new_tabs.SetTabCtrlHeight(self._tab_ctrl_height)
                 self._tab_id_counter += 1
                 new_tabs._tabs = AuiTabCtrl(self, self._tab_id_counter)
                 new_tabs._tabs.SetArtProvider(self._tabs.GetArtProvider().Clone())
                 new_tabs._tabs.SetAGWFlags(self._agwFlags)
 
-                self._mgr.AddPane(new_tabs, framemanager.AuiPaneInfo().Bottom().CaptionVisible(False).BestSize(self.CalculateNewSplitSize()),
-                                  mouse_client_pt)
+                self._mgr.AddPane(new_tabs, framemanager.AuiPaneInfo().Bottom().CaptionVisible(False), mouse_client_pt)
                 self._mgr.Update()
                 dest_tabs = new_tabs._tabs
 
@@ -5151,7 +5123,6 @@ class AuiNotebook(wx.Panel):
            enough outside of the notebook to become floating pages.
 
         """
-        from . import framemanager
 
         root_manager = framemanager.GetManager(self)
         page_title = self.GetPageText(page_index)
@@ -5222,7 +5193,6 @@ class AuiNotebook(wx.Panel):
 
         :param `event`: a :class:`CloseEvent` event to be processed.
         """
-        from . import framemanager
 
         root_manager = framemanager.GetManager(self)
         if root_manager and root_manager != self._mgr:
@@ -5253,9 +5223,8 @@ class AuiNotebook(wx.Panel):
         """
         Re-docks a floating :class:`AuiNotebook` tab in the original position, when possible.
 
-        :param `pane`: an instance of :class:`~wx.lib.agw.aui.framemanager.AuiPaneInfo`.
+        :param `pane`: an instance of :class:`~lib.agw.aui.framemanager.AuiPaneInfo`.
         """
-        from . import framemanager
 
         root_manager = framemanager.GetManager(self)
 
@@ -5281,7 +5250,7 @@ class AuiNotebook(wx.Panel):
         """
         Returns the tab control at the specified point.
 
-        :param wx.Point `pt`: the mouse location.
+        :param Point `pt`: the mouse location.
         """
 
         # if we've just removed the last tab from the source
@@ -5323,7 +5292,7 @@ class AuiNotebook(wx.Panel):
         """
         Returns the tab frame associated with a window.
 
-        :param wx.Window `wnd`: the window for which we want to locate the :class:`TabFrame`.
+        :param Window `wnd`: the window for which we want to locate the :class:`TabFrame`.
         """
 
         all_panes = self._mgr.GetAllPanes()
@@ -5346,7 +5315,7 @@ class AuiNotebook(wx.Panel):
         # tab set, the remove the tab control completely
         all_panes = self._mgr.GetAllPanes()
 
-        for indx in range(len(all_panes)-1, -1, -1):
+        for indx in xrange(len(all_panes)-1, -1, -1):
             pane = all_panes[indx]
             if pane.name == "dummy":
                 continue
@@ -5414,7 +5383,7 @@ class AuiNotebook(wx.Panel):
         """
         Sets the icon used by the :class:`TabNavigatorWindow`.
 
-        :param wx.Bitmap `bmp`: the new bitmap for the :class:`TabNavigatorWindow`.
+        :param Bitmap `bmp`: the new bitmap for the :class:`TabNavigatorWindow`.
         """
 
         if isinstance(bmp, wx.Bitmap) and bmp.IsOk():
@@ -5550,7 +5519,7 @@ class AuiNotebook(wx.Panel):
                         page_count = tabs.GetPageCount()
                         selection = -1
 
-                        for page in range(page_count):
+                        for page in xrange(page_count):
                             # remove the page from the source tabs
                             page_info = tabs.GetPage(page)
                             if page_info.active:
@@ -5582,7 +5551,7 @@ class AuiNotebook(wx.Panel):
 
                 else:
                     main_idx = self._tabs.GetIdxFromWindow(close_wnd)
-                    wx.CallAfter(self.DeletePage, main_idx)
+                    self.DeletePage(main_idx)
 
                 # notify owner that the tab has been closed
                 e2 = AuiNotebookEvent(wxEVT_COMMAND_AUINOTEBOOK_PAGE_CLOSED, self.GetId())
@@ -5695,7 +5664,7 @@ class AuiNotebook(wx.Panel):
         """
         Sets the normal font for drawing tab labels.
 
-        :param wx.Font `font`: the new font to use to draw tab labels in their normal, un-selected state.
+        :param Font `font`: the new font to use to draw tab labels in their normal, un-selected state.
         """
 
         self._normal_font = font
@@ -5706,7 +5675,7 @@ class AuiNotebook(wx.Panel):
         """
         Sets the selected tab font for drawing tab labels.
 
-        :param wx.Font `font`: the new font to use to draw tab labels in their selected state.
+        :param Font `font`: the new font to use to draw tab labels in their selected state.
         """
 
         self._selected_font = font
@@ -5717,7 +5686,7 @@ class AuiNotebook(wx.Panel):
         """
         Sets the font for calculating text measurements.
 
-        :param wx.Font `font`: the new font to use to measure tab label text extents.
+        :param Font `font`: the new font to use to measure tab label text extents.
         """
 
         self.GetArtProvider().SetMeasuringFont(font)
@@ -5727,15 +5696,15 @@ class AuiNotebook(wx.Panel):
         """
         Sets the tab font.
 
-        :param wx.Font `font`: the new font to use to draw tab labels in their normal, un-selected state.
+        :param Font `font`: the new font to use to draw tab labels in their normal, un-selected state.
 
-        :note: Overridden from :class:`Panel`.
+        :note: Overridden from :class:`PyPanel`.
         """
 
-        wx.Panel.SetFont(self, font)
+        wx.PyPanel.SetFont(self, font)
 
         selectedFont = wx.Font(font.GetPointSize(), font.GetFamily(),
-                               font.GetStyle(), wx.FONTWEIGHT_BOLD, font.GetUnderlined(),
+                               font.GetStyle(), wx.BOLD, font.GetUnderlined(),
                                font.GetFaceName(), font.GetEncoding())
 
         self.SetNormalFont(font)
@@ -5782,7 +5751,7 @@ class AuiNotebook(wx.Panel):
         tabCtrl = self.GetActiveTabCtrl()
         newPage = -1
 
-        focusWin = tabCtrl.FindFocus()
+        focusWin = wx.Window.FindFocus()
         activePage = tabCtrl.GetActivePage()
         lenPages = len(tabCtrl.GetPages())
 
@@ -5872,8 +5841,8 @@ class AuiNotebook(wx.Panel):
          ==============================  =================================
 
         :param integer `location`: the button location. Can be ``wx.LEFT`` or ``wx.RIGHT``;
-        :param wx.Bitmap `normal_bitmap`: the bitmap for an enabled tab;
-        :param wx.Bitmap `disabled_bitmap`: the bitmap for a disabled tab;
+        :param Bitmap `normal_bitmap`: the bitmap for an enabled tab;
+        :param Bitmap `disabled_bitmap`: the bitmap for a disabled tab;
         :param string `name`: the button name.
         """
 
@@ -5916,7 +5885,7 @@ class AuiNotebook(wx.Panel):
         already override it to return ``True`` and user-defined classes with similar behaviour
         should do it as well to allow the library to handle such windows appropriately.
 
-        :note: Overridden from :class:`Panel`.
+        :note: Overridden from :class:`PyPanel`.
         """
 
         return True
@@ -5946,7 +5915,6 @@ class AuiNotebook(wx.Panel):
         pages = tabCtrl.GetPages()
 
         pageStatus, pageText = [], []
-        count = 0
 
         for indx, page in enumerate(pages):
 
@@ -5956,18 +5924,16 @@ class AuiNotebook(wx.Panel):
                 continue
 
             self.SetSelectionToPage(page)
-            self.Update()
             pageText.append(page.caption)
 
             rect = page.window.GetScreenRect()
             bmp = RescaleScreenShot(TakeScreenShot(rect), thumbnail_size)
 
             page.enabled = False
-            if count == 0:
+            if indx == 0:
                 il = wx.ImageList(bmp.GetWidth(), bmp.GetHeight(), True)
 
             il.Add(bmp)
-            count += 1
 
         # create the list control
         listCtrl = wx.ListCtrl(self, style=wx.LC_ICON|wx.LC_AUTOARRANGE|wx.LC_HRULES|wx.LC_VRULES,
@@ -5979,7 +5945,7 @@ class AuiNotebook(wx.Panel):
 
         # create some items for the list
         for indx, text in enumerate(pageText):
-            listCtrl.InsertItem(10000, text, indx)
+            listCtrl.InsertImageStringItem(10000, text, indx)
 
         self.AddPage(listCtrl, "AuiNotebook Preview", True, bitmap=auinotebook_preview.GetBitmap(), disabled_bitmap=wx.NullBitmap)
         return True

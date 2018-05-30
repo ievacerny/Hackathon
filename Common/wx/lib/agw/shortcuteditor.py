@@ -3,7 +3,7 @@
 # Inspired By the GIMP Shortcut Editor.
 #
 # Andrea Gavana, @ 05 March 2012
-# Latest Revision: 27 Dec 2012, 21.00 GMT
+# Latest Revision: 21 Jun 2012, 20.00 GMT
 #
 #
 # TODO List
@@ -22,30 +22,29 @@
 #
 # Or, Obviously, To The wxPython Mailing List!!!
 #
-# Tags:        phoenix-port, unittest, documented, py3-port
 #
 # End Of Comments
 # --------------------------------------------------------------------------------- #
 
 
 """
-:class:`~wx.lib.agw.shortcuteditor.ShortcutEditor` is a widget that allows the user to customize and change keyboard
-shortcuts via a dialog. It can be used to edit :class:`wx.MenuItem` shortcuts or accelerators
+:class:`ShortcutEditor` is a widget that allows the user to customize and change keyboard
+shortcuts via a dialog. It can be used to edit :class:`MenuItem` shortcuts or accelerators
 defined in a :class:`AcceleratorTable`.
 
 .. note::
 
     :class:`ShortcutEditor` **requires** the minimum AGW version 0.9.3 or the current
-    SVN, for the various enhancements made to the :class:`~wx.lib.agw.hypertreelist.HyperTreeList`
-    and :class:`~wx.lib.agw.genericmessagedialog.GenericMessageDialog`
+    SVN, for the various enhancements made to the :class:`~lib.agw.hypertreelist.HyperTreeList`
+    and :class:`~lib.agw.genericmessagedialog.GenericMessageDialog`
     widgets.
 
-
+ 
 Description
 ===========
 
 :class:`ShortcutEditor` is a widget that allows the user to customize and change keyboard
-shortcuts via a dialog. It can be used to edit :class:`wx.MenuItem` shortcuts or accelerators
+shortcuts via a dialog. It can be used to edit :class:`MenuItem` shortcuts or accelerators
 defined in a :class:`AcceleratorTable`.
 
 The interface itself is very much inpired by the GIMP shortcut editor:
@@ -58,15 +57,15 @@ although the behaviour should be pretty much equivalent.
 Various features:
 
 * Shortcuts are listed in a tree-like structure, pretty much reflecting a menu
-  hierarchy (as most of the time :class:`ShortcutEditor` is used to edit :class:`wx.MenuItem`
+  hierarchy (as most of the time :class:`ShortcutEditor` is used to edit :class:`MenuItem`
   shortcuts);
 * Accelerators defined via :class:`AcceleratorTable` are handled in a similar way;
 * Support for I18N;
 * Ability to restore default shortcuts/accelerators via a UI button;
-* Possibility to send back the new/updated shortcuts to the original :class:`wx.MenuBar` or
+* Possibility to send back the new/updated shortcuts to the original :class:`MenuBar` or
   the original :class:`AcceleratorTable`;
 * Filters on the shortcuts label (case-insensitive);
-* Basic help window with instructions (customizable via :meth:`~ShortcutEditor.SetHTMLHelpFile`), via
+* Basic help window with instructions (customizable via meth:`~ShortcutEditor.SetHTMLHelpFile`), via
   the ``Help`` button.
 
 And a lot more. Check the demo for an almost complete review of the functionalities.
@@ -84,7 +83,7 @@ UI Interactions
       :alt: Open Subsections
       :figclass: floatcenter
       :target: _static/images/sphinxdocs/ShortcutEditor_1.png
-
+   
       **Figure 1**
 
 
@@ -97,7 +96,7 @@ UI Interactions
       :alt: Assign Shortcut
       :figclass: floatcenter
       :target: _static/images/sphinxdocs/ShortcutEditor_2.png
-
+   
       **Figure 2**
 
 
@@ -114,9 +113,9 @@ UI Interactions
       :alt: Remove/Save Shortcuts
       :figclass: floatcenter
       :target: _static/images/sphinxdocs/ShortcutEditor_3.png
-
+   
       **Figure 3**
-
+   
 
 4. If you thought my choice of ``Shift+Ctrl+F`` was an odd selection, I chose it because
    it was a keyboard combination that hadn't already been assigned to any tool or command.
@@ -129,7 +128,7 @@ UI Interactions
       :alt: Reassigning Shortcuts
       :figclass: floatcenter
       :target: _static/images/sphinxdocs/ShortcutEditor_4.png
-
+   
       **Figure 4**
 
 
@@ -140,19 +139,19 @@ Base Functionalities
 There are basically three ways to populate the :class:`ShortcutEditor` dialog, depending on
 your needs. These approaches can be combined if needed.
 
-1) Use the :meth:`~ShortcutEditor.FromMenuBar` method: if you need to give your user the ability to edit
-   the various :class:`wx.MenuItem` shortcuts in your application, you can create :class:`ShortcutEditor`
+1) Use the meth:`~ShortcutEditor.FromMenuBar` method: if you need to give your user the ability to edit
+   the various :class:`MenuItem` shortcuts in your application, you can create :class:`ShortcutEditor`
    in this way::
 
         # Build your wx.MenuBar first!!!
         # "self" is an instance of wx.TopLevelWindow
-
+        
         dlg = ShortcutEditor(self)
         dlg.FromMenuBar(self)
 
         # Here the user will make all the various modifications
         # to the shortcuts
-
+        
         if dlg.ShowModal() == wx.ID_OK:
             # Changes accepted, send back the new shortcuts to
             # the TLW wx.MenuBar
@@ -161,7 +160,7 @@ your needs. These approaches can be combined if needed.
         dlg.Destroy()
 
 
-2) Use the :meth:`~ShortcutEditor.FromAcceleratorTable` method: if you need to give your user the ability to edit
+2) Use the meth:`~ShortcutEditor.FromAcceleratorTable` method: if you need to give your user the ability to edit
    the various accelerators you set via :class:`AcceleratorTable` in your application, you can
    create :class:`ShortcutEditor` in this way::
 
@@ -169,7 +168,7 @@ your needs. These approaches can be combined if needed.
         # "accelTable" is a list of tuples (4 elements per tuple)
 
         accelTable = []
-
+        
         # Every tuple is defined in this way:
 
         for label, flags, keyCode, cmdID in my_accelerators:
@@ -178,16 +177,16 @@ your needs. These approaches can be combined if needed.
             #          or wx.ACCEL_NORMAL used to specify which modifier keys are held down
             # keyCode: the keycode to be detected (i.e., ord('b'), wx.WXK_F10, etc...)
             # cmdID:   the menu or control command ID to use for the accelerator event.
-
+            
             accel_tuple = (label, flags, keyCode, cmdID)
             accelTable.append(accel_tuple)
-
+        
         dlg = ShortcutEditor(self)
         dlg.FromAcceleratorTable(accelTable)
 
         # Here the user will make all the various modifications
         # to the shortcuts
-
+        
         if dlg.ShowModal() == wx.ID_OK:
             # Changes accepted, send back the new shortcuts to
             # the window with the wx.AcceleratorTable:
@@ -196,7 +195,7 @@ your needs. These approaches can be combined if needed.
         dlg.Destroy()
 
 
-3) Build your own hierarchy of shortcuts using :meth:`~ShortcutEditor.GetShortcutManager`::
+3) Build your own hierarchy of shortcuts using meth:`~ShortcutEditor.GetShortcutManager`::
 
         dlg = ShortcutEditor(self)
         manager = dlg.GetShortcutManager()
@@ -207,7 +206,7 @@ your needs. These approaches can be combined if needed.
 
         dlg.ShowModal()
         dlg.Destroy()
-
+   
 
 Usage
 =====
@@ -221,7 +220,7 @@ Usage example::
 
         def __init__(self, parent):
 
-            wx.Frame.__init__(self, parent, -1, "ShortcutEditor Demo")
+            wx.Frame.__init__(self, parent, -1, "ShortcutEditor Demo") 
 
             bar = wx.MenuBar()
             menu = wx.Menu()
@@ -231,10 +230,10 @@ Usage example::
             menu.Append(103, "&Earth", "You may select Earth too")
             menu.AppendSeparator()
             menu.Append(104, "&Close", "Close this frame")
-
+        
             bar.Append(menu, 'File')
             self.SetMenuBar(bar)
-
+            
             dlg = SE.ShortcutEditor(self)
             dlg.FromMenuBar(self)
 
@@ -256,7 +255,7 @@ Usage example::
     app.MainLoop()
 
 
-
+        
 Window Styles
 =============
 
@@ -286,9 +285,9 @@ Supported Platforms
 License And Version
 ===================
 
-:class:`ShortcutEditor` is distributed under the wxPython license.
+:class:`ShortcutEditor` is distributed under the wxPython license. 
 
-Latest Revision: Andrea Gavana @ 27 Dec 2012, 21.00 GMT
+Latest Revision: Andrea Gavana @ 21 Jun 2012, 20.00 GMT
 
 Version 0.1
 
@@ -310,8 +309,8 @@ from wx.lib.embeddedimage import PyEmbeddedImage
 from wx.lib.mixins import treemixin
 
 # AGW stuff
-from . import hypertreelist as HTL
-from . import genericmessagedialog as GMD
+import hypertreelist as HTL
+import genericmessagedialog as GMD
 
 # add support for I18N
 _ = wx.GetTranslation
@@ -414,9 +413,9 @@ KEYMAP = {
 #    wx.WXK_NUMPAD_UP : 'WXK_NUMPAD_UP',
 #    wx.WXK_NUMPAD_RIGHT : 'WXK_NUMPAD_RIGHT',
 #    wx.WXK_NUMPAD_DOWN : 'WXK_NUMPAD_DOWN',
+#    wx.WXK_NUMPAD_PRIOR : 'WXK_NUMPAD_PRIOR',
 #    wx.WXK_NUMPAD_PAGEUP : 'WXK_NUMPAD_PAGEUP',
-#    wx.WXK_NUMPAD_PAGEUP : 'WXK_NUMPAD_PAGEUP',
-#    wx.WXK_NUMPAD_PAGEDOWN : 'WXK_NUMPAD_PAGEDOWN',
+#    wx.WXK_NUMPAD_NEXT : 'WXK_NUMPAD_NEXT',
 #    wx.WXK_NUMPAD_PAGEDOWN : 'WXK_NUMPAD_PAGEDOWN',
 #    wx.WXK_NUMPAD_END : 'WXK_NUMPAD_END',
 #    wx.WXK_NUMPAD_BEGIN : 'WXK_NUMPAD_BEGIN',
@@ -911,7 +910,7 @@ def FontFromFont(font):
     """
     Creates a copy of the input `font`.
 
-    :param `font`: an instance of :class:`wx.Font`.
+    :param `font`: an instance of :class:`Font`.
     """
 
     new_font = wx.Font(font.GetPointSize(), font.GetFamily(), font.GetStyle(),
@@ -927,12 +926,12 @@ def FontFromFont(font):
 
 class HTMLHelpWindow(wx.Frame):
     """
-    A simple :class:`wx.Frame` container for the basic help provided to :class:`ShortcutEditor`.
+    A simple :class:`Frame` container for the basic help provided to :class:`ShortcutEditor`.
     The help page is actually straightly derived from:
 
     http://graphicssoft.about.com/od/gimptutorials/tp/keyboard-shortcut-editor.htm
     """
-
+    
     def __init__(self, parent, htmlFile):
         """
         Default class constructor.
@@ -941,14 +940,14 @@ class HTMLHelpWindow(wx.Frame):
         :param string `htmlFile`: a valid HTML file containing either the default help
          or your particular definition of help.
         """
-
+        
         wx.Frame.__init__(self, parent, title=_('Configure Keyboard Shortcuts Help'))
 
         self.htmlFile = htmlFile
-
+        
         toolbar = self.CreateToolBar(wx.TB_HORIZONTAL|wx.TB_FLAT|wx.TB_TEXT|wx.TB_3DBUTTONS)
         self.BuildToolBar(toolbar)
-
+        
         self.html = wx.html.HtmlWindow(self, style=wx.SUNKEN_BORDER)
         self.printer = wx.html.HtmlEasyPrinting()
 
@@ -960,12 +959,12 @@ class HTMLHelpWindow(wx.Frame):
 
         self.SetIcon(parent.GetIcon())
         self.CreateStatusBar()
-
+        
         xvideo = wx.SystemSettings.GetMetric(wx.SYS_SCREEN_X)
         yvideo = wx.SystemSettings.GetMetric(wx.SYS_SCREEN_Y)
-
+        
         self.SetSize((xvideo/2, yvideo/2))
-
+        
         self.html.LoadFile(self.htmlFile)
         self.Show()
 
@@ -978,28 +977,28 @@ class HTMLHelpWindow(wx.Frame):
         :param `toolbar`: an instance of :class:`ToolBar`.
         """
 
-        w, h = _html_reload.GetBitmap().GetWidth(), _html_reload.GetBitmap().GetHeight()
+        w, h = _html_reload.GetBitmap().GetWidth(), _html_reload.GetBitmap().GetHeight()        
         toolbar.SetToolBitmapSize((w, h))
 
-        toolbar.AddTool(wx.ID_BACKWARD, _('Back'), _html_back.GetBitmap(), wx.NullBitmap, shortHelpString=_('Back'),
-                        longHelpString=_('Go to the previous page'))
+        toolbar.AddLabelTool(wx.ID_BACKWARD, _('Back'), _html_back.GetBitmap(), shortHelp=_('Back'),
+                             longHelp=_('Go to the previous page'))
 
-        toolbar.AddTool(wx.ID_FORWARD, _('Forward'), _html_forward.GetBitmap(), wx.NullBitmap, shortHelpString=_('Forward'),
-                        longHelpString=_('Go to the next page'))
+        toolbar.AddLabelTool(wx.ID_FORWARD, _('Forward'), _html_forward.GetBitmap(), shortHelp=_('Forward'),
+                             longHelp=_('Go to the next page'))
 
         toolbar.AddSeparator()
 
-        toolbar.AddTool(wx.ID_HOME, _('Home'), _html_home.GetBitmap(), wx.NullBitmap, shortHelpString=_('Home Page'),
-                        longHelpString=_('Go to the home page'))
+        toolbar.AddLabelTool(wx.ID_HOME, _('Home'), _html_home.GetBitmap(), shortHelp=_('Home Page'),
+                             longHelp=_('Go to the home page'))
 
-        toolbar.AddTool(wx.ID_REFRESH, _('Refresh'), _html_reload.GetBitmap(), wx.NullBitmap, shortHelpString=_('Refresh'),
-                        longHelpString=_('Refresh the current page'))
+        toolbar.AddLabelTool(wx.ID_REFRESH, _('Refresh'), _html_reload.GetBitmap(), shortHelp=_('Refresh'),
+                             longHelp=_('Refresh the current page'))
 
         toolbar.AddSeparator()
         toolbar.AddStretchableSpace()
 
-        toolbar.AddTool(wx.ID_PRINT, _('Print'), _html_print.GetBitmap(), wx.NullBitmap, shortHelpString=_('Print'),
-                        longHelpString=_('Print the current page'))
+        toolbar.AddLabelTool(wx.ID_PRINT, _('Print'), _html_print.GetBitmap(), shortHelp=_('Print'),
+                             longHelp=_('Print the current page'))
 
         toolbar.Realize()
 
@@ -1025,7 +1024,7 @@ class HTMLHelpWindow(wx.Frame):
             self.html.LoadFile(self.htmlFile)
         elif evId == wx.ID_REFRESH:
             self.html.LoadPage(self.html.GetOpenedPage())
-        elif evId == wx.ID_PRINT:
+        elif evId == wx.ID_PRINT:    
             self.printer.GetPrintData().SetPaperId(wx.PAPER_LETTER)
             self.printer.PrintFile(self.html.GetOpenedPage())
         else:
@@ -1046,7 +1045,7 @@ class HTMLHelpWindow(wx.Frame):
         elif evId == wx.ID_FORWARD:
             event.Enable(self.html.HistoryCanForward())
         else:
-            event.Skip()
+            event.Skip()                
 
 
     def OnClose(self, event):
@@ -1061,7 +1060,7 @@ class HTMLHelpWindow(wx.Frame):
 
         parent.htmlWindow = None
         event.Skip()
-
+        
 
 # ----------------------------------------------------------------------------
 # ShortcutEvent is a special subclassing of wx.PyCommandEvent
@@ -1074,7 +1073,7 @@ class ShortcutEvent(wx.PyCommandEvent):
     This event gets emitted when the user is about to change a shortcut (via ``EVT_SHORTCUT_CHANGING``)
     and when the user has changed a shortcut (via ``EVT_SHORTCUT_CHANGED``).
     """
-
+    
     def __init__(self, evtType, evtId, **kwargs):
         """
         Default class constructor.
@@ -1085,7 +1084,7 @@ class ShortcutEvent(wx.PyCommandEvent):
         """
 
         wx.PyCommandEvent.__init__(self, evtType, evtId, **kwargs)
-
+        
 
     def GetAccelerator(self):
         """
@@ -1094,10 +1093,10 @@ class ShortcutEvent(wx.PyCommandEvent):
 
         :return: A string representing the new shortcut string (accelerator).
         """
-
+        
         return self.accelerator
 
-
+    
     def SetAccelerator(self, accelerator):
         """
         Sets the shortcut string for which the operation was performed for ``EVT_SHORTCUT_CHANGED``
@@ -1118,7 +1117,7 @@ class ShortcutEvent(wx.PyCommandEvent):
         """
 
         return self.oldAccelerator
-
+    
 
     def SetOldAccelerator(self, accelerator):
         """
@@ -1127,7 +1126,7 @@ class ShortcutEvent(wx.PyCommandEvent):
 
         :param string `accelerator`: a string representing the old shortcut string (accelerator).
         """
-
+        
         self.oldAccelerator = accelerator
 
 
@@ -1152,7 +1151,7 @@ class ShortcutEvent(wx.PyCommandEvent):
         """
 
         return self.shortcut
-
+    
 
 # ----------------------------------------------------------------------------
 # Shortcut is a class containing the details for a shortcut, whether from
@@ -1166,7 +1165,7 @@ class Shortcut(object):
     a menu item, an accelerator or a user-defined shortcut. It behaves like
     a tree, with children and parents.
     """
-
+    
     def __init__(self, label='', accelerator='', bitmap=wx.NullBitmap, help='',
                  menuItem=None, accelId=None):
         """
@@ -1174,10 +1173,10 @@ class Shortcut(object):
 
         :param string `label`: the shortcut label string;
         :param string `accelerator`: the shortcut accelerator string;
-        :param `bitmap`: an instance of :class:`wx.Bitmap`, to display along the shortcut `label`
+        :param `bitmap`: an instance of :class:`Bitmap`, to display along the shortcut `label`
          in the interface tree;
         :param string `help`: the help string for this shortcut, to display in the interface tree;
-        :param `menuItem`: if this :class:`Shortcut` is derived from a :class:`wx.MenuItem`, the :class:`wx.MenuItem`
+        :param `menuItem`: if this :class:`Shortcut` is derived from a :class:`MenuItem`, the :class:`MenuItem`
          to which it should be associated;
         :param integer `accelId`: if this :class:`Shortcut` is derived from an accelerator in a :class:`AcceleratorTable`
          or from a custom, developer-defined shortcut, it represents the ID it is associated with.
@@ -1190,7 +1189,7 @@ class Shortcut(object):
         self.menuItem = menuItem
         self.accelId = accelId
 
-        self.parent = None
+        self.parent = None        
         self.topMenu = False
         self.imageIndex = -1
         self.changed = False
@@ -1207,10 +1206,10 @@ class Shortcut(object):
 
         :param `item`: an instance of :class:`Shortcut`.
         """
-
+        
         item.parent = self
         self.children.append(item)
-
+        
 
     def GetAccelerator(self):
         """ Returns the string accelerator associated with this shortcut. """
@@ -1252,7 +1251,7 @@ class Shortcut(object):
                 DoSomething()
 
 
-         as the default bitmap associated with a :class:`Shortcut` is :class:`NullBitmap`.
+         as the default bitmap associated with a :class:`Shortcut` is :class:`NullBitmap`.                
         """
 
         return self.bitmap
@@ -1262,9 +1261,9 @@ class Shortcut(object):
         """
         Sets the bitmap associated with this :class:`Shortcut`.
 
-        :param `bitmap`: an instance of :class:`wx.Bitmap` (can be invalid, i.e., :class:`NullBitmap`).
+        :param `bitmap`: an instance of :class:`Bitmap` (can be invalid, i.e., :class:`NullBitmap`).        
         """
-
+        
         self.bitmap = bitmap
 
 
@@ -1276,11 +1275,11 @@ class Shortcut(object):
 
     def IsTop(self):
         """
-        Returns ``True`` if this :class:`Shortcut` is associated with a top-level :class:`wx.Menu`,
-        (i.e., in the top :class:`wx.MenuBar` level), ``False`` otherwise.
+        Returns ``True`` if this :class:`Shortcut` is associated with a top-level :class:`Menu`,
+        (i.e., in the top :class:`MenuBar` level), ``False`` otherwise.
         """
-
-        return self.topMenu
+        
+        return self.topMenu        
 
 
     def GetFirstChild(self, item):
@@ -1321,10 +1320,10 @@ class Shortcut(object):
             return children[cookie], cookie + 1
 
         return None, cookie
-
+    
 
     def GetImageIndex(self):
-        """ Returns an integer index to be used in the :class:`ListShortcut` own :class:`wx.ImageList`. """
+        """ Returns an integer index to be used in the :class:`ListShortcut` own :class:`ImageList`. """
 
         return self.imageIndex
 
@@ -1352,16 +1351,16 @@ class Shortcut(object):
                 return child
 
             conflict = self.CheckAccelerator(child, shortcut, accelerator)
-
+            
             if conflict:
                 return conflict
-
+            
             child, cookie = self.GetNextChild(item, cookie)
 
         return None
 
 
-    def Match(self, filter='', item=None):
+    def Match(self, filter=u'', item=None):
         """
         Matches this :class:`Shortcut` label string against the `filter` input variable.
 
@@ -1372,7 +1371,7 @@ class Shortcut(object):
         :return: An instance of :class:`Shortcut` if the `filter` string is contained in
          the `item` lable, ``None`` otherwise.
 
-        :note: The string-matching is case-insensitive.
+        :note: The string-matching is case-insensitive.         
         """
 
         if item is None:
@@ -1403,8 +1402,8 @@ class Shortcut(object):
         while parent:
             parent.shown = True
             parent = parent.parent
-
-
+            
+        
     def ResetVisibility(self, item=None):
         """
         Set the status of this :class:`Shortcut` and its parent as `hidden` in the
@@ -1416,7 +1415,7 @@ class Shortcut(object):
 
         if item is None:
             item = self
-
+            
         child, cookie = self.GetFirstChild(item)
 
         while child:
@@ -1424,7 +1423,7 @@ class Shortcut(object):
             item.shown = False
             self.ResetVisibility(child)
             child, cookie = self.GetNextChild(item, cookie)
-
+        
 
     def Get(self, label, item=None):
         """
@@ -1436,22 +1435,22 @@ class Shortcut(object):
 
         :return: An instance of :class:`Shortcut` or ``None`` if no match was found.
         """
-
+        
         if item is None:
             item = self
-
+            
         child, cookie = self.GetFirstChild(item)
         retChild = None
 
         while child:
             if child.label.lower() == label.lower():
                 return child
-
+            
             retChild = self.Get(label, child)
             child, cookie = self.GetNextChild(item, cookie)
 
         return retChild
-
+    
 
     def GetById(self, id, item=None):
         """
@@ -1466,7 +1465,7 @@ class Shortcut(object):
 
         if item is None:
             item = self
-
+            
         child, cookie = self.GetFirstChild(item)
         retChild = None
 
@@ -1475,7 +1474,7 @@ class Shortcut(object):
                 return child
             elif child.accelId == id:
                 return child
-
+            
             retChild = self.GetById(id, child)
             child, cookie = self.GetNextChild(item, cookie)
 
@@ -1511,11 +1510,11 @@ class Shortcut(object):
             child.changed = False
             self.RestoreDefaults(child)
             child, cookie = self.GetNextChild(item, cookie)
-
-
+                    
+            
     def FromMenuItem(self):
         """
-        Constructs this :class:`Shortcut` starting from a :class:`wx.Menu` or :class:`wx.MenuItem`.
+        Constructs this :class:`Shortcut` starting from a :class:`Menu` or :class:`MenuItem`.
 
         The attributes needed to properly construct a :class:`Shortcut` are the label,
         the accelerator string, the help string (optional) and the bitmap associated
@@ -1524,9 +1523,9 @@ class Shortcut(object):
 
         if self.menuItem is None:
             return
-
+        
         menuItem = self.menuItem
-
+        
         if isinstance(menuItem, wx.Menu):
             label = menuItem.GetTitle()
             accelerator = DISABLED_STRING
@@ -1535,7 +1534,7 @@ class Shortcut(object):
         else:
             label = menuItem.GetItemLabelText()
             accelerator = menuItem.GetItemLabel()
-
+            
             if '\t' in accelerator:
                 accelerator = accelerator[accelerator.index('\t')+1:]
             else:
@@ -1543,29 +1542,29 @@ class Shortcut(object):
 
             help = menuItem.GetHelp()
             bitmap = menuItem.GetBitmap()
-
+                
         self.label = label
         self.accelerator = accelerator
         self.help = help
         self.bitmap = bitmap
-
+        
         self.originalAccelerator = accelerator
 
 
     def ToMenuItem(self, menuBar):
         """
-        Dumps this :class:`Shortcut` into a :class:`wx.Menu` or :class:`wx.MenuItem`.
+        Dumps this :class:`Shortcut` into a :class:`Menu` or :class:`MenuItem`.
 
-        The attributes needed to properly dump a :class:`Shortcut` into a :class:`wx.Menu` or :class:`wx.MenuBar`
+        The attributes needed to properly dump a :class:`Shortcut` into a :class:`Menu` or :class:`MenuBar`
         are the label and the accelerator string.
 
-        :param `menuBar`: an instance of :class:`wx.MenuBar`.
+        :param `menuBar`: an instance of :class:`MenuBar`.        
         """
 
         if self.menuItem is None or not self.changed:
             return
 
-        menuItem = self.menuItem
+        menuItem = self.menuItem        
 
         if isinstance(menuItem, wx.Menu):
 
@@ -1596,7 +1595,7 @@ class Shortcut(object):
           or ``wx.ACCEL_NORMAL`` used to specify which modifier keys are held down;
         * **keyCode**: the keycode to be detected (i.e., ord('b'), wx.WXK_F10, etc...);
         * **cmdID**: the menu or control command ID to use for the accelerator event.
-
+        
         :param `table`: a list of tuples, with the above specifications.
         """
 
@@ -1611,27 +1610,27 @@ class Shortcut(object):
 
         split = accelerator.split('+')
         modifiers, keyCode = split[0:-1], split[-1]
-
-        inv_Accel = dict(list(zip(list(ACCELERATORS.values()), list(ACCELERATORS.keys()))))
-        inv_KeyMap = dict(list(zip(list(KEYMAP.values()), list(KEYMAP.keys()))))
-
+        
+        inv_Accel = dict(zip(ACCELERATORS.values(), ACCELERATORS.keys()))
+        inv_KeyMap = dict(zip(KEYMAP.values(), KEYMAP.keys()))
+        
         base = wx.ACCEL_NORMAL
 
         for mod in modifiers:
             base |= inv_Accel[mod]
-
+        
         if keyCode in inv_KeyMap:
             keyCode = inv_KeyMap[keyCode]
         else:
             keyCode = ord(keyCode)
-
+            
         accelItem = (base, keyCode, accelId)
         table.append(accelItem)
-
+        
 
 # ----------------------------------------------------------------------------
 # ConflictDialog is a subclass of GenericMessageDialog, customized to look
-# like the GIMP conflict dialog.
+# like the GIMP conflict dialog. 
 # ----------------------------------------------------------------------------
 
 class ConflictDialog(GMD.GenericMessageDialog):
@@ -1641,7 +1640,7 @@ class ConflictDialog(GMD.GenericMessageDialog):
     conflicts when the user assigns a shortcut that is already taken by another
     entry in the shortcut list.
     """
-
+    
     def __init__(self, parent, conflict):
         """
         Default class constructor.
@@ -1654,9 +1653,9 @@ class ConflictDialog(GMD.GenericMessageDialog):
         transDict = dict(shortcut=conflict.accelerator, item=conflict.label, group=conflict.parent.label)
         message = _('Shortcut "%(shortcut)s" is already taken by\n"%(item)s" from the "%(group)s" group. ')%transDict
 
-        transDict = dict(item=conflict.label)
+        transDict = dict(item=conflict.label)                
         extendedMessage = _('Reassigning the shortcut will cause it to be removed from \n"%(item)s". ')%transDict
-
+        
         GMD.GenericMessageDialog.__init__(self, parent, message, _('Conflicting Shortcuts'),
                                           wx.OK|wx.CANCEL|wx.ICON_EXCLAMATION)
 
@@ -1665,21 +1664,21 @@ class ConflictDialog(GMD.GenericMessageDialog):
 
         self.SetExtendedMessage(extendedMessage + '\n')
         self.SetIcon(parent.GetParent().GetIcon())
-
+                
 
 # ----------------------------------------------------------------------------
 # ListShortcut is a subclass of HyperTreeList, customized to look
-# like the GIMP main shortcut list.
+# like the GIMP main shortcut list. 
 # ----------------------------------------------------------------------------
-
+    
 class ListShortcut(HTL.HyperTreeList, treemixin.ExpansionState):
     """
-    :class:`ListShortcut` is a subclass of :class:`~wx.lib.agw.hypertreelist.HyperTreeList`,
-    customized to look like the GIMP main shortcut list. This class is used to display the
+    :class:`ListShortcut` is a subclass of :class:`HyperTreeList`, customized to look
+    like the GIMP main shortcut list. This class is used to display the
     shortcut label (with an optional bitmap next to it), its accelerator and
     the help string associated with it (if present).
 
-    This information is displayed in 3 columns inside :class:`ListShortcut`.
+    This information is displayed in 3 columns inside :class:`ListShortcut`.    
     """
 
     def __init__(self, parent):
@@ -1694,7 +1693,7 @@ class ListShortcut(HTL.HyperTreeList, treemixin.ExpansionState):
                                    wx.TR_FULL_ROW_HIGHLIGHT|HTL.TR_ELLIPSIZE_LONG_ITEMS)
 
         self.SetBackgroundColour(wx.WHITE)
-
+        
         self.AddColumn(_('Action'))
         self.AddColumn(_('Shortcut'))
         self.AddColumn(_('Help Label'))
@@ -1705,13 +1704,13 @@ class ListShortcut(HTL.HyperTreeList, treemixin.ExpansionState):
 
         self.selectedItem = None
         self.hookBound = False
-        self.filter = ''
+        self.filter = u''
         self.expansionState = []
-
+        
         self.Bind(wx.EVT_TREE_SEL_CHANGED, self.OnSelChanged)
         self.Bind(wx.EVT_TREE_ITEM_EXPANDED, self.OnExpandCollapse)
         self.Bind(wx.EVT_TREE_ITEM_COLLAPSED, self.OnExpandCollapse)
-
+        
         mainWindow = self.GetMainWindow()
         mainWindow.Bind(wx.EVT_LEFT_DOWN, self.OnLeftDown)
         mainWindow.Bind(wx.EVT_KILL_FOCUS, self.OnKillFocus)
@@ -1724,7 +1723,7 @@ class ListShortcut(HTL.HyperTreeList, treemixin.ExpansionState):
         """
 
         dc = wx.MemoryDC()
-        dc.SelectObject(wx.Bitmap(20, 20))
+        dc.SelectObject(wx.EmptyBitmap(20, 20))
         dc.SetFont(self.GetFont())
 
         space = 0
@@ -1738,16 +1737,16 @@ class ListShortcut(HTL.HyperTreeList, treemixin.ExpansionState):
         self.offset = text
 
         boldFont = FontFromFont(self.GetFont())
-        boldFont.SetWeight(wx.FONTWEIGHT_BOLD)
+        boldFont.SetWeight(wx.BOLD)
 
-        self.boldFont = boldFont
-
+        self.boldFont = boldFont        
+            
 
     def Populate(self, item=None, shortcut=None):
         """
         Recursively populates the :class:`ListShortcut` with information from the :class:`Shortcut` tree.
 
-        :param `item`: an instance of :class:`~wx.lib.agw.customtreectrl.GenericTreeItem`. If ``None``, it is defaulted to
+        :param `item`: an instance of :class:`GenericTreeItem`. If ``None``, it is defaulted to
          the :class:`ListShortcut` root item to make this function reentrant (i.e. allow more than one
          enumeration on one and the same object simultaneously);
         :param `shortcut`: an instance of :class:`Shortcut`. If ``None``, it is defaulted to
@@ -1763,14 +1762,14 @@ class ListShortcut(HTL.HyperTreeList, treemixin.ExpansionState):
 
             if not child.shown:
                 continue
-
+            
             image = child.GetImageIndex()
             label = child.label
-
+            
             if image < 0:
                 if not child.IsTop():
                     label = self.offset + label
-
+                    
                 newItem = self.AppendItem(item, label, data=child)
             else:
                 newItem = self.AppendItem(item, label, image=image, data=child)
@@ -1803,21 +1802,19 @@ class ListShortcut(HTL.HyperTreeList, treemixin.ExpansionState):
         :param `shortcut`: an instance of :class:`Shortcut`. If ``None``, it is defaulted to
          `self.manager` to make this function reentrant (i.e. allow more than one
          enumeration on one and the same object simultaneously);
-        :param integer `index`: the current image index inside the :class:`ListShortcut` own :class:`wx.ImageList`.
+        :param integer `index`: the current image index inside the :class:`ListShortcut` own :class:`ImageList`.
         """
 
         if shortcut is None:
             shortcut = self.manager
             index = 0
-
+        
         for child in shortcut.children:
             bitmap = child.GetBitmap()
-
+            
             if bitmap.IsOk():
-                if bitmap.GetSize() != (16, 16):
-                    bitmap = bitmap.ConvertToImage().Scale(16, 16, wx.IMAGE_QUALITY_HIGH).ConvertToBitmap()
                 self.imageList.Add(bitmap)
-                child.imageIndex = index
+                child.imageIndex = index                
                 index += 1
 
             index = self.BuildImageList(child, index)
@@ -1831,11 +1828,11 @@ class ListShortcut(HTL.HyperTreeList, treemixin.ExpansionState):
 
         In this implementation this returns the item label.
 
-        :param `item`: an instance of :class:`~wx.lib.agw.customtreectrl.GenericTreeItem`.
+        :param `item`: an instance of :class:`GenericTreeItem`.        
         """
 
         return self.GetItemText(item)
-
+    
 
     def OnSelChanged(self, event):
         """
@@ -1845,7 +1842,7 @@ class ListShortcut(HTL.HyperTreeList, treemixin.ExpansionState):
         """
 
         selectedItem = event.GetItem()
-
+        
         if selectedItem != self.selectedItem:
             if self.selectedItem is not None:
                 pydata = self.GetPyData(self.selectedItem)
@@ -1858,7 +1855,7 @@ class ListShortcut(HTL.HyperTreeList, treemixin.ExpansionState):
 
             pydata = self.GetPyData(selectedItem)
             self.SetItemText(selectedItem, pydata.accelerator, 1)
-
+            
         self.selectedItem = selectedItem
         self.ShowShortcutText(False)
 
@@ -1886,7 +1883,7 @@ class ListShortcut(HTL.HyperTreeList, treemixin.ExpansionState):
             self.hookBound = True
 
         currentItem, flags, column = self.HitTest(event.GetPosition())
-
+        
         if self.selectedItem is None or not currentItem:
             event.Skip()
             return
@@ -1899,9 +1896,9 @@ class ListShortcut(HTL.HyperTreeList, treemixin.ExpansionState):
 
         if self.GetItemText(currentItem, 1) != NEW_ACCEL_STRING:
             self.SetItemText(currentItem, NEW_ACCEL_STRING, 1)
-        else:
+        else:        
             self.SetItemText(currentItem, pydata.accelerator, 1)
-
+            
         event.Skip()
 
 
@@ -1944,7 +1941,7 @@ class ListShortcut(HTL.HyperTreeList, treemixin.ExpansionState):
             # Don't allow to change labels for shortcuts without an ID
             event.Skip()
             return
-
+                
         self.ShowShortcutText(True)
         textCtrl = self.GetParent().hiddenText
 
@@ -1956,7 +1953,7 @@ class ListShortcut(HTL.HyperTreeList, treemixin.ExpansionState):
         if keyCode == wx.WXK_BACK and modifiers == 0 and currentText in [NEW_ACCEL_STRING, DISABLED_STRING]:
 
             accelerator = DISABLED_STRING
-
+            
             if not self.FireShortcutChanging(pydata, accelerator):
                 return
 
@@ -1965,16 +1962,16 @@ class ListShortcut(HTL.HyperTreeList, treemixin.ExpansionState):
 
             colour = (pydata.HasChanged() and [wx.RED] or [wx.BLACK])[0]
             self.SetItemTextColour(self.selectedItem, colour)
-
+                
             self.ShowShortcutText(False)
             self.FireShortcutChanged(pydata, accelerator)
-
+            
             return
 
         newContent = ''
-
+        
         for mod_int, mod_name in MODIFIERS:
-
+            
             if modifiers & mod_int == 0:
                 continue
 
@@ -1984,7 +1981,7 @@ class ListShortcut(HTL.HyperTreeList, treemixin.ExpansionState):
             textCtrl.ChangeValue(newContent)
 
         accelerator = ''
-
+        
         if keyCode in KEYMAP:
             accelerator = newContent + KEYMAP[keyCode]
         else:
@@ -2000,7 +1997,7 @@ class ListShortcut(HTL.HyperTreeList, treemixin.ExpansionState):
                 return
 
             if self.AcceptShortcut(pydata, accelerator):
-
+                
                 pydata.SetAccelerator(accelerator)
                 self.SetItemText(self.selectedItem, pydata.accelerator, 1)
 
@@ -2009,7 +2006,7 @@ class ListShortcut(HTL.HyperTreeList, treemixin.ExpansionState):
 
                 self.ShowShortcutText(False)
                 self.FireShortcutChanged(pydata, accelerator)
-
+            
 
     def AcceptShortcut(self, shortcut, accelerator):
         """
@@ -2017,12 +2014,12 @@ class ListShortcut(HTL.HyperTreeList, treemixin.ExpansionState):
 
         :param `shortcut`: an instance of :class:`Shortcut`;
         :param string `accelerator`: the new accelerator to check.
-
+        
         :note: Conflicting shortcuts are handled inside this method by presenting the user with
          a conflict dialog. At this point the user can decide to reassign an existing shortcut
          or to back away, in which case this method will return ``False``.
         """
-
+        
         sortedAccel = accelerator.lower().split('+')
         sortedAccel.sort()
 
@@ -2040,7 +2037,7 @@ class ListShortcut(HTL.HyperTreeList, treemixin.ExpansionState):
 
         dlg.Destroy()
         return False
-
+            
 
     def DisableShortcut(self, conflict, item=None):
         """
@@ -2048,14 +2045,14 @@ class ListShortcut(HTL.HyperTreeList, treemixin.ExpansionState):
         the conflicting shortcut (by putting a "Disabled" string as its accelerator).
 
         :param `conflict`: an instance of :class:`Shortcut` to reset;
-        :param `item`: an instance of :class:`~wx.lib.agw.customtreectrl.GenericTreeItem`. If defaulted to ``None``, it is set
+        :param `item`: an instance of :class:`GenericTreeItem`. If defaulted to ``None``, it is set
          to the :class:`ListShortcut` root item and used only to make this function reentrant
          (i.e. allow more than one enumeration on one and the same object simultaneously).
         """
 
         if item is None:
             item = self.GetRootItem()
-
+            
         child, cookie = self.GetFirstChild(item)
 
         while child:
@@ -2093,7 +2090,7 @@ class ListShortcut(HTL.HyperTreeList, treemixin.ExpansionState):
             return False
 
         return True
-
+    
 
     def FireShortcutChanged(self, shortcut, newAccel):
         """
@@ -2108,12 +2105,12 @@ class ListShortcut(HTL.HyperTreeList, treemixin.ExpansionState):
         event.oldAccelerator = shortcut.accelerator
         event.accelerator = newAccel
         event.SetEventObject(self)
-
+        
         self.GetEventHandler().ProcessEvent(event)
 
         return True
-
-
+    
+        
     def ShowShortcutText(self, show):
         """
         Shows/Hides a :class:`TextCtrl` used to display the combination of keystrokes the user
@@ -2124,15 +2121,15 @@ class ListShortcut(HTL.HyperTreeList, treemixin.ExpansionState):
         """
 
         textCtrl = self.GetParent().hiddenText
-
+        
         if show and not textCtrl.IsShown():
             textCtrl.Show()
 
         elif not show and textCtrl.IsShown():
             textCtrl.Hide()
+                
 
-
-    def SetFilter(self, filter=''):
+    def SetFilter(self, filter=u''):
         """
         Sets the `filter` string against all the shortcuts in the :class:`ListShortcut` are matched.
 
@@ -2144,15 +2141,15 @@ class ListShortcut(HTL.HyperTreeList, treemixin.ExpansionState):
         self.manager.ResetVisibility()
         self.manager.Match(filter)
         self.RecreateTree()
-
+        
 
     def RecreateTree(self):
         """ Recreates the entire :class:`ListShortcut` (columns excluded). """
 
         self.Freeze()
         self.DeleteAllItems()
-        self.AddRoot('')
-
+        self.AddRoot(u'')
+        
         self.Populate()
 
         if not self.expansionState:
@@ -2166,28 +2163,28 @@ class ListShortcut(HTL.HyperTreeList, treemixin.ExpansionState):
 
     def HasFlag(self, flag):
         """
-        Overridden from :class:`wx.Window` as a workaround on the conflicts between `treemixin` and
-        :class:`~wx.lib.agw.hypertreelist.HyperTreeList` with the ``wx.TR_HIDE_ROOT`` `agwStyle` set.
+        Overridden from :class:`Window` as a workaround on the conflicts between `treemixin` and
+        :class:`HyperTreeList` with the ``wx.TR_HIDE_ROOT`` `agwStyle` set.
 
         :param integer `flag`: an integer bit flag specifying the `agwStyle` style.
 
-        :return: ``True`` if the :class:`ListShortcut` has the input `flag` set, ``False`` otherwise.
+        :return: ``True`` if the :class:`ListShortcut` has the input `flag` set, ``False`` otherwise.        
 
-        :note: Overridden from :class:`wx.Window`.
+        :note: Overridden from :class:`Window`.
         """
 
         return self.HasAGWFlag(flag)
-
+    
 
 # ----------------------------------------------------------------------------
 # ShortcutEditor is a subclass of wx.Dialog, customized to look
-# like the GIMP main shortcut dialog.
+# like the GIMP main shortcut dialog. 
 # ----------------------------------------------------------------------------
 
 class ShortcutEditor(wx.Dialog):
     """
     :class:`ShortcutEditor` is a widget that allows the user to customize and change keyboard
-    shortcuts via a dialog. It can be used to edit :class:`wx.MenuItem` shortcuts or accelerators
+    shortcuts via a dialog. It can be used to edit :class:`MenuItem` shortcuts or accelerators
     defined in a :class:`AcceleratorTable`.
 
     The interface itself is very much inpired by the GIMP shortcut editor:
@@ -2197,27 +2194,27 @@ class ShortcutEditor(wx.Dialog):
     There are very few minor UI differences between :class:`ShortcutEditor` and the GIMP one,
     although the behaviour should be pretty much equivalent.
     """
-
+    
     def __init__(self, parent):
         """
         Default class constructor.
 
-        :param `parent`: an instance of :class:`wx.Window`, it can also be ``None``.
+        :param `parent`: an instance of :class:`Window`, it can also be ``None``.
         """
-
+        
         wx.Dialog.__init__(self, parent, title=_('Configure Keyboard Shortcuts'),
                            style=wx.DEFAULT_DIALOG_STYLE|wx.RESIZE_BORDER)
 
         self.htmlFile = os.path.join(DATA_DIR, 'default_help_text.html')
         self.htmlWindow = None
-
+        
         self.CreateWidgets()
         self.DoLayout()
         self.BindEvents()
 
         if parent is not None and isinstance(parent, wx.TopLevelWindow):
             self.SetIcon(parent.GetIcon())
-
+        
         self.Init()
 
 
@@ -2232,7 +2229,7 @@ class ShortcutEditor(wx.Dialog):
 
         clearBmp = _clear.GetBitmap()
         self.clearButton = wx.BitmapButton(self, wx.ID_CLEAR, clearBmp, style=wx.NO_BORDER)
-
+        
         self.listShortcut = ListShortcut(self)
         self.hiddenText = wx.TextCtrl(self, -1, '', style=wx.BORDER_THEME)
 
@@ -2242,27 +2239,27 @@ class ShortcutEditor(wx.Dialog):
         defaultBmp = _default.GetBitmap()
         self.defaultButton = buttons.ThemedGenBitmapTextButton(self, wx.ID_RESET, defaultBmp,
                                                                _('Restore Defaults '), size=(-1, 29))
-
+        
         self.infoBitmap = wx.StaticBitmap(self, -1, _info.GetBitmap())
 
         message = _('To edit a shortcut key, click on the corresponding row\n' \
                     'and type a new accelerator, or press backspace to clear.')
 
         italicFont = wx.SystemSettings.GetFont(wx.SYS_DEFAULT_GUI_FONT)
-        italicFont.SetStyle(wx.FONTSTYLE_ITALIC)
-
+        italicFont.SetStyle(wx.ITALIC)
+        
         self.infoStatic = wx.StaticText(self, -1, message)
         self.infoStatic.SetFont(italicFont)
 
         okBmp = _ok.GetBitmap()
         cancelBmp = _cancel.GetBitmap()
         helpBmp = _help.GetBitmap()
-
+        
         self.okButton = buttons.ThemedGenBitmapTextButton(self, wx.ID_OK, okBmp, _('OK'))
         self.cancelButton = buttons.ThemedGenBitmapTextButton(self, wx.ID_CANCEL, cancelBmp, _('Cancel'))
         self.helpButton = buttons.ThemedGenBitmapTextButton(self, wx.ID_HELP, helpBmp, _('Help'))
 
-        self.okButton.SetDefault()
+        self.okButton.SetDefault()        
 
 
     def DoLayout(self):
@@ -2272,7 +2269,7 @@ class ShortcutEditor(wx.Dialog):
         topSizer = wx.BoxSizer(wx.HORIZONTAL)
 
         mainSizer.Add((0, 5))
-        topSizer.Add(self.topStatic, 0, wx.RIGHT|wx.ALIGN_CENTER_VERTICAL, 5)
+        topSizer.Add(self.topStatic, 0, wx.RIGHT|wx.ALIGN_CENTER_VERTICAL, 5)        
         topSizer.Add(self.searchText, 1, wx.RIGHT, 5)
         topSizer.Add(self.clearButton, 0, wx.ALIGN_CENTER_VERTICAL)
 
@@ -2286,7 +2283,7 @@ class ShortcutEditor(wx.Dialog):
         hiddenSizer.Add(self.defaultButton, 0, wx.EXPAND|wx.LEFT|wx.RIGHT, 10)
 
         mainSizer.Add(hiddenSizer, 0, wx.EXPAND|wx.BOTTOM, 5)
-
+        
         centerSizer = wx.BoxSizer(wx.HORIZONTAL)
         centerSizer.Add(self.infoBitmap, 0, wx.ALIGN_CENTER_VERTICAL|wx.RIGHT, 10)
         centerSizer.Add(self.infoStatic, 1, wx.ALIGN_CENTER)
@@ -2314,34 +2311,34 @@ class ShortcutEditor(wx.Dialog):
         * ``wx.EVT_BUTTON`` for clearing the filtering, for the HTML help window and
           to reset all the shortcuts to their defaults.
         """
-
+        
         self.searchText.Bind(wx.EVT_TEXT, self.OnSetFilter)
         self.clearButton.Bind(wx.EVT_BUTTON, self.OnClearFilter)
 
         self.defaultButton.Bind(wx.EVT_BUTTON, self.OnRestoreDefaults)
         self.helpButton.Bind(wx.EVT_BUTTON, self.OnHTMLHelp)
-
+                
 
     def Init(self):
         """ Common initialization procedures. """
 
         self.manager = Shortcut()
         self.listShortcut.manager = self.manager
-
+    
 
     def FromMenuBar(self, topWindow):
         """
-        Builds the entire shortcut hierarchy starting from a :class:`wx.MenuBar`.
+        Builds the entire shortcut hierarchy starting from a :class:`MenuBar`.
 
-        :param `topWindow`: an instance of :class:`TopLevelWindow`, containing the :class:`wx.MenuBar`
+        :param `topWindow`: an instance of :class:`TopLevelWindow`, containing the :class:`MenuBar`
          we wish to scan.
         """
-
+        
         def MenuItemSearch(menu, item):
-
-            for menuItem in list(menu.GetMenuItems()):
+            
+            for menuItem in menu.GetMenuItems():
                 label = menuItem.GetLabel()
-
+                
                 if not label:
                     # It's a separator
                     continue
@@ -2352,12 +2349,12 @@ class ShortcutEditor(wx.Dialog):
                 item.AppendItem(shortcutItem)
 
                 subMenu = menuItem.GetSubMenu()
-
+                
                 if subMenu:
                     MenuItemSearch(subMenu, shortcutItem)
 
         position = 0
-
+            
         for menu, name in topWindow.GetMenuBar().GetMenus():
 
             shortcutItem = Shortcut(menuItem=menu)
@@ -2372,11 +2369,11 @@ class ShortcutEditor(wx.Dialog):
 
     def ToMenuBar(self, topWindow):
         """
-        Dumps the entire shortcut hierarchy (for shortcuts associated with a :class:`wx.MenuItem`), into
-        a :class:`wx.MenuBar`, changing only the :class:`wx.Menu` / :class:`wx.MenuItem` labels (it does **not** rebuild
-        the :class:`wx.MenuBar`).
+        Dumps the entire shortcut hierarchy (for shortcuts associated with a :class:`MenuItem`), into
+        a :class:`MenuBar`, changing only the :class:`Menu` / :class:`MenuItem` labels (it does **not** rebuild
+        the :class:`MenuBar`).
 
-        :param `topWindow`: an instance of :class:`TopLevelWindow`, containing the :class:`wx.MenuBar`
+        :param `topWindow`: an instance of :class:`TopLevelWindow`, containing the :class:`MenuBar`
          we wish to repopulate.
         """
 
@@ -2387,11 +2384,11 @@ class ShortcutEditor(wx.Dialog):
             while child:
                 child.ToMenuItem(menuBar)
                 MenuItemSet(child, menuBar)
-                child, cookie = shortcut.GetNextChild(shortcut, cookie)
+                child, cookie = shortcut.GetNextChild(shortcut, cookie)                
 
         manager = self.GetShortcutManager()
         menuBar = topWindow.GetMenuBar()
-
+        
         MenuItemSet(manager, menuBar)
 
 
@@ -2403,7 +2400,7 @@ class ShortcutEditor(wx.Dialog):
          populated like this::
 
             accelTable = []
-
+            
             # Every tuple is defined in this way:
 
             for label, flags, keyCode, cmdID in my_accelerators:
@@ -2419,10 +2416,10 @@ class ShortcutEditor(wx.Dialog):
         """
 
         parentShortcut = Shortcut(_('Accelerators'))
-
+        
         parentShortcut.topMenu = True
         self.manager.AppendItem(parentShortcut)
-
+        
         for text, modifier, accel, ids in accelTable:
             modifier = ACCELERATORS[modifier]
             if accel in KEYMAP:
@@ -2430,10 +2427,10 @@ class ShortcutEditor(wx.Dialog):
             else:
                 accel = chr(accel)
 
-            shortcut = (modifier and ['%s+%s'%(modifier, accel)] or [accel])[0]
+            shortcut = (modifier and ['%s+%s'%(modifier, accel)] or [accel])[0]           
             shortcutItem = Shortcut(text, shortcut, accelId=ids)
             parentShortcut.AppendItem(shortcutItem)
-
+            
 
     def ToAcceleratorTable(self, window):
         """
@@ -2441,7 +2438,7 @@ class ShortcutEditor(wx.Dialog):
         a :class:`AcceleratorTable`. This method **does** rebuild the :class:`AcceleratorTable` and sets it back
         to the input `window`.
 
-        :param `window`: an instance of :class:`wx.Window`, to which the new :class:`AcceleratorTable` should be set.
+        :param `window`: an instance of :class:`Window`, to which the new :class:`AcceleratorTable` should be set.
         """
 
         def AccelItemSet(shortcut, table):
@@ -2451,15 +2448,15 @@ class ShortcutEditor(wx.Dialog):
             while child:
                 child.ToAcceleratorItem(table)
                 table = AccelItemSet(child, table)
-                child, cookie = shortcut.GetNextChild(shortcut, cookie)
+                child, cookie = shortcut.GetNextChild(shortcut, cookie)                
 
             return table
-
+        
         manager = self.GetShortcutManager()
         table = AccelItemSet(manager, table=[])
 
         window.SetAcceleratorTable(wx.AcceleratorTable(table))
-
+        
 
     def SetColumnWidths(self):
         """
@@ -2468,10 +2465,10 @@ class ShortcutEditor(wx.Dialog):
         """
 
         total_width = 0
-        for col in range(self.listShortcut.GetColumnCount()):
+        for col in xrange(self.listShortcut.GetColumnCount()):
             self.listShortcut.SetColumnWidth(col, wx.LIST_AUTOSIZE)
             width = self.listShortcut.GetColumnWidth(col)
-
+            
             if col == 0:
                 width += 20
             elif col == 1:
@@ -2480,12 +2477,12 @@ class ShortcutEditor(wx.Dialog):
                 width = min(width, 200)
 
             width = max(50, width)
-            self.listShortcut.SetColumnWidth(col, width)
+            self.listShortcut.SetColumnWidth(col, width)            
             total_width += width
 
         self.listShortcut.GetMainWindow()._lineHeight += 5
         dialogHeight = wx.SystemSettings.GetMetric(wx.SYS_SCREEN_Y)/2
-
+        
         self.SetSize((total_width+60, dialogHeight))
 
         self.Center()
@@ -2505,7 +2502,7 @@ class ShortcutEditor(wx.Dialog):
         filter = filter.lower().strip()
 
         self.listShortcut.SetFilter(filter)
-
+        
 
     def OnClearFilter(self, event):
         """
@@ -2515,7 +2512,7 @@ class ShortcutEditor(wx.Dialog):
         :param `event`: an instance of :class:`CommandEvent`.
         """
 
-        self.searchText.SetValue('')
+        self.searchText.SetValue(u'')
 
 
     def OnRestoreDefaults(self, event):
@@ -2542,7 +2539,7 @@ class ShortcutEditor(wx.Dialog):
            By default, this method launches a :class:`html.HtmlWindow` containing the default
            HTML help file. If you wish to load another help file, you should call :meth:`~ShortcutEditor.SetHTMLHelpFile`
            with another input HTML file.
-
+           
         """
 
         if self.htmlWindow:
@@ -2552,13 +2549,13 @@ class ShortcutEditor(wx.Dialog):
             return
 
         self.htmlWindow = HTMLHelpWindow(self, self.htmlFile)
-
+        
 
     def GetShortcutManager(self):
         """ Returns the root :class:`Shortcut` containing the whole shortcut hierarchy. """
 
         return self.manager
-
+    
 
     def SetHTMLHelpFile(self, htmlFile):
         """
@@ -2572,12 +2569,12 @@ class ShortcutEditor(wx.Dialog):
             raise Exception('Invalid HTML help file passed to ShortcutEditor')
 
         self.htmlFile = htmlFile
-
+        
         if self.htmlWindow is not None:
             self.htmlWindow.htmlFile = htmlFile
             self.htmlWindow.LoadFile(self.htmlFile)
 
-
+        
     def PreShow(self):
         """ Does some more common initialization before showing :class:`ShortcutEditor`. """
 
@@ -2585,7 +2582,7 @@ class ShortcutEditor(wx.Dialog):
         self.listShortcut.RecreateTree()
 
         self.SetColumnWidths()
-
+        
 
     def ShowModal(self):
         """
@@ -2593,7 +2590,7 @@ class ShortcutEditor(wx.Dialog):
 
         Program flow does not return until the dialog has been dismissed with `EndModal`.
 
-        :return: The value set with :meth:`~Dialog.SetReturnCode`.
+        :return: The value set with `SetReturnCode`.
 
         .. note::
 
@@ -2607,12 +2604,12 @@ class ShortcutEditor(wx.Dialog):
            Note that this function creates a temporary event loop which takes precedence
            over the application's main event loop (see :class:`EventLoopBase`) and which is
            destroyed when the dialog is dismissed. This also results in a call to
-           :meth:`AppConsole.ProcessPendingEvents` ().
-
-        """
+           :meth:`App.ProcessPendingEvents` ().
+           
+        """        
 
         self.PreShow()
-        return wx.Dialog.ShowModal(self)
+        wx.Dialog.ShowModal(self)        
 
 
     def Show(self, show=True):
@@ -2624,11 +2621,11 @@ class ShortcutEditor(wx.Dialog):
         :param bool `show`: if ``True``, the dialog box is shown and brought to the front,
          otherwise the box is hidden. If ``False`` and the dialog is modal, control is
          returned to the calling program.
-
-        :note: Reimplemented from :class:`wx.Window`.
+         
+        :note: Reimplemented from :class:`Window`.
         """
-
+        
         self.PreShow()
         wx.Dialog.Show(self, show)
 
-
+        

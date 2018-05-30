@@ -6,9 +6,11 @@
 # main namespace to look as much as possible like the regular Python
 # shell environment.
 import __main__
-original = list(__main__.__dict__.keys())
+original = __main__.__dict__.keys()
 
 __author__ = "Patrick K. O'Brien <pobrien@orbtech.com>"
+__cvsid__ = "$Id$"
+__revision__ = "$Revision$"[11:-2]
 
 import wx
 
@@ -19,7 +21,7 @@ class App(wx.App):
         import os
         import wx
         from wx import py
-
+        
         self.SetAppName("pycrust")
         confDir = wx.StandardPaths.Get().GetUserDataDir()
         if not os.path.exists(confDir):
@@ -27,13 +29,15 @@ class App(wx.App):
         fileName = os.path.join(confDir, 'config')
         self.config = wx.FileConfig(localFilename=fileName)
         self.config.SetRecordDefaults(True)
-
+        
         self.frame = py.crust.CrustFrame(config=self.config, dataDir=confDir)
+##        self.frame.startupFileName = os.path.join(confDir,'pycrust_startup')
+##        self.frame.historyFileName = os.path.join(confDir,'pycrust_history')
         self.frame.Show()
         self.SetTopWindow(self.frame)
         return True
-
-
+    
+    
 '''
 The main() function needs to handle being imported, such as with the
 pycrust script that wxPython installs:
@@ -51,7 +55,7 @@ def main():
     md = __main__.__dict__
     keepers = original
     keepers.append('App')
-    for key in list(md.keys()):
+    for key in md.keys():
         if key not in keepers:
             del md[key]
     # Create an application instance.
@@ -67,9 +71,9 @@ def main():
     sys.app = app
     del sys
     # Cleanup the main namespace some more.
-    if 'App' in md and md['App'] is App:
+    if md.has_key('App') and md['App'] is App:
         del md['App']
-    if '__main__' in md and md['__main__'] is __main__:
+    if md.has_key('__main__') and md['__main__'] is __main__:
         del md['__main__']
     # Start the wxPython event loop.
     app.MainLoop()

@@ -1,24 +1,11 @@
-# -*- coding: utf-8 -*-
-#----------------------------------------------------------------------------
-# Name:         auimdi.py
-# Purpose:
-#
-# Author:       Andrea Gavana <andrea.gavana@gmail.com>
-#
-# Created:
-# Version:
-# Date:         31 March 2009
-# Licence:      wxWindows license
-# Tags:         phoenix-port, documented
-#----------------------------------------------------------------------------
 __author__ = "Andrea Gavana <andrea.gavana@gmail.com>"
 __date__ = "31 March 2009"
 
 
 import wx
 
-from . import auibook
-from .aui_constants import *
+import auibook
+from aui_constants import *
 
 _ = wx.GetTranslation
 
@@ -40,14 +27,14 @@ class AuiMDIParentFrame(wx.Frame):
         # this style can be used to prevent a window from having the standard MDI
         # "Window" menu
         if not style & wx.FRAME_NO_WINDOW_MENU:
-
+        
             self._pWindowMenu = wx.Menu()
             self._pWindowMenu.Append(wxWINDOWCLOSE,    _("Cl&ose"))
             self._pWindowMenu.Append(wxWINDOWCLOSEALL, _("Close All"))
             self._pWindowMenu.AppendSeparator()
             self._pWindowMenu.Append(wxWINDOWNEXT,     _("&Next"))
             self._pWindowMenu.Append(wxWINDOWPREV,     _("&Previous"))
-
+    
         self._pClientWindow = self.OnCreateClient()
 
 
@@ -55,7 +42,7 @@ class AuiMDIParentFrame(wx.Frame):
 
         if self._pClientWindow:
             self._pClientWindow.SetArtProvider(provider)
-
+    
 
     def GetArtProvider(self):
 
@@ -83,12 +70,12 @@ class AuiMDIParentFrame(wx.Frame):
         if pMenu:
             self._pWindowMenu = pMenu
             self.AddWindowMenu(pMenuBar)
-
+        
 
     def GetWindowMenu(self):
 
         return self._pWindowMenu
-
+    
 
     def SetMenuBar(self, pMenuBar):
 
@@ -104,7 +91,7 @@ class AuiMDIParentFrame(wx.Frame):
     def SetChildMenuBar(self, pChild):
 
         if not pChild:
-
+        
             # No Child, set Our menu bar back.
             if self._pMyMenuBar:
                 self.SetMenuBar(self._pMyMenuBar)
@@ -113,9 +100,9 @@ class AuiMDIParentFrame(wx.Frame):
 
             # Make sure we know our menu bar is in use
             self._pMyMenuBar = None
-
+        
         else:
-
+        
             if pChild.GetMenuBar() == None:
                 return
 
@@ -124,14 +111,14 @@ class AuiMDIParentFrame(wx.Frame):
                 self._pMyMenuBar = self.GetMenuBar()
 
             self.SetMenuBar(pChild.GetMenuBar())
-
+    
 
     def ProcessEvent(self, event):
 
         # stops the same event being processed repeatedly
         if self._pLastEvt == event:
             return False
-
+        
         self._pLastEvt = event
 
         # let the active child (if any) process the event first.
@@ -141,16 +128,16 @@ class AuiMDIParentFrame(wx.Frame):
            event.GetEventType() not in [wx.wxEVT_ACTIVATE, wx.wxEVT_SET_FOCUS,
                                         wx.wxEVT_KILL_FOCUS, wx.wxEVT_CHILD_FOCUS,
                                         wx.wxEVT_COMMAND_SET_FOCUS, wx.wxEVT_COMMAND_KILL_FOCUS]:
-
+        
             res = self._pActiveChild.GetEventHandler().ProcessEvent(event)
-
+        
         if not res:
-
+        
             # if the event was not handled this frame will handle it,
             # which is why we need the protection code at the beginning
             # of this method
             res = self.GetEventHandler().ProcessEvent(event)
-
+        
         self._pLastEvt = None
 
         return res
@@ -179,24 +166,24 @@ class AuiMDIParentFrame(wx.Frame):
     def ActivateNext(self):
 
         if self._pClientWindow and self._pClientWindow.GetSelection() != wx.NOT_FOUND:
-
+        
             active = self._pClientWindow.GetSelection() + 1
             if active >= self._pClientWindow.GetPageCount():
                 active = 0
 
             self._pClientWindow.SetSelection(active)
-
+        
 
     def ActivatePrevious(self):
 
         if self._pClientWindow and self._pClientWindow.GetSelection() != wx.NOT_FOUND:
-
+        
             active = self._pClientWindow.GetSelection() - 1
             if active < 0:
                 active = self._pClientWindow.GetPageCount() - 1
 
             self._pClientWindow.SetSelection(active)
-
+    
 
     def Init(self):
 
@@ -211,38 +198,38 @@ class AuiMDIParentFrame(wx.Frame):
     def RemoveWindowMenu(self, pMenuBar):
 
         if pMenuBar and self._pWindowMenu:
-
+        
             # Remove old window menu
             pos = pMenuBar.FindMenu(_("&Window"))
-            if pos != wx.NOT_FOUND:
+            if pos != wx.NOT_FOUND:            
                 pMenuBar.Remove(pos)
-
+            
 
     def AddWindowMenu(self, pMenuBar):
 
         if pMenuBar and self._pWindowMenu:
-
+        
             pos = pMenuBar.FindMenu(wx.GetStockLabel(wx.ID_HELP, wx.STOCK_NOFLAGS))
             if pos == wx.NOT_FOUND:
                 pMenuBar.Append(self._pWindowMenu, _("&Window"))
             else:
                 pMenuBar.Insert(pos, self._pWindowMenu, _("&Window"))
-
+    
 
     def DoHandleMenu(self, event):
 
         evId = event.GetId()
-
+        
         if evId == wxWINDOWCLOSE:
             if self._pActiveChild:
                 self._pActiveChild.Close()
 
         elif evId == wxWINDOWCLOSEALL:
-
-            while self._pActiveChild:
+            
+            while self._pActiveChild:            
                 if not self._pActiveChild.Close():
                     return # failure
-
+                
         elif evId == wxWINDOWNEXT:
             self.ActivateNext()
 
@@ -252,7 +239,7 @@ class AuiMDIParentFrame(wx.Frame):
         else:
             event.Skip()
 
-
+    
     def Tile(self, orient=wx.HORIZONTAL):
 
         client_window = self.GetClientWindow()
@@ -264,19 +251,19 @@ class AuiMDIParentFrame(wx.Frame):
             return
 
         if orient == wx.VERTICAL:
-
+        
             client_window.Split(cur_idx, wx.LEFT)
-
+        
         elif orient == wx.HORIZONTAL:
-
+        
             client_window.Split(cur_idx, wx.TOP)
-
+    
 
 #-----------------------------------------------------------------------------
 # AuiMDIChildFrame
 #-----------------------------------------------------------------------------
 
-class AuiMDIChildFrame(wx.Panel):
+class AuiMDIChildFrame(wx.PyPanel):
 
     def __init__(self, parent, id=wx.ID_ANY, title="", pos=wx.DefaultPosition,
                  size=wx.DefaultSize, style=wx.DEFAULT_FRAME_STYLE, name="AuiMDIChildFrame"):
@@ -286,7 +273,7 @@ class AuiMDIChildFrame(wx.Panel):
             raise Exception("Missing MDI client window.")
 
         self.Init()
-
+        
         # see comment in constructor
         if style & wx.MINIMIZE:
             self._activate_on_create = False
@@ -294,7 +281,7 @@ class AuiMDIChildFrame(wx.Panel):
         cli_size = pClientWindow.GetClientSize()
 
         # create the window off-screen to prevent flicker
-        wx.Panel.__init__(self, pClientWindow, id, wx.Point(cli_size.x+1, cli_size.y+1),
+        wx.PyPanel.__init__(self, pClientWindow, id, wx.Point(cli_size.x+1, cli_size.y+1),
                             size, wx.NO_BORDER, name=name)
 
         self.SetBackgroundStyle(wx.BG_STYLE_CUSTOM)
@@ -327,7 +314,7 @@ class AuiMDIChildFrame(wx.Panel):
 
         self._pMDIParentFrame = None
         self._pMenuBar = None
-
+        
         self._mdi_currect = None
         self._mdi_newrect = wx.Rect()
         self._icon = None
@@ -345,7 +332,7 @@ class AuiMDIChildFrame(wx.Panel):
             raise Exception("Missing MDI Client Window")
 
         if pParentFrame.GetActiveChild() == self:
-
+        
             # deactivate ourself
             event = wx.ActivateEvent(wx.wxEVT_ACTIVATE, False, self.GetId())
             event.SetEventObject(self)
@@ -353,8 +340,8 @@ class AuiMDIChildFrame(wx.Panel):
 
             pParentFrame.SetActiveChild(None)
             pParentFrame.SetChildMenuBar(None)
-
-        for pos in range(pClientWindow.GetPageCount()):
+        
+        for pos in xrange(pClientWindow.GetPageCount()):
             if pClientWindow.GetPage(pos) == self:
                 return pClientWindow.DeletePage(pos)
 
@@ -367,20 +354,20 @@ class AuiMDIChildFrame(wx.Panel):
         self._pMenuBar = menu_bar
 
         if self._pMenuBar:
-
+        
             pParentFrame = self.GetMDIParentFrame()
             if not pParentFrame:
                 raise Exception("Missing MDI Parent Frame")
 
             self._pMenuBar.Reparent(pParentFrame)
             if pParentFrame.GetActiveChild() == self:
-
+            
                 # replace current menu bars
                 if pOldMenuBar:
                     pParentFrame.SetChildMenuBar(None)
-
+                    
                 pParentFrame.SetChildMenuBar(self)
-
+            
 
     def GetMenuBar(self):
 
@@ -394,11 +381,11 @@ class AuiMDIChildFrame(wx.Panel):
         pParentFrame = self.GetMDIParentFrame()
         if not pParentFrame:
             raise Exception("Missing MDI Parent Frame")
-
+        
         pClientWindow = pParentFrame.GetClientWindow()
         if pClientWindow is not None:
-
-            for pos in range(pClientWindow.GetPageCount()):
+        
+            for pos in xrange(pClientWindow.GetPageCount()):
                 if pClientWindow.GetPage(pos) == self:
                     pClientWindow.SetPageText(pos, self._title)
                     break
@@ -429,14 +416,14 @@ class AuiMDIChildFrame(wx.Panel):
 
         self._icon = icon
 
-        bmp = wx.Bitmap(self._icon)
+        bmp = wx.BitmapFromIcon(self._icon)
 
         pClientWindow = pParentFrame.GetClientWindow()
         if pClientWindow is not None:
             idx = pClientWindow.GetPageIndex(self)
             if idx != -1:
                 pClientWindow.SetPageBitmap(idx, bmp)
-
+        
 
     def GetIcon(self):
 
@@ -448,20 +435,20 @@ class AuiMDIChildFrame(wx.Panel):
         pParentFrame = self.GetMDIParentFrame()
         if not pParentFrame:
             raise Exception("Missing MDI Parent Frame")
-
+        
         pClientWindow = pParentFrame.GetClientWindow()
         if pClientWindow is not None:
-
-            for pos in range(pClientWindow.GetPageCount()):
+        
+            for pos in xrange(pClientWindow.GetPageCount()):
                 if pClientWindow.GetPage(pos) == self:
                     pClientWindow.SetSelection(pos)
                     break
-
+            
 
     def OnMenuHighlight(self, event):
 
         if self._pMDIParentFrame:
-
+    
             # we don't have any help text for this item,
             # but may be the MDI frame does?
             self._pMDIParentFrame.OnMenuHighlight(event)
@@ -478,13 +465,13 @@ class AuiMDIChildFrame(wx.Panel):
         pParentFrame = self.GetMDIParentFrame()
         if pParentFrame:
             if pParentFrame.GetActiveChild() == self:
-
+            
                 pParentFrame.SetActiveChild(None)
                 pParentFrame.SetChildMenuBar(None)
-
+            
             pClientWindow = pParentFrame.GetClientWindow()
             idx = pClientWindow.GetPageIndex(self)
-
+            
             if idx != wx.NOT_FOUND:
                 pClientWindow.RemovePage(idx)
 
@@ -502,35 +489,35 @@ class AuiMDIChildFrame(wx.Panel):
 
 
     def CreateStatusBar(self, number=1, style=1, winid=1, name=""):
-
+        
         return None
 
 
     def GetStatusBar(self):
 
         return None
-
+    
 
     def SetStatusText(self, text, number=0):
 
         pass
 
-
+    
     def SetStatusWidths(self, widths_field):
 
         pass
-
+    
 
     # no toolbar bars
     def CreateToolBar(self, style=1, winid=-1, name=""):
-
+        
         return None
 
-
+    
     def GetToolBar(self):
 
         return None
-
+    
 
     # no maximize etc
     def Maximize(self, maximize=True):
@@ -539,33 +526,33 @@ class AuiMDIChildFrame(wx.Panel):
 
 
     def Restore(self):
-
+    
         pass
 
-
+    
     def Iconize(self, iconize=True):
 
         pass
 
-
+    
     def IsMaximized(self):
 
         return True
 
-
+    
     def IsIconized(self):
 
         return False
 
-
+    
     def ShowFullScreen(self, show=True, style=0):
 
         return False
 
-
+    
     def IsFullScreen(self):
 
-        return False
+        return False        
 
 
     def IsTopLevel(self):
@@ -579,16 +566,16 @@ class AuiMDIChildFrame(wx.Panel):
         self._activate_on_create = activate_on_create
         return True
 
-
+    
     def Show(self, show=True):
 
-        wx.Panel.Show(self, show)
+        wx.PyPanel.Show(self, show)
 
 
     def ApplyMDIChildFrameRect(self):
 
         if self._mdi_currect != self._mdi_newrect:
-            self.SetSize(*self._mdi_newrect)
+            self.SetDimensions(*self._mdi_newrect)
             self._mdi_currect = wx.Rect(*self._mdi_newrect)
 
 
@@ -630,7 +617,7 @@ class AuiMDIClientWindow(auibook.AuiNotebook):
 
         # notify old active child that it has been deactivated
         if old_selection != -1 and old_selection < self.GetPageCount():
-
+        
             old_child = self.GetPage(old_selection)
             if not old_child:
                 raise Exception("AuiMDIClientWindow.PageChanged - null page pointer")
@@ -638,10 +625,10 @@ class AuiMDIClientWindow(auibook.AuiNotebook):
             event = wx.ActivateEvent(wx.wxEVT_ACTIVATE, False, old_child.GetId())
             event.SetEventObject(old_child)
             old_child.GetEventHandler().ProcessEvent(event)
-
+        
         # notify new active child that it has been activated
         if new_selection != -1:
-
+        
             active_child = self.GetPage(new_selection)
             if not active_child:
                 raise Exception("AuiMDIClientWindow.PageChanged - null page pointer")
@@ -675,5 +662,5 @@ class AuiMDIClientWindow(auibook.AuiNotebook):
 
         auibook.AuiNotebook.OnSize(self, event)
 
-        for pos in range(self.GetPageCount()):
+        for pos in xrange(self.GetPageCount()):
             self.GetPage(pos).ApplyMDIChildFrameRect()

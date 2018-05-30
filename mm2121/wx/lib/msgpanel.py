@@ -6,7 +6,8 @@
 # Author:      Robin Dunn
 #
 # Created:     19-Oct-2009
-# Copyright:   (c) 2009-2017 by Total Control Software
+# RCS-ID:      $Id: $
+# Copyright:   (c) 2009 by Total Control Software
 # Licence:     wxWindows license
 #----------------------------------------------------------------------
 
@@ -28,7 +29,7 @@ class MessagePanel(wx.Panel):
         if flags:
             artid = None
             if flags & wx.ICON_EXCLAMATION:
-                artid = wx.ART_WARNING
+                artid = wx.ART_WARNING            
             elif flags & wx.ICON_ERROR:
                 artid = wx.ART_ERROR
             elif flags & wx.ICON_QUESTION:
@@ -45,7 +46,7 @@ class MessagePanel(wx.Panel):
 
         if caption:
             caption = wx.StaticText(self, -1, caption)
-            caption.SetFont(wx.Font(24, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD))
+            caption.SetFont(wx.Font(24, wx.SWISS, wx.NORMAL, wx.BOLD))
 
         message = wx.StaticText(self, -1, message)
 
@@ -55,7 +56,7 @@ class MessagePanel(wx.Panel):
             tbox.Add(caption)
             tbox.Add((10,10))
         tbox.Add(message)
-
+        
         hbox = wx.BoxSizer(wx.HORIZONTAL)
         hbox.Add((10,10), 1)
         hbox.Add(icon)
@@ -71,7 +72,7 @@ class MessagePanel(wx.Panel):
         self.SetSizer(box)
         self.Fit()
 
-
+        
 #----------------------------------------------------------------------
 
 
@@ -92,4 +93,4 @@ This is only a test...""")
     frm.Fit()
     frm.Show()
     app.MainLoop()
-
+    

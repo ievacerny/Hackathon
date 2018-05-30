@@ -7,21 +7,20 @@
 # Author:      Anthony Tuininga
 #
 # Created:     26-Nov-2007
+# RCS-ID:      $Id$
 # Copyright:   (c) 2007 by Anthony Tuininga
 # Licence:     wxWindows license
-# Tags:        phoenix-port
 #----------------------------------------------------------------------
 
 import base64
-
+import cStringIO
 import wx
-from six import BytesIO
 
 try:
     b64decode = base64.b64decode
 except AttributeError:
     b64decode = base64.decodestring
-
+    
 
 class PyEmbeddedImage(object):
     """
@@ -38,7 +37,7 @@ class PyEmbeddedImage(object):
     from some other source at runtime, such as over the network or
     from a database.  In this case pass False for isBase64 (unless the
     data actually is base64 encoded.)  Any image type that
-    wx.Image can handle should be okay.
+    wx.ImageFromStream can handle should be okay.
     """
 
     def __init__(self, data, isBase64=True):
@@ -46,7 +45,7 @@ class PyEmbeddedImage(object):
         self.isBase64 = isBase64
 
     def GetBitmap(self):
-        return wx.Bitmap(self.GetImage())
+        return wx.BitmapFromImage(self.GetImage())
 
     def GetData(self):
         data = self.data
@@ -55,22 +54,22 @@ class PyEmbeddedImage(object):
         return data
 
     def GetIcon(self):
-        icon = wx.Icon()
+        icon = wx.EmptyIcon()
         icon.CopyFromBitmap(self.GetBitmap())
         return icon
 
     def GetImage(self):
-        stream = BytesIO(self.GetData())
-        return wx.Image(stream)
+        stream = cStringIO.StringIO(self.GetData())
+        return wx.ImageFromStream(stream)
 
     # added for backwards compatibility
-    getBitmap = wx.deprecated(GetBitmap)
-    getData = wx.deprecated(GetData)
-    getIcon = wx.deprecated(GetIcon)
-    getImage = wx.deprecated(GetImage)
+    getBitmap = GetBitmap
+    getData = GetData
+    getIcon = GetIcon
+    getImage = GetImage
 
     # define properties, for convenience
     Bitmap = property(GetBitmap)
-    Data = property(GetData)
     Icon = property(GetIcon)
     Image = property(GetImage)
+

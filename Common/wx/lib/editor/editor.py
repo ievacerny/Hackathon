@@ -1,5 +1,5 @@
 #----------------------------------------------------------------------
-# Name:        wx.lib.editor.Editor
+# Name:        wxPython.lib.editor.Editor
 # Purpose:     An intelligent text editor with colorization capabilities.
 #
 # Original
@@ -16,12 +16,13 @@
 #
 #
 # Created:     15-Dec-1999
-# Copyright:   (c) 1999-2016 by Dirk Holtwick, 1999
+# RCS-ID:      $Id$
+# Copyright:   (c) 1999 by Dirk Holtwick, 1999
 # Licence:     wxWindows license
 #----------------------------------------------------------------------
 # 12/14/2003 - Jeff Grimmett (grimmtooth@softhome.net)
 #
-# o 2.5 compatibility update.
+# o 2.5 compatability update.
 #
 # 12/21/2003 - Jeff Grimmett (grimmtooth@softhome.net)
 #
@@ -33,8 +34,8 @@ import  time
 
 import  wx
 
-from . import selection
-from . import images
+import  selection
+import  images
 
 #----------------------------
 
@@ -88,7 +89,7 @@ class Editor(wx.ScrolledWindow):
                                   style|wx.WANTS_CHARS)
 
         self.isDrawing = False
-
+        
         self.InitCoords()
         self.InitFonts()
         self.SetColors()
@@ -130,9 +131,11 @@ class Editor(wx.ScrolledWindow):
 
     def NiceFontForPlatform(self):
         if wx.Platform == "__WXMSW__":
-            font = wx.Font(10, wx.FONTFAMILY_MODERN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
+            font = wx.Font(10, wx.MODERN, wx.NORMAL, wx.NORMAL)
         else:
-            font = wx.Font(12, wx.FONTFAMILY_MODERN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False)
+            font = wx.Font(12, wx.MODERN, wx.NORMAL, wx.NORMAL, False)
+        if wx.Platform == "__WXMAC__":
+            font.SetNoAntiAliasing()
         return font
 
     def UnixKeyHack(self, key):
@@ -160,24 +163,24 @@ class Editor(wx.ScrolledWindow):
         self.bw, self.bh = self.GetClientSize()
 
         if wx.Platform == "__WXMSW__":
-            self.sh = int(self.bh / self.fh)
-            self.sw = int(self.bw / self.fw) - 1
+            self.sh = self.bh / self.fh
+            self.sw = (self.bw / self.fw) - 1
         else:
-            self.sh = int(self.bh / self.fh)
+            self.sh = self.bh / self.fh
             if self.LinesInFile() >= self.sh:
-                self.bw = self.bw - wx.SystemSettings.GetMetric(wx.SYS_VSCROLL_X)
-                self.sw = int(self.bw / self.fw) - 1
+                self.bw = self.bw - wx.SystemSettings_GetMetric(wx.SYS_VSCROLL_X)
+                self.sw = (self.bw / self.fw) - 1
 
-            self.sw = int(self.bw / self.fw) - 1
+            self.sw = (self.bw / self.fw) - 1
             if self.CalcMaxLineLen() >= self.sw:
-                self.bh = self.bh - wx.SystemSettings.GetMetric(wx.SYS_HSCROLL_Y)
-                self.sh = int(self.bh / self.fh)
+                self.bh = self.bh - wx.SystemSettings_GetMetric(wx.SYS_HSCROLL_Y)
+                self.sh = self.bh / self.fh
 
 
     def UpdateView(self, dc = None):
         if dc is None:
             dc = wx.ClientDC(self)
-        if dc.IsOk():
+        if dc.Ok():
             self.SetCharDimensions()
             self.KeepCursorOnScreen()
             self.DrawSimpleCursor(0,0, dc, True)
@@ -205,8 +208,8 @@ class Editor(wx.ScrolledWindow):
         self.fh = dc.GetCharHeight()
 
     def SetColors(self):
-        self.fgColor = wx.BLACK
-        self.bgColor = wx.WHITE
+        self.fgColor = wx.NamedColour('black')
+        self.bgColor = wx.NamedColour('white')
         self.selectColor = wx.Colour(238, 220, 120)  # r, g, b = emacsOrange
 
     def InitDoubleBuffering(self):
@@ -244,7 +247,6 @@ class Editor(wx.ScrolledWindow):
             dc.SetBackgroundMode(wx.SOLID)
             dc.SetTextBackground(self.bgColor)
             dc.SetTextForeground(self.fgColor)
-            dc.SetBackground(wx.Brush(self.bgColor))
             dc.Clear()
             for line in range(self.sy, self.sy + self.sh):
                 self.DrawLine(line, dc)
@@ -290,7 +292,7 @@ class Editor(wx.ScrolledWindow):
         szy = self.fh
         x = xp * szx
         y = yp * szy
-        dc.Blit(x,y, szx,szy, dc, x,y, wx.XOR)
+        dc.Blit(x,y, szx,szy, dc, x,y, wx.SRC_INVERT)
         self.sco_x = xp
         self.sco_y = yp
 
@@ -409,7 +411,7 @@ class Editor(wx.ScrolledWindow):
 
     def OnTimer(self, event):
         screenX, screenY = wx.GetMousePosition()
-        x, y = self.ScreenToClient((screenX, screenY))
+        x, y = self.ScreenToClientXY(screenX, screenY)
         self.MouseToRow(y)
         self.MouseToCol(x)
         self.SelectUpdate()
@@ -447,7 +449,7 @@ class Editor(wx.ScrolledWindow):
 ##------------------------ mousing functions
 
     def MouseToRow(self, mouseY):
-        row  = self.sy + int(mouseY / self.fh)
+        row  = self.sy + (mouseY/ self.fh)
         if self.AboveScreen(row):
             self.HandleAboveScreen(row)
         elif self.BelowScreen(row):
@@ -456,7 +458,7 @@ class Editor(wx.ScrolledWindow):
             self.cy  = min(row, self.LinesInFile() - 1)
 
     def MouseToCol(self, mouseX):
-        col = self.sx + int(mouseX / self.fw)
+        col = self.sx + (mouseX / self.fw)
         if self.LeftOfScreen(col):
             self.HandleLeftOfScreen(col)
         elif self.RightOfScreen(col):
@@ -819,8 +821,8 @@ class Editor(wx.ScrolledWindow):
         action[wx.WXK_UP]    = self.MoveUp
         action[wx.WXK_LEFT]  = self.MoveLeft
         action[wx.WXK_RIGHT] = self.MoveRight
-        action[wx.WXK_PAGEDOWN]  = self.MovePageDown
-        action[wx.WXK_PAGEUP] = self.MovePageUp
+        action[wx.WXK_NEXT]  = self.MovePageDown
+        action[wx.WXK_PRIOR] = self.MovePageUp
         action[wx.WXK_HOME]  = self.MoveHome
         action[wx.WXK_END]   = self.MoveEnd
 
@@ -859,7 +861,7 @@ class Editor(wx.ScrolledWindow):
         action = {}
         keySettingFunction(action)
 
-        if not key in action:
+        if not action.has_key(key):
             return False
 
         if event.ShiftDown():
@@ -888,7 +890,7 @@ class Editor(wx.ScrolledWindow):
     def Dispatch(self, keySettingFunction, key, event):
         action = {}
         keySettingFunction(action)
-        if key in action:
+        if action.has_key(key):
             action[key](event)
             self.UpdateView()
             return True
@@ -901,7 +903,7 @@ class Editor(wx.ScrolledWindow):
         key = self.UnixKeyHack(key)
         try:
             key = chr(key)
-        except Exception:
+        except:
             return False
         if not self.Dispatch(MappingFunc, key, event):
             wx.Bell()

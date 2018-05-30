@@ -2,76 +2,78 @@
 things like call tips and command auto completion."""
 
 __author__ = "Patrick K. O'Brien <pobrien@orbtech.com>"
+__cvsid__ = "$Id$"
+__revision__ = "$Revision$"[11:-2]
 
-import sys
+import cStringIO
 import inspect
+import sys
 import tokenize
 import types
 import wx
-from six import BytesIO, PY3, string_types
 
-def getAutoCompleteList(command='', locals=None, includeMagic=1,
+def getAutoCompleteList(command='', locals=None, includeMagic=1, 
                         includeSingle=1, includeDouble=1):
     """Return list of auto-completion options for command.
-
+    
     The list of options will be based on the locals namespace."""
     attributes = []
     # Get the proper chunk of code from the command.
     root = getRoot(command, terminator='.')
     try:
         if locals is not None:
-            obj = eval(root, locals)
+            object = eval(root, locals)
         else:
-            obj = eval(root)
+            object = eval(root)
     except:
         pass
     else:
-        attributes = getAttributeNames(obj, includeMagic,
+        attributes = getAttributeNames(object, includeMagic, 
                                        includeSingle, includeDouble)
     return attributes
-
-def getAttributeNames(obj, includeMagic=1, includeSingle=1,
+    
+def getAttributeNames(object, includeMagic=1, includeSingle=1,
                       includeDouble=1):
-    """Return list of unique attributes, including inherited, for obj."""
+    """Return list of unique attributes, including inherited, for object."""
     attributes = []
     dict = {}
-    if not hasattrAlwaysReturnsTrue(obj):
+    if not hasattrAlwaysReturnsTrue(object):
         # Add some attributes that don't always get picked up.
         special_attrs = ['__bases__', '__class__', '__dict__', '__name__',
                          'func_closure', 'func_code', 'func_defaults',
                          'func_dict', 'func_doc', 'func_globals', 'func_name']
         attributes += [attr for attr in special_attrs \
-                       if hasattr(obj, attr)]
+                       if hasattr(object, attr)]
     if includeMagic:
-        try: attributes += obj._getAttributeNames()
+        try: attributes += object._getAttributeNames()
         except: pass
         # Special code to allow traits to be caught by autocomplete
-        if hasattr(obj,'trait_get'):
+        if hasattr(object,'trait_get'):
             try:
-                for i in obj.trait_get().keys():
+                for i in object.trait_get().keys():
                     if i not in attributes:
-                        if hasattr(obj, i):
+                        if hasattr(object, i):
                             attributes += i
             except:
                 pass
     # Get all attribute names.
-    str_type = str(type(obj))
+    str_type = str(type(object))
     if str_type == "<type 'array'>":
-        attributes += dir(obj)
+        attributes += dir(object)
     else:
-        attrdict = getAllAttributeNames(obj)
-        # Store the obj's dir.
-        obj_dir = dir(obj)
+        attrdict = getAllAttributeNames(object)
+        # Store the object's dir.
+        object_dir = dir(object)
         for (obj_type_name, technique, count), attrlist in attrdict.items():
             # This complexity is necessary to avoid accessing all the
-            # attributes of the obj.  This is very handy for objects
+            # attributes of the object.  This is very handy for objects
             # whose attributes are lazily evaluated.
-            if type(obj).__name__ == obj_type_name and technique == 'dir':
+            if type(object).__name__ == obj_type_name and technique == 'dir':
                 attributes += attrlist
             else:
                 attributes += [attr for attr in attrlist \
-                               if attr not in obj_dir and hasattr(obj, attr)]
-
+                               if attr not in object_dir and hasattr(object, attr)]
+            
     # Remove duplicates from the attribute list.
     for item in attributes:
         dict[item] = None
@@ -80,7 +82,7 @@ def getAttributeNames(obj, includeMagic=1, includeSingle=1,
     # e.g. ITK http://www.itk.org/
     attributes = [attribute for attribute in attributes \
                   if type(attribute) == str]
-    attributes.sort(key=lambda x: x.upper())
+    attributes.sort(lambda x, y: cmp(x.upper(), y.upper()))
     if not includeSingle:
         attributes = filter(lambda item: item[0]!='_' \
                             or item[1:2]=='_', attributes)
@@ -88,12 +90,12 @@ def getAttributeNames(obj, includeMagic=1, includeSingle=1,
         attributes = filter(lambda item: item[:2]!='__', attributes)
     return attributes
 
-def hasattrAlwaysReturnsTrue(obj):
-    return hasattr(obj, 'bogu5_123_aTTri8ute')
+def hasattrAlwaysReturnsTrue(object):
+    return hasattr(object, 'bogu5_123_aTTri8ute')
 
-def getAllAttributeNames(obj):
+def getAllAttributeNames(object):
     """Return dict of all attributes, including inherited, for an object.
-
+    
     Recursively walk through a class and all base classes.
     """
     attrdict = {}  # (object, technique, count): [list of attributes]
@@ -105,29 +107,30 @@ def getAllAttributeNames(obj):
     try:
         # This could(?) fail if the type is poorly defined without
         # even a name.
-        key = type(obj).__name__
-    except Exception:
+        key = type(object).__name__
+    except:
         key = 'anonymous'
     # Wake up sleepy objects - a hack for ZODB objects in "ghost" state.
-    wakeupcall = dir(obj)
+    wakeupcall = dir(object)
     del wakeupcall
     # Get attributes available through the normal convention.
-    attributes = dir(obj)
+    attributes = dir(object)
     attrdict[(key, 'dir', len(attributes))] = attributes
     # Get attributes from the object's dictionary, if it has one.
     try:
-        attributes = sorted(obj.__dict__.keys())
-    except Exception:  # Must catch all because object might have __getattr__.
+        attributes = object.__dict__.keys()
+        attributes.sort()
+    except:  # Must catch all because object might have __getattr__.
         pass
     else:
         attrdict[(key, '__dict__', len(attributes))] = attributes
     # For a class instance, get the attributes for the class.
     try:
-        klass = obj.__class__
+        klass = object.__class__
     except:  # Must catch all because object might have __getattr__.
         pass
     else:
-        if klass is obj:
+        if klass is object:
             # Break a circular reference. This happens with extension
             # classes.
             pass
@@ -135,13 +138,13 @@ def getAllAttributeNames(obj):
             attrdict.update(getAllAttributeNames(klass))
     # Also get attributes from any and all parent classes.
     try:
-        bases = obj.__bases__
+        bases = object.__bases__
     except:  # Must catch all because object might have __getattr__.
         pass
     else:
-        if isinstance(bases, tuple):
+        if isinstance(bases, types.TupleType):
             for base in bases:
-                if type(base) is type:
+                if type(base) is types.TypeType:
                     # Break a circular reference. Happens in Python 2.2.
                     pass
                 else:
@@ -150,33 +153,32 @@ def getAllAttributeNames(obj):
 
 def getCallTip(command='', locals=None):
     """For a command, return a tuple of object name, argspec, tip text.
-
+    
     The call tip information will be based on the locals namespace."""
     calltip = ('', '', '')  # object name, argspec, tip text.
     # Get the proper chunk of code from the command.
     root = getRoot(command, terminator='(')
     try:
         if locals is not None:
-            obj = eval(root, locals)
+            object = eval(root, locals)
         else:
-            obj = eval(root)
+            object = eval(root)
     except:
         return calltip
     name = ''
-    obj, dropSelf = getBaseObject(obj)
+    object, dropSelf = getBaseObject(object)
     try:
-        name = obj.__name__
+        name = object.__name__
     except AttributeError:
         pass
     tip1 = ''
     argspec = ''
-    if inspect.isbuiltin(obj):
+    if inspect.isbuiltin(object):
         # Builtin functions don't have an argspec that we can get.
         pass
-    elif inspect.isfunction(obj):
+    elif inspect.isfunction(object):
         # tip1 is a string like: "getCallTip(command='', locals=None)"
-        argspec = inspect.getargspec(obj)
-        argspec = inspect.formatargspec(*argspec)
+        argspec = apply(inspect.formatargspec, inspect.getargspec(object))
         if dropSelf:
             # The first parameter to a method is a reference to an
             # instance, usually coded as "self", and is usually passed
@@ -185,14 +187,14 @@ def getCallTip(command='', locals=None):
             if len(temp) == 1:  # No other arguments.
                 argspec = '()'
             elif temp[0][:2] == '(*': # first param is like *args, not self
-                pass
+                pass 
             else:  # Drop the first argument.
                 argspec = '(' + ','.join(temp[1:]).lstrip()
         tip1 = name + argspec
     doc = ''
-    if callable(obj):
+    if callable(object):
         try:
-            doc = inspect.getdoc(obj)
+            doc = inspect.getdoc(object)
         except:
             pass
     if doc:
@@ -216,7 +218,7 @@ def getCallTip(command='', locals=None):
 
 def getRoot(command, terminator=None):
     """Return the rightmost root portion of an arbitrary Python command.
-
+    
     Return only the root portion that can be eval()'d without side
     effects.  The command would normally terminate with a '(' or
     '.'. The terminator and anything after the terminator will be
@@ -226,25 +228,23 @@ def getRoot(command, terminator=None):
         command = command[len(sys.ps2):]
     command = command.lstrip()
     command = rtrimTerminus(command, terminator)
-    if terminator == '.':
-        tokens = getTokens(command)
-        if not tokens:
-            return ''
-        if tokens[-1][0] is tokenize.ENDMARKER:
-            # Remove the end marker.
-            del tokens[-1]
-        if not tokens:
-            return ''
-        if terminator == '.' and \
-               (tokens[-1][1] != '.' or tokens[-1][0] is not tokenize.OP):
-            # Trap decimals in numbers, versus the dot operator.
-            return ''
-
-    # Strip off the terminator.
-    if terminator and command.endswith(terminator):
-        size = 0 - len(terminator)
-        command = command[:size]
-
+    tokens = getTokens(command)
+    if not tokens:
+        return ''
+    if tokens[-1][0] is tokenize.ENDMARKER:
+        # Remove the end marker.
+        del tokens[-1]
+    if not tokens:
+        return ''
+    if terminator == '.' and \
+           (tokens[-1][1] <> '.' or tokens[-1][0] is not tokenize.OP):
+        # Trap decimals in numbers, versus the dot operator.
+        return ''
+    else:
+        # Strip off the terminator.
+        if terminator and command.endswith(terminator):
+            size = 0 - len(terminator)
+            command = command[:size]
     command = command.rstrip()
     tokens = getTokens(command)
     tokens.reverse()
@@ -252,7 +252,6 @@ def getRoot(command, terminator=None):
     start = None
     prefix = ''
     laststring = '.'
-    lastline = ''
     emptyTypes = ('[]', '()', '{}')
     for token in tokens:
         tokentype = token[0]
@@ -260,9 +259,6 @@ def getRoot(command, terminator=None):
         line = token[4]
         if tokentype is tokenize.ENDMARKER:
             continue
-        if PY3 and tokentype is tokenize.ENCODING:
-            line = lastline
-            break
         if tokentype in (tokenize.NAME, tokenize.STRING, tokenize.NUMBER) \
         and laststring != '.':
             # We've reached something that's not part of the root.
@@ -293,44 +289,46 @@ def getRoot(command, terminator=None):
             # We've reached something that's not part of the root.
             break
         laststring = tokenstring
-        lastline = line
     if start is None:
         start = len(line)
     root = line[start:]
     if prefix in emptyTypes:
         # Empty types are safe to be eval()'d and introspected.
         root = prefix + root
-    return root
+    return root    
 
 def getTokens(command):
     """Return list of token tuples for command."""
 
     # In case the command is unicode try encoding it
-    if isinstance(command,  string_types):
+    if type(command) == unicode:
         try:
-            command = command.encode('utf-8')
+            command = command.encode(wx.GetDefaultPyEncoding())
         except UnicodeEncodeError:
             pass # otherwise leave it alone
-
-    f = BytesIO(command)
-    # tokens is a list of token tuples, each looking like:
+                
+    f = cStringIO.StringIO(command)
+    # tokens is a list of token tuples, each looking like: 
     # (type, string, (srow, scol), (erow, ecol), line)
     tokens = []
     # Can't use list comprehension:
     #   tokens = [token for token in tokenize.generate_tokens(f.readline)]
     # because of need to append as much as possible before TokenError.
     try:
-        if not PY3:
-            def eater(*args):
-                tokens.append(args)
-            tokenize.tokenize_loop(f.readline, eater)
-        else:
-            tokens = list(tokenize.tokenize(f.readline))
+##        This code wasn't backward compatible with Python 2.1.3.
+##
+##        for token in tokenize.generate_tokens(f.readline):
+##            tokens.append(token)
+
+        # This works with Python 2.1.3 (with nested_scopes).
+        def eater(*args):
+            tokens.append(args)
+        tokenize.tokenize_loop(f.readline, eater)
     except tokenize.TokenError:
         # This is due to a premature EOF, which we expect since we are
         # feeding in fragments of Python code.
         pass
-    return tokens
+    return tokens    
 
 def rtrimTerminus(command, terminator=None):
     """Return command minus anything that follows the final terminator."""
@@ -340,51 +338,51 @@ def rtrimTerminus(command, terminator=None):
             command = terminator.join(pieces[:-1]) + terminator
     return command
 
-def getBaseObject(obj):
+def getBaseObject(object):
     """Return base object and dropSelf indicator for an object."""
-    if inspect.isbuiltin(obj):
+    if inspect.isbuiltin(object):
         # Builtin functions don't have an argspec that we can get.
         dropSelf = 0
-    elif inspect.ismethod(obj):
+    elif inspect.ismethod(object):
         # Get the function from the object otherwise
         # inspect.getargspec() complains that the object isn't a
         # Python function.
         try:
-            if obj.im_self is None:
+            if object.im_self is None:
                 # This is an unbound method so we do not drop self
                 # from the argspec, since an instance must be passed
                 # as the first arg.
                 dropSelf = 0
             else:
                 dropSelf = 1
-            obj = obj.im_func
+            object = object.im_func
         except AttributeError:
             dropSelf = 0
-    elif inspect.isclass(obj):
+    elif inspect.isclass(object):
         # Get the __init__ method function for the class.
-        constructor = getConstructor(obj)
+        constructor = getConstructor(object)
         if constructor is not None:
-            obj = constructor
+            object = constructor
             dropSelf = 1
         else:
             dropSelf = 0
-    elif callable(obj):
+    elif callable(object):
         # Get the __call__ method instead.
         try:
-            obj = obj.__call__.im_func
+            object = object.__call__.im_func
             dropSelf = 1
         except AttributeError:
             dropSelf = 0
     else:
         dropSelf = 0
-    return obj, dropSelf
+    return object, dropSelf
 
-def getConstructor(obj):
+def getConstructor(object):
     """Return constructor for class object, or None if there isn't one."""
     try:
-        return obj.__init__.im_func
+        return object.__init__.im_func
     except AttributeError:
-        for base in obj.__bases__:
+        for base in object.__bases__:
             constructor = getConstructor(base)
             if constructor is not None:
                 return constructor

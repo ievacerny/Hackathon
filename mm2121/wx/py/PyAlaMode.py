@@ -2,6 +2,8 @@
 """PyAlaMode is a programmer's editor."""
 
 __author__ = "Patrick K. O'Brien <pobrien@orbtech.com>"
+__cvsid__ = "$Id$"
+__revision__ = "$Revision$"[11:-2]
 
 import wx
 from wx import py
@@ -17,6 +19,7 @@ class App(wx.App):
         wx.App.__init__(self, redirect=False)
 
     def OnInit(self):
+        wx.InitAllImageHandlers()
         self.frame = py.editor.EditorNotebookFrame(filename=self.filename)
         self.frame.Show()
         self.SetTopWindow(self.frame)

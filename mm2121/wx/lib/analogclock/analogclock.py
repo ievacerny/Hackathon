@@ -5,17 +5,16 @@
 # Distributed under the wxWidgets license.
 #
 # For more info please see the __init__.py file.
-# Tags:     phoenix-port
 
 import wx
 
-from .styles import *
-from .helpers import Dyer, Face, Hand, HandSet, TickSet, Box
-from .setup import Setup
+from styles import *
+from helpers import Dyer, Face, Hand, HandSet, TickSet, Box
+from setup import Setup
 
 #----------------------------------------------------------------------
 
-class AnalogClock(wx.Window):
+class AnalogClock(wx.PyWindow):
     """An analog clock."""
 
     def __init__(self, parent, id=wx.ID_ANY, pos=wx.DefaultPosition,
@@ -23,7 +22,7 @@ class AnalogClock(wx.Window):
                  clockStyle=DEFAULT_CLOCK_STYLE,
                  minutesStyle=TICKS_CIRCLE, hoursStyle=TICKS_POLY):
 
-        wx.Window.__init__(self, parent, id, pos, size, style, name)
+        wx.PyWindow.__init__(self, parent, id, pos, size, style, name)
 
         # Base size for scale calc purposes.
         self.basesize = wx.Size(348, 348)
@@ -65,8 +64,8 @@ class AnalogClock(wx.Window):
         # HandSet is the set of hands; there's always one HandSet defined
         # regardless whether hands are being shown or not.
         #
-        # A 'lenfac = 0.95', e.g., means that the length of that hand will
-        # be 95% of the maximum allowed hand length ('nice' maximum length).
+        # A 'lenfac = 0.95', e.g., means that the lenght of that hand will
+        # be 95% of the maximum allowed hand lenght ('nice' maximum lenght).
         handH = Hand(size=7, lenfac=0.7)
         handM = Hand(size=5, lenfac=0.95)
         handS = Hand(size=1, lenfac=0.95)
@@ -98,7 +97,7 @@ class AnalogClock(wx.Window):
         # Do initial drawing (in case there is not an initial size event)
         self.RecalcCoords(self.GetSize())
         self.DrawBox()
-
+        
         # Initialize the timer that drives the update of the clock face.
         # Update every half second to ensure that there is at least one true
         # update during each realtime second.
@@ -112,7 +111,7 @@ class AnalogClock(wx.Window):
         size = wx.Size(50,50)
         self.CacheBestSize(size)
         return size
-
+    
 
     def _OnSize(self, evt):
         size = self.GetClientSize()
@@ -124,14 +123,14 @@ class AnalogClock(wx.Window):
 
 
     def _OnPaint(self, evt):
-        dc = wx.GCDC(wx.BufferedPaintDC(self))
+        dc = wx.BufferedPaintDC(self)
         self.DrawHands(dc)
 
 
     def _OnTimer(self, evt):
         self.Refresh(False)
         self.Update()
-
+        
 
     def _OnDestroyWindow(self, evt):
         self.timer.Stop()
@@ -167,7 +166,7 @@ class AnalogClock(wx.Window):
         to make sure the buffer is always the same size as the window.
         """
 
-        self.faceBitmap = wx.Bitmap(*size.Get())
+        self.faceBitmap = wx.EmptyBitmap(*size.Get())
 
         # Recalc all coords.
         scale = min([float(size.width) / self.basesize.width,
@@ -188,8 +187,8 @@ class AnalogClock(wx.Window):
 
     def _drawBox(self):
         """Draws clock face and tick marks onto the faceBitmap."""
-        dc = wx.GCDC(wx.BufferedDC(None, self.faceBitmap))
-        dc.SetBackground(wx.Brush(self.GetBackgroundColour(), wx.BRUSHSTYLE_SOLID))
+        dc = wx.BufferedDC(None, self.faceBitmap)
+        dc.SetBackground(wx.Brush(self.GetBackgroundColour(), wx.SOLID))
         dc.Clear()
         self.Box.Draw(dc)
 
@@ -336,7 +335,7 @@ class AnalogClock(wx.Window):
         self.RecalcCoords(size)
         self.DrawBox()
         self.Refresh(False)
-
+        
 
     def SetHandSize(self, size, target=ALL):
         """Sets thickness of hands."""
@@ -590,10 +589,10 @@ class AnalogClockWindow(AnalogClock):
 
     def SetMinutesOffset(self, o):
         pass
-
+    
     def SetShadowColour(self, s):
         pass
-
+    
     def SetWatchPenBrush(self, p=None, b=None):
         if p:
             self.SetFaceBorderColour(p.GetColour())
@@ -611,11 +610,11 @@ class AnalogClockWindow(AnalogClock):
         if m:
             self.SetTickStyle(h, MINUTE)
 
-
+        
 # Test stuff ----------------------------------------------------------
 
 if __name__ == "__main__":
-    print(wx.VERSION_STRING)
+    print wx.VERSION_STRING
 
     class AcDemoApp(wx.App):
         def OnInit(self):
@@ -628,3 +627,7 @@ if __name__ == "__main__":
     acApp = AcDemoApp(0)
     acApp.MainLoop()
 
+
+#
+##
+### eof

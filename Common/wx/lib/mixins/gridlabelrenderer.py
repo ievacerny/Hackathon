@@ -7,7 +7,8 @@
 # Author:      Robin Dunn
 #
 # Created:     20-Mar-2009
-# Copyright:   (c) 2009-2017 by Total Control Software
+# RCS-ID:      $Id$
+# Copyright:   (c) 2009 by Total Control Software
 # Licence:     wxWindows license
 #----------------------------------------------------------------------
 
@@ -26,17 +27,17 @@ class GridWithLabelRenderersMixin(object):
     how the cell renderers work in the main Grid class.
     """
     def __init__(self):
-        self.GetGridRowLabelWindow().Bind(wx.EVT_PAINT, self._onPaintRowLabels)
+        self.GetGridRowLabelWindow().Bind(wx.EVT_PAINT, self._onPaintRowLabels)        
         self.GetGridColLabelWindow().Bind(wx.EVT_PAINT, self._onPaintColLabels)
         self.GetGridCornerLabelWindow().Bind(wx.EVT_PAINT, self._onPaintCornerLabel)
-
+        
         self._rowRenderers = dict()
         self._colRenderers = dict()
         self._cornderRenderer = None
         self._defRowRenderer = None
         self._defColRenderer = None
-
-
+        
+        
     def SetRowLabelRenderer(self, row, renderer):
         """
         Register a renderer to be used for drawing the label for the
@@ -48,7 +49,7 @@ class GridWithLabelRenderersMixin(object):
         else:
             self._rowRenderers[row] = renderer
 
-
+            
     def SetDefaultRowLabelRenderer(self, renderer):
         """
         Set the row label renderer that should be used for any row
@@ -57,7 +58,7 @@ class GridWithLabelRenderersMixin(object):
         """
         self._defRowRenderer = renderer
 
-
+    
     def SetColLabelRenderer(self, col, renderer):
         """
         Register a renderer to be used for drawing the label for the
@@ -69,7 +70,7 @@ class GridWithLabelRenderersMixin(object):
         else:
             self._colRenderers[col] = renderer
 
-
+            
     def SetDefaultColLabelRenderer(self, renderer):
         """
         Set the column label renderer that should be used for any
@@ -79,7 +80,7 @@ class GridWithLabelRenderersMixin(object):
         self._defColRenderer = renderer
 
 
-
+    
     def SetCornerLabelRenderer(self, renderer):
         """
         Sets the renderer that should be used for drawing the area in
@@ -88,18 +89,18 @@ class GridWithLabelRenderersMixin(object):
         `GridDefaultCornerLabelRenderer`
         """
         self._cornderRenderer = renderer
-
-
+    
+        
     #----------------------------------------------------------------
-
+    
     def _onPaintRowLabels(self, evt):
         window = evt.GetEventObject()
         dc = wx.PaintDC(window)
-
+                
         rows = self.CalcRowLabelsExposed(window.GetUpdateRegion())
         if rows == [-1]:
             return
-
+        
         x, y = self.CalcUnscrolledPosition((0,0))
         pt = dc.GetDeviceOrigin()
         dc.SetDeviceOrigin(pt.x, pt.y-y)
@@ -114,8 +115,8 @@ class GridWithLabelRenderersMixin(object):
             renderer = self._rowRenderers.get(row, None) or \
                        self._defRowRenderer or GridDefaultRowLabelRenderer()
             renderer.Draw(self, dc, rect, row)
-
-
+            
+            
     def _onPaintColLabels(self, evt):
         window = evt.GetEventObject()
         dc = wx.PaintDC(window)
@@ -123,7 +124,7 @@ class GridWithLabelRenderersMixin(object):
         cols = self.CalcColLabelsExposed(window.GetUpdateRegion())
         if cols == [-1]:
             return
-
+        
         x, y = self.CalcUnscrolledPosition((0,0))
         pt = dc.GetDeviceOrigin()
         dc.SetDeviceOrigin(pt.x-x, pt.y)
@@ -139,18 +140,18 @@ class GridWithLabelRenderersMixin(object):
                        self._defColRenderer or GridDefaultColLabelRenderer()
             renderer.Draw(self, dc, rect, col)
 
-
+            
     def _onPaintCornerLabel(self, evt):
         window = evt.GetEventObject()
         dc = wx.PaintDC(window)
         w, h = window.GetSize()
         rect = wx.Rect(0, 0, w, h)
-
+        
         renderer = self._cornderRenderer or GridDefaultCornerLabelRenderer()
         renderer.Draw(self, dc, rect, -1)
 
-
-
+        
+        
     # NOTE: These helpers or something like them should probably be publicly
     # available in the C++ wxGrid class, but they are currently protected so
     # for now we will have to calculate them ourselves.
@@ -162,7 +163,7 @@ class GridWithLabelRenderersMixin(object):
             c += 1
         right = left + self.GetColSize(col)
         return left, right
-
+        
     def _getRowTopBottom(self, row):
         r = 0
         top = 0
@@ -171,7 +172,7 @@ class GridWithLabelRenderersMixin(object):
             r += 1
         bottom = top + self.GetRowSize(row) - 1
         return top, bottom
-
+        
 
 
 
@@ -179,7 +180,7 @@ class GridLabelRenderer(object):
     """
     Base class for row, col or corner label renderers.
     """
-
+    
     def Draw(self, grid, dc, rect, row_or_col):
         """
         Override this method in derived classes to do the actual
@@ -187,7 +188,7 @@ class GridLabelRenderer(object):
         """
         raise NotImplementedError
 
-
+    
     # These two can be used to duplicate the default wxGrid label drawing
     def DrawBorder(self, grid, dc, rect):
         """
@@ -197,7 +198,7 @@ class GridLabelRenderer(object):
         top = rect.top
         bottom = rect.bottom
         left = rect.left
-        right = rect.right
+        right = rect.right        
         dc.SetPen(wx.Pen(wx.SystemSettings.GetColour(wx.SYS_COLOUR_3DSHADOW)))
         dc.DrawLine(right, top, right, bottom)
         dc.DrawLine(left, top, left, bottom)
@@ -206,7 +207,7 @@ class GridLabelRenderer(object):
         dc.DrawLine(left+1, top, left+1, bottom)
         dc.DrawLine(left+1, top, right, top)
 
-
+        
     def DrawText(self, grid, dc, rect, text, hAlign, vAlign):
         """
         Draw the label's text in the rectangle, using the alignment
@@ -218,7 +219,7 @@ class GridLabelRenderer(object):
         rect = wx.Rect(*rect)
         rect.Deflate(2,2)
         grid.DrawTextRectangle(dc, text, rect, hAlign, vAlign)
-
+        
 
 
 # These classes draw approximately the same things that the built-in
@@ -231,17 +232,17 @@ class GridDefaultRowLabelRenderer(GridLabelRenderer):
         text = grid.GetRowLabelValue(row)
         self.DrawBorder(grid, dc, rect)
         self.DrawText(grid, dc, rect, text, hAlign, vAlign)
-
+        
 class GridDefaultColLabelRenderer(GridLabelRenderer):
     def Draw(self, grid, dc, rect, col):
         hAlign, vAlign = grid.GetColLabelAlignment()
         text = grid.GetColLabelValue(col)
         self.DrawBorder(grid, dc, rect)
         self.DrawText(grid, dc, rect, text, hAlign, vAlign)
-
+        
 class GridDefaultCornerLabelRenderer(GridLabelRenderer):
     def Draw(self, grid, dc, rect, row_or_col):
         self.DrawBorder(grid, dc, rect)
-
-
+        
+        
 #---------------------------------------------------------------------------

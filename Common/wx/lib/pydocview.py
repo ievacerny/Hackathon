@@ -5,14 +5,13 @@
 # Author:       Peter Yared, Morgan Hua, Matt Fryer
 #
 # Created:      5/15/03
+# CVS-ID:       $Id$
 # Copyright:    (c) 2003-2006 ActiveGrid, Inc.
 # License:      wxWindows license
-# Tags:         phoenix-port
 #----------------------------------------------------------------------------
 
 
 import wx
-import wx.adv
 import wx.lib.docview
 import sys
 import getopt
@@ -161,7 +160,7 @@ class DocFrameMixIn:
         Creates the default StatusBar.
         """
         wx.Frame.CreateStatusBar(self)
-        self.GetStatusBar().Show(wx.ConfigBase.Get().ReadInt("ViewStatusBar", True))
+        self.GetStatusBar().Show(wx.ConfigBase_Get().ReadInt("ViewStatusBar", True))
         self.UpdateStatus()
         return self.GetStatusBar()
 
@@ -185,7 +184,7 @@ class DocFrameMixIn:
         self._toolBar.AddSimpleTool(wx.ID_UNDO, Undo.GetBitmap(), _("Undo"), _("Reverses the last action"))
         self._toolBar.AddSimpleTool(wx.ID_REDO, Redo.GetBitmap(), _("Redo"), _("Reverses the last undo"))
         self._toolBar.Realize()
-        self._toolBar.Show(wx.ConfigBase.Get().ReadInt("ViewToolBar", True))
+        self._toolBar.Show(wx.ConfigBase_Get().ReadInt("ViewToolBar", True))
 
         return self._toolBar
 
@@ -265,7 +264,7 @@ class DocMDIParentFrameMixIn:
         """
         Adjusts the position and size of the frame using the saved config position and size.
         """
-        config = wx.ConfigBase.Get()
+        config = wx.ConfigBase_Get()
         if pos == wx.DefaultPosition and size == wx.DefaultSize and config.ReadInt("MDIFrameMaximized", False):
             pos = [0, 0]
             size = wx.DisplaySize()
@@ -274,7 +273,7 @@ class DocMDIParentFrameMixIn:
             if pos == wx.DefaultPosition:
                 pos = config.ReadInt("MDIFrameXLoc", -1), config.ReadInt("MDIFrameYLoc", -1)
 
-            if wx.Display.GetFromPoint(pos) == -1:  # Check if the frame position is offscreen
+            if wx.Display_GetFromPoint(pos) == -1:  # Check if the frame position is offscreen
                 pos = wx.DefaultPosition
 
             if size == wx.DefaultSize:
@@ -302,7 +301,7 @@ class DocMDIParentFrameMixIn:
         menuBar = self.CreateDefaultMenuBar()
         statusBar = self.CreateDefaultStatusBar()
 
-        config = wx.ConfigBase.Get()
+        config = wx.ConfigBase_Get()
         if config.ReadInt("MDIFrameMaximized", False):
             # wxBug: On maximize, statusbar leaves a residual that needs to be refereshed, happens even when user does it
             self.Maximize()
@@ -383,7 +382,7 @@ class DocMDIParentFrameMixIn:
         defaultHSize = max(minSize, int(frameSize[0] / 6))
         defaultVSize = max(minSize, int(frameSize[1] / 7))
         defaultSubVSize = int(frameSize[1] / 2)
-        config = wx.ConfigBase.Get()
+        config = wx.ConfigBase_Get()
         if windows & (EMBEDDED_WINDOW_LEFT | EMBEDDED_WINDOW_TOPLEFT | EMBEDDED_WINDOW_BOTTOMLEFT):
             self._leftEmbWindow = self._CreateEmbeddedWindow(self, (max(minSize,config.ReadInt("MDIEmbedLeftSize", defaultHSize)), -1), wx.LAYOUT_VERTICAL, wx.LAYOUT_LEFT, visible = config.ReadInt("MDIEmbedLeftVisible", 1), sash = wx.SASH_RIGHT)
         else:
@@ -422,12 +421,12 @@ class DocMDIParentFrameMixIn:
         """
         Saves the sizes of the embedded windows.
         """
-        config = wx.ConfigBase.Get()
+        config = wx.ConfigBase_Get()
         if not self.IsMaximized():
-            config.WriteInt("MDIFrameXLoc", self.GetPosition()[0])
-            config.WriteInt("MDIFrameYLoc", self.GetPosition()[1])
-            config.WriteInt("MDIFrameXSize", self.GetSize()[0])
-            config.WriteInt("MDIFrameYSize", self.GetSize()[1])
+            config.WriteInt("MDIFrameXLoc", self.GetPositionTuple()[0])
+            config.WriteInt("MDIFrameYLoc", self.GetPositionTuple()[1])
+            config.WriteInt("MDIFrameXSize", self.GetSizeTuple()[0])
+            config.WriteInt("MDIFrameYSize", self.GetSizeTuple()[1])
         config.WriteInt("MDIFrameMaximized", self.IsMaximized())
         config.WriteInt("ViewToolBar", self._toolBar.IsShown())
         config.WriteInt("ViewStatusBar", self.GetStatusBar().IsShown())
@@ -679,7 +678,7 @@ class DocTabbedChildFrame(wx.Panel):
                 if title.endswith("*"):
                     title = title[:-1]
                     self.SetTitle(title)
-
+        
 
     def ProcessEvent(event):
         """
@@ -788,7 +787,7 @@ class DocTabbedParentFrame(wx.Frame, DocFrameMixIn, DocMDIParentFrameMixIn):
         """
         Lays out the frame.
         """
-        wx.adv.LayoutAlgorithm().LayoutFrame(self, self._notebook)
+        wx.LayoutAlgorithm().LayoutFrame(self, self._notebook)
 
 
     def CreateNotebook(self):
@@ -822,8 +821,8 @@ class DocTabbedParentFrame(wx.Frame, DocFrameMixIn, DocMDIParentFrameMixIn):
                     icon.SetHeight(16)
                     icon.SetWidth(16)
                     if wx.GetApp().GetDebug():
-                        print("Warning: icon for '%s' isn't 16x16, not crossplatform" % template._docTypeName)
-                iconIndex = iconList.Add(icon)
+                        print "Warning: icon for '%s' isn't 16x16, not crossplatform" % template._docTypeName
+                iconIndex = iconList.AddIcon(icon)
                 self._iconIndexLookup.append((template, iconIndex))
 
         icon = Blank.GetIcon()
@@ -831,8 +830,8 @@ class DocTabbedParentFrame(wx.Frame, DocFrameMixIn, DocMDIParentFrameMixIn):
             icon.SetHeight(16)
             icon.SetWidth(16)
             if wx.GetApp().GetDebug():
-                print("Warning: getBlankIcon isn't 16x16, not crossplatform")
-        self._blankIconIndex = iconList.Add(icon)
+                print "Warning: getBlankIcon isn't 16x16, not crossplatform"
+        self._blankIconIndex = iconList.AddIcon(icon)
         self._notebook.AssignImageList(iconList)
 
 
@@ -1174,7 +1173,7 @@ class DocMDIChildFrame(wx.MDIChildFrame):
             else:
                 if title.endswith("*"):
                     title = title[:-1]
-                    self.SetTitle(title)
+                    self.SetTitle(title)                
                 else:
                     return
 
@@ -1520,7 +1519,7 @@ class OptionsDialog(wx.Dialog):
                         icon.SetHeight(16)
                         icon.SetWidth(16)
                         if wx.GetApp().GetDebug():
-                            print("Warning: icon for '%s' isn't 16x16, not crossplatform" % template._docTypeName)
+                            print "Warning: icon for '%s' isn't 16x16, not crossplatform" % template._docTypeName
                     iconIndex = iconList.AddIcon(icon)
                     self._iconIndexLookup.append((optionsPanel, iconIndex))
 
@@ -1586,7 +1585,7 @@ class GeneralOptionsPanel(wx.Panel):
         wx.Panel.__init__(self, parent, id)
         SPACE = 10
         HALF_SPACE = 5
-        config = wx.ConfigBase.Get()
+        config = wx.ConfigBase_Get()
         self._showTipsCheckBox = wx.CheckBox(self, -1, _("Show tips at start up"))
         self._showTipsCheckBox.SetValue(config.ReadInt("ShowTipAtStartup", True))
         if self._AllowModeChanges():
@@ -1642,7 +1641,7 @@ class GeneralOptionsPanel(wx.Panel):
         """
         Updates the config based on the selections in the options panel.
         """
-        config = wx.ConfigBase.Get()
+        config = wx.ConfigBase_Get()
         config.WriteInt("ShowTipAtStartup", self._showTipsCheckBox.GetValue())
         if self._AllowModeChanges():
             config.WriteInt("UseMDI", (self._documentRadioBox.GetStringSelection() == self._mdiChoice))
@@ -1791,7 +1790,7 @@ class DocApp(wx.App):
         DocApp's file history into the document manager.
         """
         self._docManager = docManager
-        config = wx.ConfigBase.Get()
+        config = wx.ConfigBase_Get()
         self.GetDocumentManager().FileHistoryLoad(config)
 
 
@@ -1878,7 +1877,7 @@ class DocApp(wx.App):
         """
         for service in self._services:
             service.OnExit()
-        config = wx.ConfigBase.Get()
+        config = wx.ConfigBase_Get()
         self._docManager.FileHistorySave(config)
 
         if hasattr(self, "_singleInstanceChecker"):
@@ -1889,7 +1888,7 @@ class DocApp(wx.App):
         """
         Returns the default flags to use when creating the DocManager.
         """
-        config = wx.ConfigBase.Get()
+        config = wx.ConfigBase_Get()
         if config.ReadInt("UseMDI", True) or config.ReadInt("UseWinMDI", False):
             flags = wx.lib.docview.DOC_MDI | wx.lib.docview.DOC_OPEN_ONCE
             if config.ReadInt("UseWinMDI", False):
@@ -1904,7 +1903,7 @@ class DocApp(wx.App):
         Shows the tip window, generally this is called when an application starts.
         A wx.TipProvider must be passed.
         """
-        config = wx.ConfigBase.Get()
+        config = wx.ConfigBase_Get()
         showTip = config.ReadInt("ShowTipAtStartup", 1)
         if showTip:
             index = config.ReadInt("TipIndex", 0)
@@ -2012,7 +2011,7 @@ class DocApp(wx.App):
                 maximize = False
             else:
                 # get default setting from registry
-                maximize = wx.ConfigBase.Get().ReadInt("MDIChildFrameMaximized", False)
+                maximize = wx.ConfigBase_Get().ReadInt("MDIChildFrameMaximized", False)
 
         frame = wx.lib.docview.DocMDIChildFrame(doc, view, wx.GetApp().GetTopWindow(), id, title, pos, size, style)
         if maximize:  # wxBug: Should already be maximizing new child frames if one is maximized but it's not so we have to force it to
@@ -2032,7 +2031,7 @@ class DocApp(wx.App):
         Remember in the config whether the MDI Frame is maximized so that it can be restored
         on open.
         """
-        config = wx.ConfigBase.Get()
+        config = wx.ConfigBase_Get()
         maximizeFlag = config.ReadInt("MDIChildFrameMaximized", False)
         if maximized != maximizeFlag:
             config.WriteInt("MDIChildFrameMaximized", maximized)
@@ -2173,7 +2172,7 @@ class DocApp(wx.App):
             splash_bmp = image
         else:
             splash_bmp = wx.Image(image).ConvertToBitmap()
-        self._splash = wx.adv.SplashScreen(splash_bmp, wx.adv.SPLASH_CENTRE_ON_SCREEN|wx.adv.SPLASH_NO_TIMEOUT, 0, None, -1, style=wx.SIMPLE_BORDER|wx.FRAME_NO_TASKBAR)
+        self._splash = wx.SplashScreen(splash_bmp, wx.SPLASH_CENTRE_ON_SCREEN|wx.SPLASH_NO_TIMEOUT, 0, None, -1, style=wx.SIMPLE_BORDER|wx.FRAME_NO_TASKBAR)
         self._splash.Show()
 
 
@@ -2240,7 +2239,7 @@ class DocMDIParentFrame(wx.lib.docview.DocMDIParentFrame, DocFrameMixIn, DocMDIP
         """
         Lays out the frame.
         """
-        wx.adv.LayoutAlgorithm().LayoutMDIFrame(self)
+        wx.LayoutAlgorithm().LayoutMDIFrame(self)
         self.GetClientWindow().Refresh()
 
 
@@ -2724,7 +2723,7 @@ class FilePropertiesDialog(wx.Dialog):
         sizer.Add(self.CreateButtonSizer(wx.OK), 0, wx.ALIGN_RIGHT | wx.RIGHT | wx.BOTTOM, HALF_SPACE)
 
         sizer.Fit(self)
-        self.SetSize(-1, -1, 310, -1, wx.SIZE_USE_EXISTING)
+        self.SetDimensions(-1, -1, 310, -1, wx.SIZE_USE_EXISTING)
         self.SetSizer(sizer)
         self.Layout()
 
@@ -2880,11 +2879,11 @@ class WindowMenuService(DocService):
             windowMenu = wx.Menu()
         else:
             needWindowMenu = False
-
+            
         if self.GetDocumentManager().GetFlags() & wx.lib.docview.DOC_SDI:
             if not _WINDOWS:  # Arrange All and window navigation doesn't work on Linux
                 return
-
+                
             item = windowMenu.Append(self.ARRANGE_WINDOWS_ID, _("&Arrange All"), _("Arrange the open windows"))
             wx.EVT_MENU(frame, self.ARRANGE_WINDOWS_ID, frame.ProcessEvent)
             wx.EVT_UPDATE_UI(frame, self.ARRANGE_WINDOWS_ID, frame.ProcessUpdateUIEvent)
@@ -2972,7 +2971,7 @@ class WindowMenuService(DocService):
         elif wx.GetApp().GetUseTabbedMDI():
             if id == self.SELECT_NEXT_WINDOW_ID:
                 self.BuildWindowMenu(event.GetEventObject())  # build file list only when we are updating the windows menu
-
+                
                 notebook = wx.GetApp().GetTopWindow()._notebook
                 i = notebook.GetSelection()
                 if i == -1:
@@ -3013,7 +3012,6 @@ class WindowMenuService(DocService):
             currentFrame = wx.GetApp().GetTopWindow()
 
         windowMenuIndex = currentFrame.GetMenuBar().FindMenu(_("&Window"))
-        assert windowMenuIndex != wx.NOT_FOUND, "Menu not found in MenuBar for {}".format(_("&Window"))
         windowMenu = currentFrame.GetMenuBar().GetMenu(windowMenuIndex)
 
         if self.GetDocumentManager().GetFlags() & wx.lib.docview.DOC_SDI:
@@ -3057,8 +3055,8 @@ class WindowMenuService(DocService):
             if numPages > len(self._selectWinIds):
                 for i in range(len(self._selectWinIds), numPages):
                     self._selectWinIds.append(wx.NewId())
-                    wx.EVT_MENU(currentFrame, self._selectWinIds[i], self.OnCtrlKeySelect)
-
+                    wx.EVT_MENU(currentFrame, self._selectWinIds[i], self.OnCtrlKeySelect)                    
+            
             for i in range(0, numPages):
                 if i == 0 and not self._sep:
                     self._sep = windowMenu.AppendSeparator()
