@@ -85,9 +85,7 @@ class Names:
 
         If the name_id is not an index in the names list, return None.
         """
-        if name_id < 0:
-            raise ValueError('NameID cannot be negative')
-        elif name_id < len(self.name_table):
+        if name_id >= 0 and name_id < len(self.name_table):
             return self.name_table[name_id]
         else:
             return None

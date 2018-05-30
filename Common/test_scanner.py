@@ -34,15 +34,18 @@ def init_scanner(data):
     ('?', [None, None]),
     ('\\*7*\\.', [9, None]),
     ('\\*7*\\\\', [None, None]),
-    ('''\\\\fsdfsdf
-    DEVICES''', [3, 0]),
+    ('''\\\\fsdfsdf\nDEVICES''', [3, 0]),
     ('\\', [None, None]),
     ('1BC', [4, 1]),
     ('--', [None, None]),
     ('-->', [None, None]),
     ('<-', [None, None]),
     ('\\ABC', [None, None]),
-    ('B1C', [5, 11])
+    ('B1C', [5, 11]),
+    ('*\\', [None, None]),
+    ('\\\\ \n\\', [None, None]),
+    ('\\\\ \n\\*ABC*\\.', [9, None]),
+    ('\\\\ \n\\*ABC*\\\\', [None, None])
 ])
 
 
@@ -60,8 +63,10 @@ def test_scanning(data, expected_output):
     ('612.', 612),
     ('154,', 154),
     ('157;.plp', 157),
-    ('15:17', 15)
-
+    ('15:17', 15),
+    ('asd15', -1),
+    ('\n  15', 15),
+    ('\n sfd15', -1)
 ])
 
 def test_get_number(data, expected_output):
@@ -77,8 +82,9 @@ def test_get_number(data, expected_output):
     ('SW4.3', 'SW4'),
     ('BTD5_I', 'BTD5'),
     ('AH4;BST', 'AH4'),
-
-
+    ('\n  12395', ''),
+    ('\n\t\rABC', 'ABC'),
+    ('2ABC', ''),
 ])
 
 def test_get_name(data, expected_output):
@@ -91,7 +97,8 @@ def test_get_name(data, expected_output):
     ('45678', '5'),
     (',.-l', '.'),
     ('l dac', ' '),
-
+    ('\n   12', '2'),
+    ('', '')
 ])
 
 def test_advance(data, expected_output):
@@ -109,7 +116,13 @@ def test_advance(data, expected_output):
     ('''\\*Comment*\\DEVICES: SW1 -> A1''',
         [[3, 0], [2, None], [5, 11], [6, None], [5, 12]]),
     ('NAND N! 4,',
-        [[3, 6], [5, 11], [None, None], [4, 4], [0, None]])
+        [[3, 6], [5, 11], [None, None], [4, 4], [0, None]]),
+    ('\t123\nABC\rDEF\t\n\rDEVICES :',
+        [[4, 123], [5, 11], [5, 12], [3, 0], [2, None]]),
+    ('''\\*Comment\n*\\DEVICES: SW1 -> A1''',
+        [[3, 0], [2, None], [5, 11], [6, None], [5, 12]]),
+    ('''\\*Comment\n\\\\anothercomment*\\DEVICES: SW1 -> A1''',
+        [[3, 0], [2, None], [5, 11], [6, None], [5, 12]])
 ])
 def test_symbol_sequence(data, expected_output):
     """Test if a sequence of symbols is correct."""
@@ -122,8 +135,56 @@ def test_symbol_sequence(data, expected_output):
 
 @pytest.mark.parametrize(
     "data, expected_output, error_prev_symb, no_arrow, err_loc", [
-        ("DEVICES:\nCLOCK CL3 3,", "CLOCK CL3 3,\n       ^\n",
-            False, False, 4)
+        ("DEVICES:\nCLOCK CL3 3,", "CLOCK CL3 3,\n",
+            False, True, 4),
+        ("DEVICES:\nCLOCK\nCL3\n3,", "CL3\n",
+            False, True, 4),
+        ("DEVICES:\nCLOCK\n\tCL3\n3,", "\tCL3\n",
+            False, True, 4),
+        ("DEVICES:\nCLOCK\n\n\n\tCL3\n3,", "\tCL3\n",
+            False, True, 4),
+        ("DEVICES:\nCLOCK CL3 3,", "CLOCK CL3 3,\n        ^\n",
+            False, False, 4),
+        ("DEVICES:\n\tCLOCK CL3 3,", "\tCLOCK CL3 3,\n\t        ^\n",
+            False, False, 4),
+        ("DEVICES:\nCLOCK\n\nCL3 3,", "CL3 3,\n  ^\n",
+            False, False, 4),
+        ("DEVICES:\nCLOCK CL3 3,", "CLOCK CL3 3,\n    ^\n",
+            True, False, 4),
+        ("DEVICES:\nCLOCK\tCL3 3,", "CLOCK\tCL3 3,\n    ^\n",
+            True, False, 4),
+        ("DEVICES:\n\tCLOCK\tCL3 3,", "\tCLOCK\tCL3 3,\n\t    ^\n",
+            True, False, 4),
+        ("DEVICES:\nCLOCK  .  CL3 3,", "CLOCK  .  CL3 3,\n       ^\n",
+            True, False, 5),
+        ("DEVICES:\nCLOCK \*Com*\ CL3 3,", "CLOCK \*Com*\ CL3 3,\n    ^\n",
+            True, False, 4),
+        ("DEVICES:\n\tCLOCK \*Com*\ CL3 3,", "\tCLOCK \*Com*\ CL3 3,\n    ^\n",
+            True, False, 4),
+        ("DEVICES:\n\tCLOCK\t\*Com*\CL3 3,", "\tCLOCK\t\*Com*\CL3 3,\n    ^\n",
+            True, False, 4),
+        ("DEVICES:\n\tCLOCK\*\tCom*\CL3 3,", "\tCLOCK\*\tCom*\CL3 3,\n    ^\n",
+            True, False, 4),
+        ("DEVICES:\nCLOCK \*CLOCK*\ CL3 3,", "CLOCK \*CLOCK*\ CL3 3,\n    ^\n",
+            True, False, 4),
+        ("DEVICES:\nCLOCK CL3 3,", "DEVICES:\n       ^\n",
+            True, False, 3),
+        ("DEVICES:\n\nCLOCK CL3 3,", "DEVICES:\n       ^\n",
+            True, False, 3),
+        ("\tDEVICES:\nCLOCK CL3 3,", "\tDEVICES:\n\t       ^\n",
+            True, False, 3),
+        ("DEVICES:\n\\\\Comment\nCLOCK CL3 3,", "DEVICES:\n       ^\n",
+            True, False, 3),
+        ("DEVICES:\n\\\nCLOCK CL3 3,", "\\\n^\n",
+            True, False, 3),
+        ("DEVICES:\\*Com\nment\n*\\CLOCK CL3 3,", "DEVICES:\\*Com\n       ^\n",
+            True, False, 3),
+        ("DEVICES:\\*C\nom\n\n*\\CLOCK CL3 3,", "DEVICES:\\*C\n       ^\n",
+            True, False, 3),
+        ("DEVICES:\n\\\\DEVICES:com\nCLOCK CL3 3,", "DEVICES:\n       ^\n",
+            True, False, 3),
+        ("DEVICES:\n\\\\DEVICES:com\n\nCLOCK CL3 3,", "DEVICES:\n       ^\n",
+            True, False, 3)
     ]
 )
 def test_get_line(capsys, data, expected_output, error_prev_symb,

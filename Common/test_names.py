@@ -33,15 +33,14 @@ def test_get_string_raises_exceptions(used_names):
         used_names.get_name_string(1.4)
     with pytest.raises(TypeError):
         used_names.get_name_string("hello")
-    with pytest.raises(ValueError):
-        used_names.get_name_string(-1)
 
 
 @pytest.mark.parametrize("name_id, expected_string", [
     (0, "SW1"),
     (1, "SECOND_CLOCK"),
     (2, "DTYPE3"),
-    (3, None)
+    (3, None),
+    (-1, None)
 ])
 def test_get_name_string(used_names, new_names, name_id, expected_string):
     """Test if get_string returns the expected string."""
