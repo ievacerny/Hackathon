@@ -9,7 +9,7 @@ Scanner - reads definition file and translates characters into symbols.
 """
 
 import sys
-import re
+# import re
 
 
 class Scanner:
@@ -119,6 +119,8 @@ class Scanner:
             prev_line_index = self.line_count - 1
             while self.list_file[prev_line_index].isspace() is True or len(self.list_file[prev_line_index]) == 0:
                 prev_line_index -= 1
+            while (self.list_file[prev_line_index]).find('\\\\') != -1 or (self.list_file[prev_line_index]).find('\\*') or (self.list_file[prev_line_index]).find('*\\'):
+                prev_line_index -= 1
             prev_line = self.list_file[prev_line_index]
 
             # len(re.findall(check_string, test_string))
@@ -152,17 +154,18 @@ class Scanner:
         elif before is False and arrow is False:
             # print(self.character_count)
             line = self.list_file[self.line_count]
-            symbol = self.current_symbol
-            print('current symol is:', symbol)
-            if len(re.findall(line, symbol)) == 1:
-                print(line)
-                print(' ' * (line.find(symbol) - 1), '^')
-            else:
-                character_no = self.character_count
-                print(line)
-                print(' ' * (character_no - 2), '^')
-                # print('character number is:', character_no)
-
+            # symbol = self.current_symbol
+            character_no = self.character_count
+            print(line)
+            # print(' ' * (character_no - 2), '^')
+            cut_line = line[:character_no - 2]
+            arrow_line = ''
+            for char in cut_line:
+                if not char.isspace():
+                    arrow_line = arrow_line + ' '
+                else:
+                    arrow_line = arrow_line + char
+            print(arrow_line, '^')
         # else:
         #     line = self.list_file[self.line_count]
         #     symbol = self.current_symbol
@@ -189,15 +192,16 @@ class Scanner:
 
             nextchar = self.input_file.read(1)
             self.character_count += 1
-            # print("Get number: {}".format(self.character_count))
-            # print(self.character_count)
             if nextchar.isdigit():
                 number = number + nextchar
                 continue
             else:
                 self.current_character = nextchar
                 break
-        return int(number)
+        if len(number) == 0:
+            return -1
+        else:
+            return int(number)
 
     def get_symbol(self):
         """Return the symbol type and ID of the next sequence of characters.
@@ -215,36 +219,29 @@ class Scanner:
         self.skip_spaces()
 
         # skipping over comments
-        if self.current_character == "\\":
-            self.advance()
-            if self.current_character == '*':
+        while self.current_character == '\\':
+            if self.current_character == "\\":
                 self.advance()
-                while self.current_character != '\\':
-                    while self.current_character != '*':
-                        if self.current_character == "\n":
-                            self.line_count += 1
-                            self.advance()
-                        else:
-                            self.advance()
+                if self.current_character == '*':
                     self.advance()
-                self.advance()
+                    while self.current_character != '\\':
+                        while self.current_character != '*':
+                            if self.current_character == "\n":
+                                self.line_count += 1
+                                self.advance()
+                            else:
+                                self.advance()
+                        self.advance()
+                    self.advance()
 
-            else:
-                if self.current_character == '\\':
+                elif self.current_character == '\\':
                     while self.current_character != '\n':
                         self.advance()
 
-                # while self.current_character != "/":
-                #     self.advance()
-                #         if self.current_character
-                #     if self.current_character == "\n":
-                #         self.line_count += 1
-                #         self.advance()
-                #     else:
-                #         self.advance()
-                # self.advance()
+                else:
+                    return [None, None]
 
-        self.skip_spaces()
+            self.skip_spaces()
 
         # current character now not whitespace
         if self.current_character.isalpha():  # name
