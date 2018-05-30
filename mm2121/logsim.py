@@ -10,8 +10,11 @@ Show help: logsim.py -h
 Command line user interface: logsim.py -c <file path>
 Graphical user interface: logsim.py <file path>
 """
+import pytest
 import getopt
 import sys
+
+sys.stdout = open('errors.txt','w')
 
 import wx
 
@@ -31,6 +34,7 @@ def main(arg_list):
     Run either the command line user interface, the graphical user interface,
     or display the usage message.
     """
+    print("hello")
     usage_message = ("Usage:\n"
                      "Show help: logsim.py -h\n"
                      "Command line user interface: logsim.py -c <file path>\n"

@@ -415,8 +415,8 @@ class Parser:
             # Print error message (switched places for unit tests)
             print(self.errors.error_msg[error_code])
             # One error that doesn't have specific location (don't print line)
-            if error_code != self.NOT_ALL_INPUTS_CONNECTED:
-                self.scanner.get_line(error_previous_symbol, no_marker)
+            #if error_code != self.NOT_ALL_INPUTS_CONNECTED:
+                #self.scanner.get_line(error_previous_symbol, no_marker)
             # Update counter
             self.error_counter += 1
 
