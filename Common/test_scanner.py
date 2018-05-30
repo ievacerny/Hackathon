@@ -23,15 +23,26 @@ def init_scanner(data):
     (',', [0, None]),
     (';', [1, None]),
     (':', [2, None]),
-    ('NAND', [3, None]),
+    ('NAND', [3, 6]),
     ('DEVICES',[3, 0]),
     ('CONNECTIONS',[3, 1]),
     ('7', [4, 7]),
-    ('SW1', [5,3]),
+    ('SW1', [5,11]),
     ('->', [6, None]),
     ('', [7, None]),
     ('.', [9, None]),
-
+    ('?', [None, None]),
+    ('\\*7*\\.', [9, None]),
+    ('\\*7*\\\\', [None, None]),
+    ('''\\\\fsdfsdf
+    DEVICES''', [3, 0]),
+    ('\\', [None, None]),
+    ('1BC', [4, 1]),
+    ('--', [None, None]),
+    ('-->', [None, None]),
+    ('<-', [None, None]),
+    ('\\ABC', [None, None]),
+    ('B1C', [5, 11])
 ])
 
 
@@ -48,7 +59,8 @@ def test_scanning(data, expected_output):
     ('407-', 407),
     ('612.', 612),
     ('154,', 154),
-    ('157;.plp', 157)
+    ('157;.plp', 157),
+    ('15:17', 15)
 
 ])
 
@@ -87,6 +99,39 @@ def test_advance(data, expected_output):
     assert scanner.advance() == expected_output
 
 
+@pytest.mark.parametrize("data, expected_output", [
+    ('ABC:DEVICES 24;',
+        [[5, 11], [2, None], [3, 0], [4, 24], [1, None]]),
+    ('''\\\\Comment\nDEVICES: SW1 -> A1''',
+        [[3, 0], [2, None], [5, 11], [6, None], [5, 12]]),
+    ('''\\\\Comment\nCONNECTION: SW1 -> A1''',
+        [[5, 11], [2, None], [5, 12], [6, None], [5, 13]]),
+    ('''\\*Comment*\\DEVICES: SW1 -> A1''',
+        [[3, 0], [2, None], [5, 11], [6, None], [5, 12]]),
+    ('NAND N! 4,',
+        [[3, 6], [5, 11], [None, None], [4, 4], [0, None]])
+])
+def test_symbol_sequence(data, expected_output):
+    """Test if a sequence of symbols is correct."""
+    scanner = init_scanner(data)
+    symbols = []
+    for i in range(5):
+        symbols.append(scanner.get_symbol())
+    assert symbols == expected_output
 
 
-
+@pytest.mark.parametrize(
+    "data, expected_output, error_prev_symb, no_arrow, err_loc", [
+        ("DEVICES:\nCLOCK CL3 3,", "CLOCK CL3 3,\n       ^\n",
+            False, False, 4)
+    ]
+)
+def test_get_line(capsys, data, expected_output, error_prev_symb,
+                  no_arrow, err_loc):
+    """Test printing out of the error line function."""
+    scanner = init_scanner(data)
+    for i in range(err_loc):
+        scanner.get_symbol()
+    scanner.get_line(error_prev_symb, no_arrow)
+    out, err = capsys.readouterr()
+    assert out == expected_output, scanner.current_symbol
