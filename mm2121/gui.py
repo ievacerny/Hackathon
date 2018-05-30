@@ -75,7 +75,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.Bind(wx.EVT_MOUSE_EVENTS, self.on_mouse)
 
         # Color mappings from string to RGB value
-        self.colormap = {'red':[1.0, 0.0, 0.0],'green':[0.0, 1.0, 0.0],'blue':[0.0, 0.0, 1.0],'black':[0.0, 0.0, 0.0], 'white':[1.0, 1.0, 1.0]}
+        self.colormap = {'red':[1.0, 0.0, 0.0],'green':[0.0, 1.0, 0.0],'blue':[0.0, 0.0, 1.0], 'yellow':[1.0, 1.0, 0.0], 'black':[0.0, 0.0, 0.0], 'white':[1.0, 1.0, 1.0]}
         
         #Display variables
         self.right_offset = 42 #offset for internal frame from right hand side edge of canvas 
@@ -102,7 +102,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.y_axis_label_offset = 20
 
         #Devices, monitors
-        self.devices_properties = [] #internal use - is a list of lists of the form [device_type,device_name,device_signal]. 
+        self.devices_monitored = [] #internal use - is a list of lists of the form [device_type,device_name,device_signal]. 
                                      #Is set upon initialisation of Gui class instance
 
         #Windows - decide which window to show 
@@ -140,17 +140,12 @@ class MyGLCanvas(wxcanvas.GLCanvas):
 
         #print(time.clock()) #for debugging
 
-        #if self.display_startup: #TODO different window before a file is loaded (proper application-style)
-            #Display the basic startup screen
-            #self.render_rectangle([30,30],100,200,'red',0.5)
-        #else:
-            #Draw main frame lines
-
-        #TODO - enable startup window (?)
-
         #Draw basic frame
         self.render_line_strip([[self.origin_x, self.origin_y], [size.width-self.right_offset, self.origin_y]], 'black') #horizontal line
         self.render_line_strip([[self.origin_x, self.origin_y], [self.origin_x, size.height-self.top_offset]], 'black') #vertical line
+        self.render_line_strip([[self.origin_x, size.height-self.top_offset], [size.width-self.right_offset, size.height-self.top_offset]], 'black') #horizontal line
+        self.render_line_strip([[size.width-self.right_offset, size.height-self.top_offset], [size.width-self.right_offset, self.origin_y]], 'black') #vertical line
+        
         self.render_text('Number of cycles', size.width - self.right_offset - self.x_axis_label_offset, 15, 'black')
         self.render_text('Name\n[Type]', self.y_axis_label_offset, size.height - self.top_offset - 10,'black')
 
@@ -165,7 +160,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         #Draw device outputs
         max_num_devices = (size.height - self.top_offset - self.bottom_offset)//(self.inter_panel_spacing + self.panel_height)
 
-        for index, device in enumerate(self.devices_properties): #TODO with simple loop over self.devices
+        for index, device in enumerate(self.devices_monitored): #TODO with simple loop over self.devices
             if index+1 == max_num_devices: #index + 1 is the number of devices at present iteration
                 print('Too many monitors - limit number of monitors to '+ str(max_num_devices))
                 break
@@ -182,6 +177,8 @@ class MyGLCanvas(wxcanvas.GLCanvas):
                 color = 'green'
             elif device_type == 'DTYPE':
                 color = 'blue'
+            elif device_type == 'SWITCH':
+                color = 'yellow'
             else:
                 color = 'red'
 
@@ -393,7 +390,7 @@ class Gui(wx.Frame):
         self.num_cycles = 200
         self.num_cycles_max = 1000
         
-        self.run_network(self.num_cycles)
+        self.run_network(True, self.num_cycles)
         self.canvas = MyGLCanvas(self) # Canvas for drawing signals
         self.canvas.grid_big_value = self.num_cycles/5 #big value attribute of canvas depends on initial number of cycles
         self.update_canvas_monitors()
@@ -402,30 +399,35 @@ class Gui(wx.Frame):
         self.button_size = wx.Size(105,15)
         self.text = wx.StaticText(self, wx.ID_ANY, "Cycles", size=self.button_size)
         self.spin = wx.SpinCtrl(self, wx.ID_ANY, value="", pos=wx.DefaultPosition,
-                                size=self.button_size, style=wx.SP_ARROW_KEYS, min=0, 
+                                size=wx.Size(120,15), style=wx.SP_ARROW_KEYS, min=0, 
                                 max=self.num_cycles_max, initial=self.num_cycles, name="wxSpinCtrl")
         self.run_button = wx.Button(self, wx.ID_ANY, "Run", size=self.button_size)
+        self.continue_button = wx.Button(self, wx.ID_ANY, "Continue", size=self.button_size)
 
         #Monitor control:
         self.add_monitor_name = wx.TextCtrl(self, wx.ID_ANY, "",
                                     style=wx.TE_PROCESS_ENTER, size=self.button_size)
-        self.add_monitor = wx.Button(self, wx.ID_ANY, "Add Monitor", size=self.button_size)
+        self.add_monitor = wx.Button(self, wx.ID_ANY, "+ Monitor", size=self.button_size)
         self.remove_monitor_name = wx.TextCtrl(self, wx.ID_ANY, "",
                                     style=wx.TE_PROCESS_ENTER, size=self.button_size)
-        self.remove_monitor = wx.Button(self, wx.ID_ANY, "Remove Monitor", size=self.button_size)
+        self.remove_monitor = wx.Button(self, wx.ID_ANY, "- Monitor", size=self.button_size)
 
         #Connections control:
         self.add_connection_name = wx.TextCtrl(self, wx.ID_ANY, "",
                                     style=wx.TE_PROCESS_ENTER, size=self.button_size)
-        self.add_connection = wx.Button(self, wx.ID_ANY, "Add Connection", size=self.button_size)
+        self.add_connection = wx.Button(self, wx.ID_ANY, "+ Connection", size=self.button_size)
         self.remove_connection_name = wx.TextCtrl(self, wx.ID_ANY, "",
                                     style=wx.TE_PROCESS_ENTER, size=self.button_size)
-        self.remove_connection = wx.Button(self, wx.ID_ANY, "Del. Connection", size=wx.Size(105,30))
+        self.remove_connection = wx.Button(self, wx.ID_ANY, "- Connection", size=wx.Size(105,30))
+        self.set_switch_name = wx.TextCtrl(self, wx.ID_ANY, "",
+                                    style=wx.TE_PROCESS_ENTER, size=self.button_size)
+        self.set_switch = wx.Button(self, wx.ID_ANY, "Set Switch", size=self.button_size)
 
         # Bind events to widgets
         self.Bind(wx.EVT_MENU, self.on_menu)
         self.spin.Bind(wx.EVT_SPINCTRL, self.on_spin)
         self.run_button.Bind(wx.EVT_BUTTON, self.on_run_button)
+        self.continue_button.Bind(wx.EVT_BUTTON, self.on_continue_button)
         self.add_monitor_name.Bind(wx.EVT_TEXT_ENTER, self.on_add_monitor_name)
         self.add_monitor.Bind(wx.EVT_BUTTON, self.on_add_monitor)
         self.remove_monitor_name.Bind(wx.EVT_TEXT_ENTER, self.on_remove_monitor_name)
@@ -434,6 +436,8 @@ class Gui(wx.Frame):
         self.add_connection.Bind(wx.EVT_BUTTON, self.on_add_connection)
         self.remove_connection_name.Bind(wx.EVT_TEXT_ENTER, self.on_remove_connection_name)
         self.remove_connection.Bind(wx.EVT_BUTTON, self.on_remove_connection)
+        self.set_switch_name.Bind(wx.EVT_TEXT_ENTER, self.on_set_switch_name)
+        self.set_switch.Bind(wx.EVT_BUTTON, self.on_set_switch)
 
         # Configure sizers for layout
         main_sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -442,9 +446,10 @@ class Gui(wx.Frame):
         main_sizer.Add(self.canvas, 5, wx.EXPAND | wx.ALL, 5)
         main_sizer.Add(side_sizer, 1, wx.ALL, 5)
 
-        side_sizer.Add(self.text, 1, wx.TOP, 10)
+        side_sizer.Add(self.text, 1, wx.TOP, 5)
         side_sizer.Add(self.spin, 1, wx.ALL, 5)
         side_sizer.Add(self.run_button, 1, wx.ALL, 5)
+        side_sizer.Add(self.continue_button, 1, wx.ALL, 5)
         side_sizer.Add(self.add_monitor_name, 1, wx.ALL, 5)
         side_sizer.Add(self.add_monitor, 1, wx.ALL, 5)
         side_sizer.Add(self.remove_monitor_name, 1, wx.ALL, 5)
@@ -453,6 +458,8 @@ class Gui(wx.Frame):
         side_sizer.Add(self.add_connection, 1, wx.ALL, 5)
         side_sizer.Add(self.remove_connection_name, 1, wx.ALL, 5)
         side_sizer.Add(self.remove_connection, 1, wx.ALL, 5)
+        side_sizer.Add(self.set_switch_name, 1, wx.ALL, 5)
+        side_sizer.Add(self.set_switch, 1, wx.ALL, 5)
 
         self.SetSizeHints(300, 300)
         self.SetSizer(main_sizer)
@@ -475,9 +482,7 @@ class Gui(wx.Frame):
             wx.MessageBox("Logic Simulator\nCreated by Mojisola Agboola\n2017","About Logsim", wx.ICON_INFORMATION | wx.OK)
 
     def on_spin(self, event):
-        """Handle the event when the user changes the spin control value."""
-        #text = "".join(["New spin control value: ", str(spin_value)])
-        #self.canvas.render(text)
+        self.on_run_button(None)
 
     def on_run_button(self, event):
         """Handle the event when the user clicks the run button."""
@@ -486,17 +491,27 @@ class Gui(wx.Frame):
             self.canvas.grid_big_value = spin_value/5 #since there are 5 big subdivisions in the grid
             if spin_value > self.num_cycles: #re-start whole simulation upto new number of cycles
                 self.monitors.reset_monitors()
-                self.run_network(spin_value)
+                self.run_network(True, spin_value)
                 self.update_canvas_monitors()
             self.num_cycles = spin_value #update num_cycles
             self.canvas.render('')
-            #print(self.canvas.devices_properties[0][2]) #DEBUG
+
+            #print(self.canvas.devices_monitored[0][2]) #DEBUG
+
+    def on_continue_button(self, event):
+        spin_value = self.spin.GetValue()
+        if spin_value > 0:
+            self.canvas.grid_big_value = (self.num_cycles + spin_value)/5 #add these cycles to the present number of cycles
+            self.run_network(False, spin_value) #don't restart clocks and dtypes
+            self.update_canvas_monitors() 
+            self.num_cycles = self.num_cycles + spin_value #update num_cycles
+            self.canvas.render('')
 
     def on_add_monitor_name(self, event):
-        text_box_value = self.add_monitor_name.GetValue() #maybe print out to command line?
+        self.on_add_monitor(None)
 
     def on_remove_monitor_name(self, event):
-        text_box_value = self.remove_monitor_name.GetValue() #maybe print out to command line?
+        self.on_remove_monitor(None)
 
     def on_add_monitor(self, event): 
         device_name = self.add_monitor_name.GetValue()
@@ -512,57 +527,126 @@ class Gui(wx.Frame):
                     [device_id,output_id] = self.devices.get_signal_ids(device_name) 
                     self.monitors.make_monitor(device_id, output_id, 0) 
                     self.monitors.reset_monitors()
-                    self.run_network(self.num_cycles)
+                    self.run_network(True, self.num_cycles)
                     self.update_canvas_monitors()
                     self.canvas.render('')
 
     def on_remove_monitor(self, event):
         monitor_name = self.remove_monitor_name.GetValue()
         if monitor_name != "":
-            for index, device in enumerate(self.canvas.devices_properties):
+            for index, device in enumerate(self.canvas.devices_monitored): 
                 if device[1] == monitor_name: #check if device is currently being monitored
-                    self.canvas.devices_properties.pop(index) #easily remove from canvas monitors since we have access to index
+                    self.canvas.devices_monitored.pop(index) #remove from canvas monitors
                     [device_id,output_id] = self.devices.get_signal_ids(monitor_name) 
                     self.monitors.remove_monitor(device_id, output_id) #remove from local monitor instance
                     self.canvas.render('')
                     return
-            #searched through canvas monitors, name not found...
-            print('Device with such name is not being monitored')
+            print('Device with such name is not being monitored') #searched through canvas monitors, name not found...
 
     def on_add_connection_name(self, event):
-        print('Add connection text entered')#TODO add functionality for these - integration with connections
+        self.on_add_connection(None)
 
     def on_remove_connection_name(self, event):
-        print('Remove connection text entered')
+        self.on_remove_connection(None)
 
-    def on_add_connection(self, event):
+    def on_add_connection(self, event): #sw1->d1.DATA
         '''
         connection = self.add_connection_name.GetValue()
         if connection is not None:
             connection = connection.split('->')
             if len(connection) == 2:
-                #convert this list to device names
-                
+                name_exists1 = self.names.query(connection[0].split('.')[0])
+                name_exists2 = self.names.query(connection[1].split('.')[0])
+                if name_exists1 is None:
+                    print('Error - Invalid device name on left of ->')
+                elif name_exists2 is None:
+                    print('Error - Invalid device name on left of ->')
+                else:
+                    [device1_id,port1_id] = self.devices.get_signal_ids(connection[0]) 
+                    [device2_id,port2_id] = self.devices.get_signal_ids(connection[1]) 
 
-                [device_id1,output_id1] = self.devices.get_signal_ids(device1) 
-                [device_id2,output_id2] = self.devices.get_signal_ids(device2) 
-                print('Add connection')
+                    #FIND DEVICE2's input ID
+                    input_device = self.devices.get_device(device2_id)
+                    input_device_type = self.translate_device_kind(input_device.device_kind)
+                    input_port_string = connection[1].split('.')[1]
+
+                    if input_device_type == "DTYPE":
+                        if input_port_string == 'CLK':
+                            input_id = input_device.inputs[0]
+                        elif input_port_string == 'SET':
+                            input_id = input_device.inputs[1]
+                        elif input_port_string == 'CLEAR':
+                            input_id = input_device.inputs[2]
+                        elif input_port_string == 'DATA':
+                            input_id = input_device.inputs[3]
+                    elif input_device_type == "NAND" or input_device_type == "AND" or input_device_type == "NOR" or input_device_type == "OR" or input_device_type == "XOR":
+                        index = int(input_port_string[1:]) - 1
+                        if index + 1 > len(input_device.inputs):
+                            print('Input number too large for specified gate type device')
+                            return
+                        else:
+                            input_id = input_device.inputs[index]
+                    else:
+                        print('Device on right does not take input')
+                        return
+                    ###
+
+                    if self.network.make_connection(device1_id, port1_id, device2_id, input_id) == self.network.NO_ERROR:
+                        self.monitors.reset_monitors()
+                        self.run_network(True, self.num_cycles)
+                        self.update_canvas_monitors()
+                        self.canvas.render('')
+                        print('Added connection')
+                    else:
+                        print('Failed to add connection')
         '''
+
 
     def on_remove_connection(self, event):
         '''
-        connection = self.remove_connection_name.GetValue()
+        connection = self.add_connection_name.GetValue()
         if connection is not None:
             connection = connection.split('->')
             if len(connection) == 2:
-
-                [device_id1,output_id1] = self.devices.get_signal_ids(device1) 
-                [device_id2,output_id2] = self.devices.get_signal_ids(device2) 
-                print('Remove connection')
+                name_exists1 = self.names.query(connection.split('.')[0])
+                name_exists2 = self.names.query(connection.split('.')[1])
+                if name_exists1 is None:
+                    print('Error - Invalid device name on left of ->')
+                elif name_exists2 is None:
+                    print('Error - Invalid device name on left of ->')
+                else:
+                    [device1_id,output1_id] = self.devices.get_signal_ids(connection[0]) 
+                    [device2_id,output2_id] = self.devices.get_signal_ids(connection[1]) 
+                    self.devices.get_device(first_device_id)[output1_id] = None
+                    self.devices.get_device(second_device_id)[output2_id] = None
+                    print('Removed connection')
         '''
 
-    def run_network(self, num_cycles):
-        self.devices.cold_startup()
+    def on_set_switch_name(self, event):
+        self.on_set_switch(None) #run when user presses Enter
+
+    def on_set_switch(self, event):
+        input_list = self.set_switch_name.GetValue().split('=')
+        switch_name = input_list[0]
+        switch_state = int(input_list[1])
+        if switch_name != "" and switch_state in [0,1]:
+            name_exists = self.names.query(switch_name)
+            if name_exists is None:
+                print('Switch name does not exist')
+            else:
+                [device_id,output_id] = self.devices.get_signal_ids(switch_name) 
+                if self.devices.set_switch(device_id,switch_state):
+                    self.monitors.reset_monitors()
+                    self.run_network(True, self.num_cycles)
+                    self.update_canvas_monitors()
+                    self.canvas.render('')
+                    print('Switch set successfully')
+                else:
+                    print('Error - Failed to set switch')
+
+    def run_network(self, restart, num_cycles):
+        if restart:
+            self.devices.cold_startup()
         for _ in range(num_cycles):
             if self.network.execute_network():
                 self.monitors.record_signals()
@@ -570,13 +654,13 @@ class Gui(wx.Frame):
                 print("Error - Network oscillating.")
 
     def update_canvas_monitors(self): #list out monitored devices and their properties from scratch
-        self.canvas.devices_properties.clear()
+        self.canvas.devices_monitored.clear()
         for device_id, output_id in self.monitors.monitors_dictionary:
             device_name = self.devices.get_signal_name(device_id, output_id)
             device_type = self.translate_device_kind(self.devices.get_device(device_id).device_kind)
             signal_list = self.monitors.monitors_dictionary[(device_id, output_id)]
             device_signal = self.translate_signal(signal_list)
-            self.canvas.devices_properties.append([device_type, device_name, device_signal])
+            self.canvas.devices_monitored.append([device_type, device_name, device_signal])
 
     def translate_signal(self, signal_list): #convert from format in devices class to custom gui format (see below)
         device_signal = []
