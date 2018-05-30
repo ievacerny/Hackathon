@@ -396,10 +396,10 @@ class Gui(wx.Frame):
         self.update_canvas_monitors()
 
         # Configure the widgets
-        self.button_size = wx.Size(105,15)
+        self.button_size = wx.Size(105,30)
         self.text = wx.StaticText(self, wx.ID_ANY, "Cycles", size=self.button_size)
         self.spin = wx.SpinCtrl(self, wx.ID_ANY, value="", pos=wx.DefaultPosition,
-                                size=wx.Size(120,15), style=wx.SP_ARROW_KEYS, min=0, 
+                                size=wx.Size(120,30), style=wx.SP_ARROW_KEYS, min=0, 
                                 max=self.num_cycles_max, initial=self.num_cycles, name="wxSpinCtrl")
         self.run_button = wx.Button(self, wx.ID_ANY, "Run", size=self.button_size)
         self.continue_button = wx.Button(self, wx.ID_ANY, "Continue", size=self.button_size)
@@ -412,13 +412,6 @@ class Gui(wx.Frame):
                                     style=wx.TE_PROCESS_ENTER, size=self.button_size)
         self.remove_monitor = wx.Button(self, wx.ID_ANY, "- Monitor", size=self.button_size)
 
-        #Connections control:
-        self.add_connection_name = wx.TextCtrl(self, wx.ID_ANY, "",
-                                    style=wx.TE_PROCESS_ENTER, size=self.button_size)
-        self.add_connection = wx.Button(self, wx.ID_ANY, "+ Connection", size=self.button_size)
-        self.remove_connection_name = wx.TextCtrl(self, wx.ID_ANY, "",
-                                    style=wx.TE_PROCESS_ENTER, size=self.button_size)
-        self.remove_connection = wx.Button(self, wx.ID_ANY, "- Connection", size=wx.Size(105,30))
         self.set_switch_name = wx.TextCtrl(self, wx.ID_ANY, "",
                                     style=wx.TE_PROCESS_ENTER, size=self.button_size)
         self.set_switch = wx.Button(self, wx.ID_ANY, "Set Switch", size=self.button_size)
@@ -432,10 +425,6 @@ class Gui(wx.Frame):
         self.add_monitor.Bind(wx.EVT_BUTTON, self.on_add_monitor)
         self.remove_monitor_name.Bind(wx.EVT_TEXT_ENTER, self.on_remove_monitor_name)
         self.remove_monitor.Bind(wx.EVT_BUTTON, self.on_remove_monitor)
-        self.add_connection_name.Bind(wx.EVT_TEXT_ENTER, self.on_add_connection_name)
-        self.add_connection.Bind(wx.EVT_BUTTON, self.on_add_connection)
-        self.remove_connection_name.Bind(wx.EVT_TEXT_ENTER, self.on_remove_connection_name)
-        self.remove_connection.Bind(wx.EVT_BUTTON, self.on_remove_connection)
         self.set_switch_name.Bind(wx.EVT_TEXT_ENTER, self.on_set_switch_name)
         self.set_switch.Bind(wx.EVT_BUTTON, self.on_set_switch)
 
@@ -454,10 +443,6 @@ class Gui(wx.Frame):
         side_sizer.Add(self.add_monitor, 1, wx.ALL, 5)
         side_sizer.Add(self.remove_monitor_name, 1, wx.ALL, 5)
         side_sizer.Add(self.remove_monitor, 1, wx.ALL, 5)
-        side_sizer.Add(self.add_connection_name, 1, wx.ALL, 5)
-        side_sizer.Add(self.add_connection, 1, wx.ALL, 5)
-        side_sizer.Add(self.remove_connection_name, 1, wx.ALL, 5)
-        side_sizer.Add(self.remove_connection, 1, wx.ALL, 5)
         side_sizer.Add(self.set_switch_name, 1, wx.ALL, 5)
         side_sizer.Add(self.set_switch, 1, wx.ALL, 5)
 
@@ -542,85 +527,6 @@ class Gui(wx.Frame):
                     self.canvas.render('')
                     return
             print('Device with such name is not being monitored') #searched through canvas monitors, name not found...
-
-    def on_add_connection_name(self, event):
-        self.on_add_connection(None)
-
-    def on_remove_connection_name(self, event):
-        self.on_remove_connection(None)
-
-    def on_add_connection(self, event): #sw1->d1.DATA
-        '''
-        connection = self.add_connection_name.GetValue()
-        if connection is not None:
-            connection = connection.split('->')
-            if len(connection) == 2:
-                name_exists1 = self.names.query(connection[0].split('.')[0])
-                name_exists2 = self.names.query(connection[1].split('.')[0])
-                if name_exists1 is None:
-                    print('Error - Invalid device name on left of ->')
-                elif name_exists2 is None:
-                    print('Error - Invalid device name on left of ->')
-                else:
-                    [device1_id,port1_id] = self.devices.get_signal_ids(connection[0]) 
-                    [device2_id,port2_id] = self.devices.get_signal_ids(connection[1]) 
-
-                    #FIND DEVICE2's input ID
-                    input_device = self.devices.get_device(device2_id)
-                    input_device_type = self.translate_device_kind(input_device.device_kind)
-                    input_port_string = connection[1].split('.')[1]
-
-                    if input_device_type == "DTYPE":
-                        if input_port_string == 'CLK':
-                            input_id = input_device.inputs[0]
-                        elif input_port_string == 'SET':
-                            input_id = input_device.inputs[1]
-                        elif input_port_string == 'CLEAR':
-                            input_id = input_device.inputs[2]
-                        elif input_port_string == 'DATA':
-                            input_id = input_device.inputs[3]
-                    elif input_device_type == "NAND" or input_device_type == "AND" or input_device_type == "NOR" or input_device_type == "OR" or input_device_type == "XOR":
-                        index = int(input_port_string[1:]) - 1
-                        if index + 1 > len(input_device.inputs):
-                            print('Input number too large for specified gate type device')
-                            return
-                        else:
-                            input_id = input_device.inputs[index]
-                    else:
-                        print('Device on right does not take input')
-                        return
-                    ###
-
-                    if self.network.make_connection(device1_id, port1_id, device2_id, input_id) == self.network.NO_ERROR:
-                        self.monitors.reset_monitors()
-                        self.run_network(True, self.num_cycles)
-                        self.update_canvas_monitors()
-                        self.canvas.render('')
-                        print('Added connection')
-                    else:
-                        print('Failed to add connection')
-        '''
-
-
-    def on_remove_connection(self, event):
-        '''
-        connection = self.add_connection_name.GetValue()
-        if connection is not None:
-            connection = connection.split('->')
-            if len(connection) == 2:
-                name_exists1 = self.names.query(connection.split('.')[0])
-                name_exists2 = self.names.query(connection.split('.')[1])
-                if name_exists1 is None:
-                    print('Error - Invalid device name on left of ->')
-                elif name_exists2 is None:
-                    print('Error - Invalid device name on left of ->')
-                else:
-                    [device1_id,output1_id] = self.devices.get_signal_ids(connection[0]) 
-                    [device2_id,output2_id] = self.devices.get_signal_ids(connection[1]) 
-                    self.devices.get_device(first_device_id)[output1_id] = None
-                    self.devices.get_device(second_device_id)[output2_id] = None
-                    print('Removed connection')
-        '''
 
     def on_set_switch_name(self, event):
         self.on_set_switch(None) #run when user presses Enter
