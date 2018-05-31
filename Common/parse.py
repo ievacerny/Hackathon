@@ -63,7 +63,7 @@ class Parser:
 
         self.errors = Errors(devices, network, monitors, self)
 
-        self.log = False
+        self.log = True
         self.count_errors = True  # Set to False once EOF is reached
 
     # Method for debugging purposes
@@ -180,9 +180,9 @@ class Parser:
                 self._log("After skip {}".format(self.symbol_type))
 
         # At this point, symbol posibilities: ;/EOF/section keyword
-        if self.symbol_type != self.scanner.SEMICOLON:
-            no_error &= self._error(self.MISSING_SEMICOLON,
-                                    error_previous_symbol=True)
+        # if self.symbol_type != self.scanner.SEMICOLON:
+        #     no_error &= self._error(self.MISSING_SEMICOLON,
+        #                             error_previous_symbol=True)
 
         return no_error
 
@@ -197,7 +197,10 @@ class Parser:
 
         # Device type (saved as keywords)
         [self.symbol_type, self.symbol_id] = self.scanner.get_symbol()
-        if self.symbol_type == self.scanner.KEYWORD:
+        if (self.symbol_type == self.scanner.KEYWORD and
+            (self.symbol_id not in [self.scanner.DEVICES_ID,
+                                    self.scanner.CONNECTIONS_ID,
+                                    self.scanner.MONITOR_ID])):
             device_type = self.symbol_id
         else:
             no_error &= self._error(self.devices.BAD_DEVICE)
@@ -415,8 +418,8 @@ class Parser:
             # Print error message (switched places for unit tests)
             print(self.errors.error_msg[error_code])
             # One error that doesn't have specific location (don't print line)
-            #if error_code != self.NOT_ALL_INPUTS_CONNECTED:
-                #self.scanner.get_line(error_previous_symbol, no_marker)
+            if error_code != self.NOT_ALL_INPUTS_CONNECTED:
+                self.scanner.get_line(error_previous_symbol, no_marker)
             # Update counter
             self.error_counter += 1
 
