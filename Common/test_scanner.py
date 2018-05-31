@@ -179,7 +179,9 @@ def test_symbol_sequence(data, expected_output):
         ("DEVICES:\n\\\\Comment\nCLOCK CL3 3,", "DEVICES:\n       ^\n",
             True, False, 3),
         ("DEVICES:\n\\\nCLOCK CL3 3,", "\\\n^\n",
-            True, False, 3),
+            True, False, 4),
+        ("DEVICES:\n\\Comm\nCLOCK CL3 3,", "\\Comm\n    ^\n",
+            True, False, 5),
         ("DEVICES:\\*Com\nment\n*\\CLOCK CL3 3,", "DEVICES:\\*Com\n       ^\n",
             True, False, 3),
         ("DEVICES:\\*C\nom\n\n*\\CLOCK CL3 3,", "DEVICES:\\*C\n       ^\n",
@@ -187,6 +189,17 @@ def test_symbol_sequence(data, expected_output):
         ("DEVICES:\n\\\\DEVICES:com\nCLOCK CL3 3,", "DEVICES:\n       ^\n",
             True, False, 3),
         ("DEVICES:\n\\\\DEVICES:com\n\nCLOCK CL3 3,", "DEVICES:\n       ^\n",
+            True, False, 3),
+        ("\\*C\nom*\\DEVICES:\nCLOCK CL3 3,",
+            "om*\\DEVICES:\n           ^\n",
+            True, False, 3),
+        ("DEVICES:\\*Com\nment\n*\\CLOCK CL3 3,", "DEVICES:\\*Com\n       ^\n",
+            True, False, 3),
+        ("DEVICES:\n*Comm\n*CLOCK CL3 3,", "*CLOCK CL3 3,\n^\n",
+            True, False, 6),
+        ("DEVICES:\n*Comm\n*CLOCK CL3 3,", "*Comm\n    ^\n",
+            True, False, 5),
+        ("DEVICES:\\\\Com\nCLOCK CL3 3,", "DEVICES:\\\\Com\n       ^\n",
             True, False, 3)
     ]
 )
