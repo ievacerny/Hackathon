@@ -66,7 +66,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
 
         # Initialise variables for zooming
         self.zoom = 1
-        self.min_zoom = 0.9
+        self.min_zoom = 0.7
         self.max_zoom = 2.5
 
         # Bind events to the canvas
@@ -98,8 +98,9 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.grid_big_value = 20 #number of cycles that correspond to one big mark on the grid (changed by wx 'Cycles' button)
         self.grid_hor_text_offset = 10 #how much to the left of the grid marker you draw the value text
         self.grid_vert_text_offset = 25 #how much below the grid line you draw the number to be shown
-        self.x_axis_label_offset = 125
-        self.y_axis_label_offset = 10 
+        self.x_axis_label_offset = 100
+        self.y_axis_label_offset = 0 
+        self.max_margin = 10 #Is set upon initialisation of Gui class instance
 
         #Devices, monitors
         self.devices_monitored = [] #internal use - is a list of lists of the form [device_type,device_name,device_signal]. 
@@ -140,7 +141,10 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         #Draw basic frame
         self.render_line_strip([[self.origin_x, self.origin_y], 
                                 [size.width - self.right_offset, self.origin_y]], 'black') #bottom horizontal line
-        self.render_text('Number of cycles', size.width - self.right_offset - self.x_axis_label_offset, 15, 'black')
+        self.render_text('Number of cycles', size.width - self.right_offset - self.x_axis_label_offset/self.zoom, 15, 'black')
+
+        #keep text close to the y-axis when zooming
+        self.y_axis_label_offset = self.origin_x - 7*self.max_margin/self.zoom
 
         #max number of devices that will fit in un-resized window
         max_devices_fit = (size.height - self.top_offset - self.bottom_offset)//(self.inter_panel_spacing + self.panel_height)
@@ -154,7 +158,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         							[size.width - self.right_offset, self.origin_y]], 'black') #right vertical line
         	self.render_line_strip([[self.origin_x, max_height_panels], 
         							[size.width - self.right_offset, max_height_panels]], 'black') #top horizontal line
-        	self.render_text('Name\n[Type]', self.y_axis_label_offset, max_height_panels + 30,'black')
+        	self.render_text('Name\n[Type]', self.y_axis_label_offset + 30/self.zoom, max_height_panels + 30,'black')
         else:
         	self.render_line_strip([[self.origin_x, self.origin_y],
         							[self.origin_x, size.height - self.top_offset]], 'black') #left vertical line
@@ -162,7 +166,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         							[size.width-self.right_offset, self.origin_y]], 'black') #right vertical line
         	self.render_line_strip([[self.origin_x, size.height - self.top_offset],
         							[size.width - self.right_offset, size.height - self.top_offset]], 'black') #top horizontal line
-        	self.render_text('Name\n[Type]', self.y_axis_label_offset, size.height - self.top_offset - 10,'black')
+        	self.render_text('Name\n[Type]', self.y_axis_label_offset + 30/self.zoom, size.height - self.top_offset - 10,'black')
 
         #Adjust small and big intervals to occupy window area
         big_interval = int((size.width - self.right_offset - self.origin_x) / 5)
@@ -204,10 +208,14 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             self.render_rectangle([corner_x, corner_y], 
             					  self.panel_height, size.width - corner_x - self.right_offset, 
             					  color, 0.2) #draw colored panel behind signal
-            self.render_text(device_name, self.y_axis_label_offset, corner_y + 25, 'black') #render device name to the left of this panel
-            self.render_text("[" + device_type + "]", self.y_axis_label_offset, corner_y + 10, 'black') #render device type below device_name
-            self.render_signal(corner_y, device_signal)
+            
+            device_name = " "*(self.max_margin - len(device_name)+ 3) + device_name #align to right by padding text with blanks. +3 found to give best alignment
+            device_type = " "*(self.max_margin - len(device_type) - 2) + "[" + device_type + "]" #extra -2 for square brackets
 
+            self.render_text(device_name, self.y_axis_label_offset, corner_y + 25, 'black') #render device name to the left of this panel
+            self.render_text(device_type, self.y_axis_label_offset, corner_y + 10, 'black') #render device type below device_name
+            self.render_signal(corner_y, device_signal, size)
+        
         # We have been drawing to the back buffer, flush the graphics pipeline
         # and swap the back buffer to the front
         GL.glFlush()
@@ -257,10 +265,8 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             self.zoom *= (1.0 + (
                 event.GetWheelRotation() / (20 * event.GetWheelDelta())))
             
-            if self.zoom > self.max_zoom:
-                self.zoom = self.max_zoom
-            if self.zoom < self.min_zoom:
-                self.zoom = self.min_zoom
+            self.zoom = min(self.zoom, self.max_zoom)
+            self.zoom = max(self.zoom, self.min_zoom)
             
             self.init = False
             text = "".join(["Negative mouse wheel rotation. Zoom is now: ",
@@ -270,10 +276,8 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             self.zoom /= (1.0 - (
                 event.GetWheelRotation() / (20 * event.GetWheelDelta())))
 
-            if self.zoom > self.max_zoom:
-                self.zoom = self.max_zoom
-            if self.zoom < self.min_zoom:
-                self.zoom = self.min_zoom
+            self.zoom = min(self.zoom, self.max_zoom)
+            self.zoom = max(self.zoom, self.min_zoom)
 
             self.init = False
             text = "".join(["Positive mouse wheel rotation. Zoom is now: ",
@@ -296,7 +300,8 @@ class MyGLCanvas(wxcanvas.GLCanvas):
 
         GL.glColor4f(color[0], color[1], color[2], 1.0)
         GL.glRasterPos2f(x_pos, y_pos)
-        font = GLUT.GLUT_BITMAP_8_BY_13
+
+        font = GLUT.GLUT_BITMAP_HELVETICA_12
 
         for character in text:
             if character == '\n':
@@ -330,10 +335,10 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         GL.glVertex2f(corner[0], corner[1]+height)
         GL.glEnd()
 
-    def render_signal(self, corner_y, bits): 
+    def render_signal(self, corner_y, bits, size): 
     	#corner_y is the y-coordinate of the bottom-left corner of the panel that the signal belongs to
     	#bits contains a list of values 0, 1, 0.5 (rising), -0.5 (falling) or 2 (blank)
-        size = self.GetClientSize()
+
         x_prev = self.origin_x 
         x_interval = self.grid_small_interval*10/self.grid_big_value
         x_max = size.width - self.right_offset
@@ -343,7 +348,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         for index, bit in enumerate(bits):
             if x_prev + x_interval >= x_max: #signal about to go outside panel 
                 break
-            if bit in [-0.5, 0.5]: #rising
+            elif bit in [-0.5, 0.5]: #rising
                 y_next = y_base + (bit + 0.5)*self.signal_height #if -0.5, y is going to be zero; if +0.5, y is going to be 1
                 self.render_line_strip([[x_prev, y_prev],
                 						[x_prev + x_interval, y_next]], 'black')
@@ -409,7 +414,12 @@ class Gui(wx.Frame):
         self.run_network(True, self.num_cycles) 
         self.canvas = MyGLCanvas(self) # Canvas for drawing signals
         self.canvas.grid_big_value = self.num_cycles/5 #big value attribute of canvas depends on initial number of cycles
-        self.update_canvas_monitors()
+        
+        #deal with monitor name lengths
+        self.max_name_length = 10
+        self.canvas.origin_x = self.canvas.origin_x + self.max_name_length #push everything in canvas to the right based on max length
+
+        self.update_canvas_monitors() #requires self.max_name_length, so place after setting 
 
         # Configure the widgets
         self.button_size = wx.Size(105,30)
@@ -578,6 +588,8 @@ class Gui(wx.Frame):
         self.canvas.devices_monitored.clear()
         for device_id, output_id in self.monitors.monitors_dictionary:
             device_name = self.devices.get_signal_name(device_id, output_id)
+            if len(device_name) > self.max_name_length: 
+                device_name = device_name[:self.max_name_length - 2] + '...' #+2 to give space for '...'
             device_type = self.translate_device_kind(self.devices.get_device(device_id).device_kind)
             signal_list = self.monitors.monitors_dictionary[(device_id, output_id)]
             device_signal = self.translate_signal(signal_list)
