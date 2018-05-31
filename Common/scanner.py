@@ -9,7 +9,6 @@ Scanner - reads definition file and translates characters into symbols.
 """
 
 import sys
-# import re
 
 
 class Scanner:
@@ -41,7 +40,6 @@ class Scanner:
             print("Filename incorrect or file doesn't exist")
             sys.exit()
 
-        # self.input_file = open(path, 'r')
         self.list_file = [line.rstrip('\n') for line in open(path, 'r')]
 
         self.names = names
@@ -59,6 +57,8 @@ class Scanner:
         self.prev_symbol = ''
         self.two_prev_symbol = ''
         self.space_count = 0
+        self.prev_char_count = 0
+        self.comment_lines = []
         self.advance()
         self.skip_spaces()
 
@@ -69,95 +69,107 @@ class Scanner:
         return char
 
     def skip_spaces(self):
-        self.space_count = 0
+        # self.space_count = 0
         while self.current_character.isspace():
             if self.current_character == "\n":
+                self.prev_char_count = self.character_count
                 self.character_count = -1
-                # print("Reser in skip spaces: {}".format(self.character_count))
                 self.line_count += 1
             self.space_count += 1
             self.current_character = self.input_file.read(1)
             self.character_count += 1
-            # print("Skip spaces {}".format(self.character_count))
-            # print(self.character_count)
 
     def get_name(self):
         name = ''
         if self.current_character.isalpha():
             name = self.current_character
 
-        while True:
-            nextchar = self.input_file.read(1)
-            self.character_count += 1
-            # print("Names: {}".format(self.character_count))
-            if nextchar.isalnum():
-                name = name + nextchar
-                continue
-            else:
-                self.current_character = nextchar
-                break
+            while True:
+                nextchar = self.input_file.read(1)
+                self.character_count += 1
+                if nextchar.isalnum():
+                    name = name + nextchar
+                    continue
+                else:
+                    self.current_character = nextchar
+                    break
         return name
 
     def cur_sym(self):
         print(self.current_symbol)
 
+    def add_ignore(self):
+        line_index = self.line_count
+        # print("h", ((self.list_file[line_index]).strip()).find('*\\'))
+        if ((self.list_file[line_index]).strip()).find('\\*') == 0 and ((self.list_file[line_index]).strip()).find('*\\') == -1:
+            self.comment_lines.append(line_index)
+        elif ((self.list_file[line_index]).strip()).find('\\*') == 0 and ((self.list_file[line_index]).strip()).find('*\\') == len((((self.list_file[line_index]).strip())))-2:
+            (self.comment_lines).append(line_index)
+        elif ((self.list_file[line_index]).strip()).find('*\\') == len((((self.list_file[line_index]).strip())))-2 and (((self.list_file[line_index]).strip())).find('\\*') == -1:
+            self.comment_lines.append(line_index)
+        elif ((self.list_file[line_index]).strip()).find('\\*') == -1 and (((self.list_file[line_index]).strip())).find('*\\') == -1:
+            self.comment_lines.append(line_index)
+
     def get_line(self, before, arrow):  # arrow true means no arrow
-        # length = len(self.current_symbol)
-        # if self.current_symbol == self.list_file[self.line_count][:length] and self.line_count != 0:
-
-        # if before == True and self.line_count != 0:
-        #     prev_line = self.list_file[self.line_count - 1]
-        #     prev_symbol = self.prev_symbol
-        #     print(prev_line)
-        #     print(' ' * (prev_line.find(prev_symbol) - 1), '^')
-
         if before is True and arrow is False:
             symbol = self.current_symbol
             line = self.list_file[self.line_count]
-            prev_symbol = self.prev_symbol
-            # prev_line = self.list_file[self.line_count - 1]
             prev_line_index = self.line_count - 1
-            while self.list_file[prev_line_index].isspace() is True or len(self.list_file[prev_line_index]) == 0:
+            character_no = self.character_count
+            prev_char_num = self.prev_char_count
+
+            while self.list_file[prev_line_index].isspace() is True or len(self.list_file[prev_line_index]) == 0 or (((self.list_file[prev_line_index]).strip())).find('\\\\') == 0 or prev_line_index in self.comment_lines:
                 prev_line_index -= 1
-            while (self.list_file[prev_line_index]).find('\\\\') != -1 or (self.list_file[prev_line_index]).find('\\*') or (self.list_file[prev_line_index]).find('*\\'):
-                prev_line_index -= 1
+
             prev_line = self.list_file[prev_line_index]
 
-            # len(re.findall(check_string, test_string))
+            # print('prev line index:' , prev_line_index)
+            # print(self.comment_lines)
 
-            # if len(re.findall(line, symbol)) == 1:
-            #     if line.find(symbol) == 0:
-            #         print(prev_line)
-            #         print(' ' * (prev_line.find(prev_symbol) - 1), '^')
-            #
-            #     else:
-            #         print(line)
-            #         print(' ' * (line.find(prev_symbol) - 1), '^')
-
-            if line.find(symbol) == 0:
+            if (line.strip()).find(symbol) == 0 or ((line.strip()).find('*\\') + 2 == (line.strip()).find(symbol) and (line.strip()).find('\\*') == -1) or ((line.strip()).find('*\\') + 2 == (line.strip()).find(symbol) and (line.strip()).find('\\*') == 0):
                 print(prev_line)
-                print(' ' * (len(prev_line)-1), '^')
+                if prev_line.find('\\*') != -1:
+                    arrow_index = prev_line.find('\\*') - 1
+
+                elif prev_line.find('\\\\') != -1:
+                    arrow_index = prev_line.find('\\\\') - 1
+
+                else:
+                    arrow_index = len(prev_line) -1
+
+                cut_line = prev_line[:arrow_index]
+                arrow_line = ''
+                for char in cut_line:
+                    if not char.isspace():
+                        arrow_line = arrow_line + ' '
+                    else:
+                        arrow_line = arrow_line + char
+                print(arrow_line + '^')
+                # print('prev char count:' , prev_char_num)
+                # print('cur symb:' , symbol)
 
             else:
-                symb_len = len(symbol)
-                prev_symb_len = len(prev_symbol)
-                # print(symb_len)
-                # print("Index {}".format(self.character_count - symb_len - 1))
-
                 print(line)
-                print(' '*(self.character_count - symb_len - 1 - prev_symb_len - self.space_count), '^')
+
+                cut_line = line[:character_no - len(symbol) - 2 - self.space_count]
+                arrow_line = ''
+                for char in cut_line:
+                    if not char.isspace():
+                        arrow_line = arrow_line + ' '
+                    else:
+                        arrow_line = arrow_line + char
+                print(arrow_line, '^')
+
+                # print('The current symbol is:', symbol)
 
         elif before is False and arrow is True:
             line = self.list_file[self.line_count]
             print(line)
 
         elif before is False and arrow is False:
-            # print(self.character_count)
             line = self.list_file[self.line_count]
-            # symbol = self.current_symbol
             character_no = self.character_count
             print(line)
-            # print(' ' * (character_no - 2), '^')
             cut_line = line[:character_no - 2]
             arrow_line = ''
             for char in cut_line:
@@ -166,27 +178,11 @@ class Scanner:
                 else:
                     arrow_line = arrow_line + char
             print(arrow_line, '^')
-        # else:
-        #     line = self.list_file[self.line_count]
-        #     symbol = self.current_symbol
-        #
-        #     print(line)
-        #     print(' ' * (line.find(symbol)-1), '^')
-
-        # print(len(self.current_symbol))
-        # return self.list_file[self.line_count]
 
     def get_number(self):
         number = ""
         if self.current_character.isdigit():
             number = self.current_character
-        """while True:
-            char = self.input_file.read(1)
-            if char == '':
-                break
-            if char.isdigit():
-                number = char
-                break"""
 
         while True:
 
@@ -211,10 +207,8 @@ class Scanner:
         if it encounters a comment or end of line.
         """
 
-        # print(self.get_line())
         """Return the symbol type and ID of the next sequence of characters."""
-
-        # print(self.character_count)
+        self.space_count = 0
 
         self.skip_spaces()
 
@@ -223,22 +217,29 @@ class Scanner:
             if self.current_character == "\\":
                 self.advance()
                 if self.current_character == '*':
+                    self.add_ignore()
                     self.advance()
+                    self.space_count += 2
                     while self.current_character != '\\':
                         while self.current_character != '*':
                             if self.current_character == "\n":
+                                self.add_ignore()
                                 self.line_count += 1
                                 self.advance()
                             else:
                                 self.advance()
+                                self.space_count += 1
                         self.advance()
+                        self.space_count += 1
                     self.advance()
+                    self.space_count += 1
 
                 elif self.current_character == '\\':
                     while self.current_character != '\n':
                         self.advance()
-
                 else:
+                    self.prev_symbol = self.current_symbol
+                    self.current_symbol = "\\"
                     return [None, None]
 
             self.skip_spaces()
