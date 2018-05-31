@@ -78,5 +78,7 @@ class Errors:
             parser.UNEXPECTED_SYMBOL: "Error {}: Unexpected symbol detected."
                 .format(parser.UNEXPECTED_SYMBOL),
             parser.PREMATURE_EOF: "Error {}: File ended abruptly."
-                .format(parser.PREMATURE_EOF)
+                .format(parser.PREMATURE_EOF),
+            parser.COMMA_NOT_SEMICOLON: "Error {}: A comma was found instead of a semicolon at the end of the list. Or a section header is missplaced. Please check the definition file."
+                .format(parser.COMMA_NOT_SEMICOLON)
         }
