@@ -309,7 +309,6 @@ class Network:
         """
         device = self.devices.get_device(device_id)
         output_signal = device.outputs[None]  # output ID is None
-        print(output_signal)
 
         # Signal is updated only on timer=rc_constant and timer=rc_constant+1
         if(output_signal == self.devices.HIGH and
@@ -321,7 +320,6 @@ class Network:
                                             self.devices.LOW)
         else:  # Steady state
             new_signal = output_signal
-
         if new_signal is None:  # update is unsuccessful
             return False
         device.outputs[None] = new_signal
@@ -390,8 +388,10 @@ class Network:
         # Update RC timers
         for device_id in rc_devices:
             device = self.devices.get_device(device_id)
+            # Initialise RC counter if it hasn't been done yet
+            if device.rc_counter is None:
+                device.rc_counter = 0
             device.rc_counter += 1
-
 
         # Number of iterations to wait for the signals to settle before
         # declaring the network unstable

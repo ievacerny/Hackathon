@@ -348,3 +348,41 @@ def test_oscillating_network(new_network):
     network.make_connection(NOR1, None, NOR1, I1)
 
     assert not network.execute_network()
+
+
+def test_rc_device(new_network):
+    """Test if the RC device behaves correctly."""
+    network = new_network
+    devices = network.devices
+    names = devices.names
+
+    LOW = devices.LOW
+    HIGH = devices.HIGH
+
+    [RC1, SW1, OR1, I1, I2] = names.lookup(["RC1", "SW1", "OR1", "I1", "I2"])
+    # Make devices
+    devices.make_device(RC1, devices.RC, 3)
+    devices.make_device(SW1, devices.SWITCH, 0)
+    devices.make_device(OR1, devices.OR, 2)
+
+    # Connect the devices
+    network.make_connection(RC1, None, OR1, I1)
+    network.make_connection(SW1, None, OR1, I2)
+
+    # Strings for evaluation
+    rc1_output = "network.get_output_signal(RC1, None)"
+    sw1_output = "network.get_output_signal(SW1, None)"
+    or1_output = "network.get_output_signal(OR1, None)"
+
+    # Check initial values of of RC1 and SW1. OR1 is in default state 0
+    assert [eval(rc1_output), eval(sw1_output), eval(or1_output)] == [
+            HIGH, LOW, LOW]
+    # Execute once to see that OR is correct
+    network.execute_network()
+    assert [eval(rc1_output), eval(sw1_output), eval(or1_output)] == [
+            HIGH, LOW, HIGH]
+    # Execute 6 more times. RC should have fallen to LOW and OR1 now LOW
+    for i in range(6):
+        network.execute_network()
+    assert [eval(rc1_output), eval(sw1_output), eval(or1_output)] == [
+            LOW, LOW, LOW]

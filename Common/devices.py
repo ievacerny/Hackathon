@@ -271,7 +271,7 @@ class Devices:
         self.add_output(device_id, output_id=None, signal=self.HIGH)
 
     def cold_startup(self):
-        """Simulate cold start-up of D-types and clocks.
+        """Simulate cold start-up of D-types, clocks and RC devices.
 
         Set the memory of the D-types to a random state and make the clocks
         begin from a random point in their cycles.
