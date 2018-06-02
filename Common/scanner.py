@@ -46,7 +46,7 @@ class Scanner:
         self.symbol_type_list = [self.COMMA, self.SEMICOLON, self.COLON,
                                  self.KEYWORD, self.NUMBER, self.NAME, self.ARROW, self.EOF, self.NEWLINE, self.DOT] = range(10)
         self.keywords_list = ["DEVICES", "CONNECTIONS", "MONITOR", "DTYPE", "XOR", "AND", "NAND", "OR", "NOR", "SWITCH",
-                              "CLOCK"]
+                              "CLOCK", "RC"]
         dummy = self.names.lookup(self.keywords_list)
         [self.DEVICES_ID, self.CONNECTIONS_ID, self.MONITOR_ID] = self.names.lookup(self.keywords_list[:3])
         self.current_character = ""

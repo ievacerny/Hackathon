@@ -302,6 +302,31 @@ class Network:
 
         return True
 
+    def execute_rc(self, device_id):
+        """Simulate an RC device and update its output signal value.
+
+        Return True if successful.
+        """
+        device = self.devices.get_device(device_id)
+        output_signal = device.outputs[None]  # output ID is None
+        print(output_signal)
+
+        # Signal is updated only on timer=rc_constant and timer=rc_constant+1
+        if(output_signal == self.devices.HIGH and
+           device.rc_counter == device.rc_constant):
+            new_signal = self.update_signal(output_signal,
+                                            self.devices.LOW)
+        elif output_signal == self.devices.FALLING:
+            new_signal = self.update_signal(output_signal,
+                                            self.devices.LOW)
+        else:  # Steady state
+            new_signal = output_signal
+
+        if new_signal is None:  # update is unsuccessful
+            return False
+        device.outputs[None] = new_signal
+        return True
+
     def execute_clock(self, device_id):
         """Simulate a clock and update its output signal value.
 
@@ -358,9 +383,15 @@ class Network:
         nand_devices = self.devices.find_devices(self.devices.NAND)
         nor_devices = self.devices.find_devices(self.devices.NOR)
         xor_devices = self.devices.find_devices(self.devices.XOR)
+        rc_devices = self.devices.find_devices(self.devices.RC)
 
         # This sets clock signals to RISING or FALLING, where necessary
         self.update_clocks()
+        # Update RC timers
+        for device_id in rc_devices:
+            device = self.devices.get_device(device_id)
+            device.rc_counter += 1
+
 
         # Number of iterations to wait for the signals to settle before
         # declaring the network unstable
@@ -401,6 +432,11 @@ class Network:
             for device_id in xor_devices:  # execute XOR devices
                 if not self.execute_gate(device_id, None, None):
                     return False
+
+            for device_id in rc_devices:  # execute RC devices
+                if not self.execute_rc(device_id):
+                    return False
+
             if self.steady_state:
                 break
         return self.steady_state

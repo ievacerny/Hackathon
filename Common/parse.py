@@ -59,7 +59,7 @@ class Parser:
          ] = self.names.unique_error_codes(16)
 
         self.device_list = ["DTYPE", "XOR", "AND", "NAND", "OR", "NOR",
-                            "SWITCH", "CLOCK"]
+                            "SWITCH", "CLOCK", "RC"]
         self.type_id_list = self.names.lookup(self.device_list)
         self.section_headers = [self.scanner.DEVICES_ID,
                                 self.scanner.CONNECTIONS_ID,
