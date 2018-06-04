@@ -31,14 +31,14 @@ def main(arg_list):
     Run either the command line user interface, the graphical user interface,
     or display the usage message.
     """
-    usage_message = ("Usage:\n"
+    usage_message = _("Usage:\n"
                      "Show help: logsim.py -h\n"
                      "Command line user interface: logsim.py -c <file path>\n"
                      "Graphical user interface: logsim.py <file path>")
     try:
         options, arguments = getopt.getopt(arg_list, "hc:")
     except getopt.GetoptError:
-        print("Error: invalid command line arguments\n")
+        print(_("Error: invalid command line arguments\n"))
         print(usage_message)
         sys.exit()
 
@@ -64,7 +64,7 @@ def main(arg_list):
     if not options:  # no option given, use the graphical user interface
 
         if len(arguments) != 1:  # wrong number of arguments
-            print("Error: one file path required\n")
+            print(_("Error: one file path required\n"))
             print(usage_message)
             sys.exit()
 
@@ -74,7 +74,7 @@ def main(arg_list):
         if parser.parse_network():
             # Initialise an instance of the gui.Gui() class
             app = wx.App()
-            gui = Gui("Logic Simulator", path, names, devices, network,
+            gui = Gui(_("Logic Simulator"), path, names, devices, network,
                       monitors)
             gui.Show(True)
             app.MainLoop()
