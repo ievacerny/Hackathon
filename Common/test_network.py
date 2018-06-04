@@ -381,8 +381,8 @@ def test_rc_device(new_network):
     network.execute_network()
     assert [eval(rc1_output), eval(sw1_output), eval(or1_output)] == [
             HIGH, LOW, HIGH]
-    # Execute 6 more times. RC should have fallen to LOW and OR1 now LOW
-    for i in range(6):
+    # Execute 3 more times. RC should have fallen to LOW and OR1 now LOW
+    for i in range(3):
         network.execute_network()
     assert [eval(rc1_output), eval(sw1_output), eval(or1_output)] == [
             LOW, LOW, LOW]
