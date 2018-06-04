@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: LOGSIM\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-06-04 20:38+0100\n"
-"PO-Revision-Date: 2018-06-04 20:38+0100\n"
+"PO-Revision-Date: 2018-06-04 21:22+0100\n"
 "Last-Translator: \n"
 "Language-Team: Team0 <ic322@cam.ac.uk>\n"
 "Language: \n"
@@ -19,111 +19,111 @@ msgstr ""
 
 #: errors.py:28
 msgid "Error {}: Invalid parameter for the specified device."
-msgstr "Λάθος {}: "
+msgstr "Λάθος {}: Μη έγκυρη παράμετρος για τη συγκεκριμένη συσκευή."
 
 #: errors.py:30
 msgid "Error {}: Missing parameter for the specified device."
-msgstr "Λάθος {}: "
+msgstr "Λάθος {}: Λείπει παράμετρος για τη συγκεκριμένη συσκευή."
 
 #: errors.py:32
 msgid "Error {}: Invalid device. Supported devices: SWITCH, CLOCK, AND, NAND, OR, NOR, XOR, DTYPE, RC."
-msgstr "Λάθος {}: "
+msgstr "Λάθος {}: Μη έγκυρη συσκευή. Υποστηριζόμενες συσκευές: SWITCH, CLOCK, AND, NAND, OR, NOR, XOR, DTYPE, RC."
 
 #: errors.py:34
 msgid "Error {}: Specified devices does not need any parameters."
-msgstr "Λάθος {}: "
+msgstr "Λάθος {}: Οι συγκεκριμένες συσκευές δεν χρειάζονται καμία παράμετρο."
 
 #: errors.py:36
 msgid "Error {}: Device with such name already exists."
-msgstr "Λάθος {}: "
+msgstr "Λάθος {}: Η συσκευή με αυτό το όνομα υπάρχει ήδη."
 
 #: errors.py:39
 msgid "Error {}: An input is connected to an input. Must be output -> input."
-msgstr "Λάθος {}: "
+msgstr "Λάθος {}: Μια είσοδος συνδέεται με μια είσοδο. Πρέπει να είναι παραγωγή -> εισαγωγή."
 
 #: errors.py:41
 msgid "Error {}: An output is connected to an output. Must be output -> input."
-msgstr "Λάθος {}: "
+msgstr "Λάθος {}: Μια έξοδος συνδέεται με μια έξοδο. Πρέπει να είναι παραγωγή -> εισαγωγή."
 
 #: errors.py:43
 msgid "Error {}: Specified input is already connected."
-msgstr "Λάθος {}: "
+msgstr "Λάθος {}: Η καθορισμένη είσοδος είναι ήδη συνδεδεμένη."
 
 #: errors.py:45
 msgid "Error {}: Invalid input or output port."
-msgstr "Λάθος {}: "
+msgstr "Λάθος {}: Μη έγκυρη θύρα εισόδου ή εξόδου."
 
 #: errors.py:47
 msgid "Error {}: Device has not been defined."
-msgstr "Λάθος {}: "
+msgstr "Λάθος {}: Η συσκευή δεν έχει οριστεί."
 
 #: errors.py:50
 msgid "Error {}: Specified port is not an output. Only outputs can be monitored."
-msgstr "Λάθος {}: "
+msgstr "Λάθος {}: Η καθορισμένη θύρα δεν είναι έξοδος. Μόνο οι εξόδους μπορούν να παρακολουθούνται."
 
 #: errors.py:52
 msgid "Error {}: Specified port is already being monitored."
-msgstr "Λάθος {}: "
+msgstr "Λάθος {}: Ο καθορισμένος λιμένας παρακολουθείται ήδη."
 
 #: errors.py:55
 msgid "Error {}: Expected section header 'DEVICES'."
-msgstr "Λάθος {}: "
+msgstr "Λάθος {}: Αναμενόμενη κεφαλίδα ενότητας 'DEVICES'."
 
 #: errors.py:57
 msgid "Error {}: Expected section header 'CONNECTIONS'."
-msgstr "Λάθος {}: "
+msgstr "Λάθος {}: Αναμενόμενη κεφαλίδα ενότητας 'CONNECTIONS'."
 
 #: errors.py:59
 msgid "Error {}: There is no section header MONITOR, but a third section after the semicolon is found on file. Either semicolon is not placed correctly or section header is missing."
-msgstr "Λάθος {}: "
+msgstr "Λάθος {}: Δεν υπάρχει κεφαλίδα ενότητας MONITOR, αλλά ένα τρίτο τμήμα μετά το ερωτηματικό βρίσκεται στο αρχείο. Οποιοδήποτε ερωτηματικό δεν τοποθετείται σωστά ή λείπει η κεφαλίδα ενότητας."
 
 #: errors.py:61
 msgid "Error {}: Expected a colon after the section header."
-msgstr "Λάθος {}: "
+msgstr "Λάθος {}: Αναμενόταν ένα παχύ τελεία μετά την κεφαλίδα ενότητας."
 
 #: errors.py:63
 msgid "Error {}: Expected a semicolon at the end of the list."
-msgstr "Λάθος {}: "
+msgstr "Λάθος {}: Αναμενόταν ένα ερωτηματικό στο τέλος της λίστας."
 
 #: errors.py:65
 msgid "Error {}: Invalid device name. Name must start with a letter and must consist of letters and digits only. Name can't be the same as one of the device types."
-msgstr "Λάθος {}: "
+msgstr "Λάθος {}: Μη έγκυρο όνομα συσκευής. Το όνομα πρέπει να ξεκινά με ένα γράμμα και πρέπει να αποτελείται μόνο από γράμματα και ψηφία. Το όνομα δεν μπορεί να είναι το ίδιο με έναν από τους τύπους συσκευών."
 
 #: errors.py:67
 msgid "Error {}: A comma between list items or a semicolon at the end of the list expected."
-msgstr "Λάθος {}: "
+msgstr "Λάθος {}: Ένα κόμμα ανάμεσα στα στοιχεία λίστας ή ένα ερωτηματικό στο τέλος της λίστας αναμένεται."
 
 #: errors.py:69
 msgid "Error {}: After dot a valid input or output port should follow."
-msgstr "Λάθος {}: "
+msgstr "Λάθος {}: Μετά την κουκίδα πρέπει να ακολουθήσει μια έγκυρη θύρα εισόδου ή εξόδου."
 
 #: errors.py:71
 msgid "Error {}: Port must be a valid output of the specified device."
-msgstr "Λάθος {}: "
+msgstr "Λάθος {}: Η θύρα πρέπει να είναι μια έγκυρη έξοδος της συγκεκριμένης συσκευής."
 
 #: errors.py:73
 msgid "Error {}: Port must be a valid input of the specified device."
-msgstr "Λάθος {}: "
+msgstr "Λάθος {}: Η θύρα πρέπει να είναι μια έγκυρη είσοδος της συγκεκριμένης συσκευής."
 
 #: errors.py:75
 msgid "Error {}: Missing arrow in the connection description."
-msgstr "Λάθος {}: "
+msgstr "Λάθος {}: Λείπει το βέλος στην περιγραφή της σύνδεσης."
 
 #: errors.py:77
 msgid "Error {}: Not all inputs in the network are connected. Please check your circuit diagram."
-msgstr "Λάθος {}: "
+msgstr "Λάθος {}: Δεν συνδέονται όλες οι εισόδους στο δίκτυο. Ελέγξτε το διάγραμμα κυκλωμάτων σας."
 
 #: errors.py:79
 msgid "Error {}: Unexpected symbol detected."
-msgstr "Λάθος {}: "
+msgstr "Λάθος {}: Εμφανίστηκε απροσδόκητο σύμβολο."
 
 #: errors.py:81
 msgid "Error {}: File ended abruptly."
-msgstr "Λάθος {}: "
+msgstr "Λάθος {}: Το αρχείο έληξε απότομα."
 
 #: errors.py:83
 msgid "Error {}: A comma was found instead of a semicolon at the end of the list. Or a section header is missplaced. Please check the definition file."
-msgstr "Λάθος {}: "
+msgstr "Λάθος {}: Ένα κόμμα βρέθηκε αντί για ένα ερωτηματικό στο τέλος της λίστας. Ή μια κεφαλίδα ενότητας δεν είναι σωστή. Ελέγξτε το αρχείο ορισμού."
 
 #: gui.py:153
 msgid "Number of cycles"
