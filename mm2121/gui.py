@@ -19,7 +19,10 @@ from network import Network
 from monitors import Monitors
 from scanner import Scanner
 from parse import Parser
+import gettext 
+gettext.install('logsim')
 
+import os
 
 class MyGLCanvas(wxcanvas.GLCanvas):
     """Handle all drawing operations.
@@ -241,6 +244,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         GL.glFlush()
         self.SwapBuffers()
 
+
     def on_paint(self, event):
         """Handle the paint event."""
         self.SetCurrent(self.context)
@@ -250,11 +254,13 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             self.init = True
         self.render()
 
+
     def on_size(self, event):
         """Handle the canvas resize event."""
         # Forces reconfiguration of the viewport, modelview and projection
         # matrices on the next paint event
         self.init = False
+
 
     def on_mouse(self, event):
         """Handle mouse events."""
@@ -328,6 +334,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             else:
                 GLUT.glutBitmapCharacter(font, ord(character))
 
+
     def render_line_strip(self, vertices, color):
         '''Draw a line strip based on a list of points/vertices
            Each point/vertex is specified by a list of x and y values'''
@@ -342,6 +349,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             GL.glVertex2f(next_vertex[0], next_vertex[1])
         GL.glEnd()
 
+
     def render_rectangle(self, corner, height, width, color, opacity): 
         '''Used for drawing colored panels behind the signals.
            corner: list of x and y coordinates of bottom left corner'''
@@ -355,6 +363,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         GL.glVertex2f(corner[0]+width, corner[1]+height)
         GL.glVertex2f(corner[0], corner[1]+height)
         GL.glEnd()
+
 
     def render_signal(self, corner_y, bits, size): 
         '''Draw the signal
@@ -426,13 +435,25 @@ class Gui(wx.Frame):
     def __init__(self, title, path, names, devices, network, monitors):
         """Initialise widgets and layout."""
         super().__init__(parent=None, title=title, size=(800, 600))
+        self.initialise(path, names, devices, network, monitors) 
 
+
+    def initialise(self, path, names, devices, network, monitors): 
         # Configure the file menu
         fileMenu = wx.Menu()
         menuBar = wx.MenuBar()
-        fileMenu.Append(wx.ID_ABOUT, "&About")
-        fileMenu.Append(wx.ID_EXIT, "&Exit")
-        menuBar.Append(fileMenu, "&File")
+        fileMenu.Append(wx.FD_OPEN, _("&Open File"))
+        fileMenu.Append(wx.ID_ABOUT, _("&About"))
+        fileMenu.Append(wx.ID_EXIT, _("&Exit"))
+
+        langMenu = wx.Menu()
+        self.ENGLISH_ID = wx.NewId()
+        self.GREEK_ID = wx.NewId()
+        langMenu.Append(self.ENGLISH_ID, "&English")
+        langMenu.Append(self.GREEK_ID, u"&Ελληνικά")
+        
+        menuBar.Append(fileMenu, _("&File"))
+        menuBar.Append(langMenu, _("&Language"))
         self.SetMenuBar(menuBar)
 
         #store external class instances as local attributes
@@ -456,14 +477,12 @@ class Gui(wx.Frame):
 
         # Configure the widgets
         self.button_size = wx.Size(105,30) #default button size
-        self.text_cycles = wx.StaticText(self, wx.ID_ANY, "Cycles:", size=self.button_size)
+        self.text_cycles = wx.StaticText(self, wx.ID_ANY, _("Cycles:"), size=self.button_size)
         self.spin = wx.SpinCtrl(self, wx.ID_ANY, value="", pos=wx.DefaultPosition,
                                 size=wx.Size(120,30), style=wx.SP_ARROW_KEYS, min=1, #added width to show spin properly on Linux
-                                max=self.num_cycles_max, initial=self.num_cycles, name="wxSpinCtrl")
-        self.run_button = wx.Button(self, wx.ID_ANY, "Run", size=self.button_size)
-        self.continue_button = wx.Button(self, wx.ID_ANY, "Continue", size=self.button_size)
-        
-        # self.checkbox = wx.CheckBox(self,wx.ID_ANY,"Check me",size=self.button_size)
+                                max=self.num_cycles_max, initial=self.num_cycles)
+        self.run_button = wx.Button(self, wx.ID_ANY, _("Run"), size=self.button_size)
+        self.continue_button = wx.Button(self, wx.ID_ANY, _("Continue"), size=self.button_size)
 
         # Bind events to widgets
         self.Bind(wx.EVT_MENU, self.on_menu)
@@ -483,7 +502,7 @@ class Gui(wx.Frame):
         side_sizer.Add(self.continue_button, 1, wx.ALL, 5)
        
         #Add 'Monitors' header
-        self.text_monitors = wx.StaticText(self, wx.ID_ANY, "Monitors:", size=self.button_size)
+        self.text_monitors = wx.StaticText(self, wx.ID_ANY, _("Monitors:"), size=self.button_size)
         side_sizer.Add(self.text_monitors, 1, wx.TOP, 5)
 
         #Get full list of device names 
@@ -517,8 +536,8 @@ class Gui(wx.Frame):
             device_type = device_object.device_kind
 
             if device_type == self.devices.SWITCH:
-                radio_0 = wx.RadioButton(self,wx.ID_ANY,'0',size=self.radiobutton_size,style=wx.RB_GROUP) #specify style to start a new group of radio buttons
-                radio_1 = wx.RadioButton(self,wx.ID_ANY,'1',size=self.radiobutton_size)
+                radio_0 = wx.RadioButton(self,wx.ID_ANY,_('0'),size=self.radiobutton_size,style=wx.RB_GROUP) #specify style to start a new group of radio buttons
+                radio_1 = wx.RadioButton(self,wx.ID_ANY,_('1'),size=self.radiobutton_size)
                 radio_0.Bind(wx.EVT_RADIOBUTTON,self.on_radiobutton)
                 radio_1.Bind(wx.EVT_RADIOBUTTON,self.on_radiobutton)
                 radio_0.name = device_name
@@ -534,19 +553,48 @@ class Gui(wx.Frame):
                 sub_side_sizer.Add(radio_0, 1, wx.ALL, 5)
                 sub_side_sizer.Add(radio_1, 1, wx.ALL, 5)
                 side_sizer.Add(sub_side_sizer, 1, wx.ALL, 5)
-                
-        # side_sizer.Add(self.checkbox, 1, wx.ALL, 5)
 
         self.SetSizeHints(300, 300)
         self.SetSizer(main_sizer)
 
+
     def on_menu(self, event):
         """Handle the event when the user selects a menu item."""
         Id = event.GetId()
-        if Id == wx.ID_EXIT:
+        if Id == wx.FD_OPEN:
+            self.load_file(None)
+        elif Id == wx.ID_EXIT:
             self.Close(True)
         elif Id == wx.ID_ABOUT:
-            wx.MessageBox("Logic Simulator\nCreated by Mojisola Agboola\n2017","About Logsim", wx.ICON_INFORMATION | wx.OK)
+            wx.MessageBox(_("Logic Simulator\nCreated by Mojisola Agboola\n2017"),_("About Logsim"), wx.ICON_INFORMATION | wx.OK)
+        elif Id == self.ENGLISH_ID:
+            print('Eng') #TODO actually convert to Eng
+        elif Id == self.GREEK_ID:
+            print('Gre') #TODO actually convert to Greek
+
+
+    def load_file(self, event):
+        open_file_dialog = wx.FileDialog(self, _("Open"), "", "", 
+                                       _("Text files (*.txt)|*.txt"), 
+                                       wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
+        open_file_dialog.ShowModal()
+        path = open_file_dialog.GetPath()
+        
+        #Initialise instances
+        names = Names()
+        devices = Devices(names)
+        network = Network(names, devices)
+        monitors = Monitors(names, devices, network)
+        scanner = Scanner(path, names)
+        parser = Parser(names, devices, network, monitors, scanner)
+
+        if parser.parse_network():
+            self.initialise(path, names, devices, network, monitors)
+        else:
+            wx.MessageBox(_("ERROR: Unable to load file"),_("Error"), wx.ICON_INFORMATION | wx.OK)
+        
+        open_file_dialog.Destroy()
+
 
     def on_run_button(self, event):
         """Handle the event when the user clicks the run button:
@@ -560,6 +608,7 @@ class Gui(wx.Frame):
         self.num_cycles = spin_value #update num_cycles
         self.canvas.render() #Display new output
 
+
     def on_continue_button(self, event):
         '''To run the network for a further n (user input) number of cycles,
         don't reset monitors and run the network without restarting dtypes/clocks
@@ -572,7 +621,8 @@ class Gui(wx.Frame):
             self.num_cycles = self.num_cycles + spin_value #update num_cycles
             self.canvas.render() #Display new output
         else:
-            print('Cannot run for more than a total of ' + str(self.num_cycles_max) + ' cycles')
+            wx.MessageBox(_('ERROR: Cannot run for more than a total of {} cycles').format(self.num_cycles_max), _("Error"), wx.ICON_INFORMATION | wx.OK)
+
 
     def run_network(self, restart, num_cycles):
         '''Run the network for a given number of cycles. 
@@ -583,7 +633,8 @@ class Gui(wx.Frame):
             if self.network.execute_network():
                 self.monitors.record_signals()
             else:
-                print("Error - Network oscillating.")
+                wx.MessageBox(_("ERROR: Network oscillating."), _("Error"), wx.ICON_INFORMATION | wx.OK)
+
 
     def update_canvas_monitors(self): 
         '''List out monitored devices and their properties from scratch, update canvas monitors'''
@@ -594,6 +645,7 @@ class Gui(wx.Frame):
             signal_list = self.monitors.monitors_dictionary[(device_id, output_id)]
             device_signal = self.translate_signal(signal_list)
             self.canvas.devices_monitored.append([device_type, device_name, device_signal])
+
 
     def translate_signal(self, signal_list): 
         '''Convert from format in devices class to custom gui format'''
@@ -611,8 +663,9 @@ class Gui(wx.Frame):
                 device_signal.append(2)
             else: #report an error 
                 device_signal.append(2)
-                print('Error - corrupt signal value')
+                wx.MessageBox(_('ERROR: Corrupt signal value'), _("Error"), wx.ICON_INFORMATION | wx.OK)
         return device_signal
+
     
     def translate_device_kind(self, device_kind): 
         '''Convert from devices class constants to strings for display'''
@@ -635,8 +688,9 @@ class Gui(wx.Frame):
         elif device_kind == self.devices.D_TYPE:
             return 'DTYPE'
         else:
-            print('Error - BAD DEVICE found')
+            wx.MessageBox(_('ERROR: BAD DEVICE found'), _("Error"), wx.ICON_INFORMATION | wx.OK)
             return 'BAD DEVICE'
+
 
     def on_checkbox(self,event):
         device_name = event.GetEventObject().name
@@ -657,11 +711,12 @@ class Gui(wx.Frame):
                     self.canvas.render() #Display new output
                     return
 
+
     def on_radiobutton(self,event):
         device_name = event.GetEventObject().name
         value = int(event.GetEventObject().GetLabel())
 
         [device_id,output_id] = self.devices.get_signal_ids(device_name) 
         if not self.devices.set_switch(device_id,value):
-            wx.MessageBox("ERROR: Failed to set switch value", wx.ICON_INFORMATION | wx.OK)
+            wx.MessageBox(_("ERROR: Failed to set switch value"), _("Error"), wx.ICON_INFORMATION | wx.OK)
           
