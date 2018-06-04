@@ -310,19 +310,16 @@ class Network:
         device = self.devices.get_device(device_id)
         output_signal = device.outputs[None]  # output ID is None
 
-        # Signal is updated only on timer=rc_constant and timer=rc_constant+1
-        if(output_signal == self.devices.HIGH and
-           device.rc_counter == device.rc_constant):
-            new_signal = self.update_signal(output_signal,
-                                            self.devices.LOW)
-        elif output_signal == self.devices.FALLING:
-            new_signal = self.update_signal(output_signal,
-                                            self.devices.LOW)
-        else:  # Steady state
-            new_signal = output_signal
-        if new_signal is None:  # update is unsuccessful
-            return False
-        device.outputs[None] = new_signal
+        # Signal is updated only on timer=rc_constant
+        if device.rc_counter == device.rc_constant:
+            if output_signal in [self.devices.HIGH, self.devices.FALLING]:
+                new_signal = self.update_signal(output_signal,
+                                                self.devices.LOW)
+            else:  # Steady state
+                new_signal = output_signal
+            if new_signal is None:  # update is unsuccessful
+                return False
+            device.outputs[None] = new_signal
         return True
 
     def execute_clock(self, device_id):
