@@ -36,7 +36,7 @@ class Scanner:
         """Open specified file and initialise reserved words and IDs."""
         try:
             self.input_file = open(path, 'r')
-        except FileNotFoundError:
+        except (FileNotFoundError, IsADirectoryError):
             print(_("Error: Filename incorrect or file doesn't exist."))
             sys.exit()
 

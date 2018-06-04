@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: LOGSIM\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-06-04 20:38+0100\n"
-"PO-Revision-Date: 2018-06-04 21:22+0100\n"
+"POT-Creation-Date: 2018-06-04 22:38+0100\n"
+"PO-Revision-Date: 2018-06-04 22:42+0100\n"
 "Last-Translator: \n"
 "Language-Team: Team0 <ic322@cam.ac.uk>\n"
 "Language: \n"
@@ -125,56 +125,51 @@ msgstr "Λάθος {}: Το αρχείο έληξε απότομα."
 msgid "Error {}: A comma was found instead of a semicolon at the end of the list. Or a section header is missplaced. Please check the definition file."
 msgstr "Λάθος {}: Ένα κόμμα βρέθηκε αντί για ένα ερωτηματικό στο τέλος της λίστας. Ή μια κεφαλίδα ενότητας δεν είναι σωστή. Ελέγξτε το αρχείο ορισμού."
 
-#: gui.py:153
-msgid "Number of cycles"
-msgstr "Αριθμός κύκλων"
+#: gui.py:446
+msgid "&Open File"
+msgstr "&Ανοιγμα αρχείου"
 
-#: gui.py:171
-#: gui.py:179
-msgid ""
-"Name\n"
-"[Type]"
-msgstr ""
-"Ονομα\n"
-"[Τύπος]"
-
-#: gui.py:437
+#: gui.py:447
 msgid "&About"
 msgstr "&Σχετικά με"
 
-#: gui.py:438
+#: gui.py:448
 msgid "&Exit"
 msgstr "&Εξοδος"
 
-#: gui.py:439
+#: gui.py:456
 msgid "&File"
 msgstr "&Αρχείο"
 
-#: gui.py:465
-msgid "Cycles"
-msgstr "Κύκλοι"
+#: gui.py:457
+msgid "&Language"
+msgstr "&Γλώσσα"
 
-#: gui.py:469
+#: gui.py:481
+msgid "Cycles:"
+msgstr "Κύκλοι:"
+
+#: gui.py:485
 msgid "Run"
 msgstr "Τρέξιμο"
 
-#: gui.py:470
+#: gui.py:486
 msgid "Continue"
 msgstr "Να συνεχίσει"
 
-#: gui.py:475
-msgid "+ Monitor"
-msgstr "+ Οθόνη"
+#: gui.py:506
+msgid "Monitors:"
+msgstr "Οθόνες:"
 
-#: gui.py:478
-msgid "- Monitor"
-msgstr "- Οθόνη"
+#: gui.py:540
+msgid "0"
+msgstr "0"
 
-#: gui.py:482
-msgid "Set Switch"
-msgstr "Ορισμός διακόπτη"
+#: gui.py:541
+msgid "1"
+msgstr "1"
 
-#: gui.py:522
+#: gui.py:570
 msgid ""
 "Logic Simulator\n"
 "Created by Mojisola Agboola\n"
@@ -184,60 +179,54 @@ msgstr ""
 "Δημιουργήθηκε από Mojisola Agboola\n"
 "2017"
 
-#: gui.py:522
+#: gui.py:570
 msgid "About Logsim"
 msgstr "Σχετικά με Logsim"
 
-#: gui.py:549
-msgid "Cannot run for more than a total of {} cycles"
+#: gui.py:578
+msgid "Open"
+msgstr "Ανοιξε"
+
+#: gui.py:579
+msgid "Text files (*.txt)|*.txt"
+msgstr ""
+
+#: gui.py:595
+msgid "Error: Unable to load file"
+msgstr "Λάθος: Δεν είναι δυνατή η φόρτωση αρχείου"
+
+#: gui.py:595
+#: gui.py:625
+#: gui.py:637
+#: gui.py:667
+#: gui.py:692
+#: gui.py:722
+msgid "Error"
+msgstr "Error"
+
+#: gui.py:625
+#, fuzzy
+msgid "Error: Cannot run for more than a total of {} cycles"
 msgstr "Δεν είναι δυνατή η εκτέλεση για περισσότερο από {} κύκλους συνολικά"
 
-#: gui.py:568
-msgid "Error - Device is already being monitored"
+#: gui.py:637
+#: userint.py:255
+msgid "Error: Network oscillating."
+msgstr "Λάθος: Το δίκτυο ταλαντώνεται."
+
+#: gui.py:667
+#, fuzzy
+msgid "Error: Corrupt signal value"
 msgstr "Λάθος - "
 
-#: gui.py:577
-msgid "Error - Device with such name does not exist"
+#: gui.py:692
+#, fuzzy
+msgid "Error: BAD DEVICE found"
 msgstr "Λάθος - "
 
-#: gui.py:591
-msgid "Error - Device with such name is not being monitored"
-msgstr "Λάθος - "
-
-#: gui.py:610
-msgid "Error - Switch name does not exist"
-msgstr "Λάθος - "
-
-#: gui.py:614
-msgid "Error - Input device is not a switch"
-msgstr "Λάθος - "
-
-#: gui.py:622
-msgid "Error - Failed to set switch"
-msgstr "Λάθος - "
-
-#: gui.py:624
-msgid "Error - Invalid switch value. Enter 0 or 1 after \"=\""
-msgstr "Λάθος - "
-
-#: gui.py:626
-msgid "Error - must assign value to switch e.g. \"sw1=0\""
-msgstr "Λάθος - "
-
-#: gui.py:628
-msgid "Invalid switch name"
-msgstr "Μη έγκυρο όνομα διακόπτη"
-
-#: gui.py:639
-msgid "Error - Network oscillating."
-msgstr "Λάθος - "
-
-#: gui.py:669
-msgid "Error - corrupt signal value"
-msgstr "Λάθος - "
-
-#: gui.py:691
-msgid "Error - BAD DEVICE found"
+#: gui.py:722
+#, fuzzy
+msgid "Error: Failed to set switch value"
 msgstr "Λάθος - "
 
 #: logsim.py:37
@@ -377,10 +366,6 @@ msgstr "Η παρακολούθηση ολοκληρώθηκε με επιτυχ
 msgid "Error: Could not zap monitor."
 msgstr "Λάθος: Δεν ήταν δυνατή η παρακολούθηση του προγράμματος."
 
-#: userint.py:255
-msgid "Error: Network oscillating."
-msgstr "Λάθος: Το δίκτυο ταλαντώνεται."
-
 #: userint.py:267
 msgid "Running for {} cycles"
 msgstr "Λειτουργεί για {} κύκλους"
@@ -392,6 +377,49 @@ msgstr "Λάθος: Τίποτα δεν θα συνεχιστεί. Εκτελέ�
 #: userint.py:280
 msgid "Continuing for {} cycles. Total: {} "
 msgstr "Συνεχίζοντας για {} κύκλους. Σύνολο: {}"
+
+#~ msgid "Number of cycles"
+#~ msgstr "Αριθμός κύκλων"
+
+#~ msgid ""
+#~ "Name\n"
+#~ "[Type]"
+#~ msgstr ""
+#~ "Ονομα\n"
+#~ "[Τύπος]"
+
+#~ msgid "- Monitor"
+#~ msgstr "- Οθόνη"
+
+#~ msgid "Set Switch"
+#~ msgstr "Ορισμός διακόπτη"
+
+#~ msgid "Error - Device is already being monitored"
+#~ msgstr "Λάθος - "
+
+#~ msgid "Error - Device with such name does not exist"
+#~ msgstr "Λάθος - "
+
+#~ msgid "Error - Device with such name is not being monitored"
+#~ msgstr "Λάθος - "
+
+#~ msgid "Error - Switch name does not exist"
+#~ msgstr "Λάθος - "
+
+#~ msgid "Error - Input device is not a switch"
+#~ msgstr "Λάθος - "
+
+#~ msgid "Error - Invalid switch value. Enter 0 or 1 after \"=\""
+#~ msgstr "Λάθος - "
+
+#~ msgid "Error - must assign value to switch e.g. \"sw1=0\""
+#~ msgstr "Λάθος - "
+
+#~ msgid "Invalid switch name"
+#~ msgstr "Μη έγκυρο όνομα διακόπτη"
+
+#~ msgid "Error - Network oscillating."
+#~ msgstr "Λάθος - "
 
 #~ msgid "Error: one file path required\n"
 #~ msgstr "Λάθος:\n"

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-06-04 20:38+0100\n"
+"POT-Creation-Date: 2018-06-04 22:38+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -140,113 +140,95 @@ msgid ""
 "Or a section header is missplaced. Please check the definition file."
 msgstr ""
 
-#: gui.py:153
-msgid "Number of cycles"
+#: gui.py:446
+msgid "&Open File"
 msgstr ""
 
-#: gui.py:171 gui.py:179
-msgid ""
-"Name\n"
-"[Type]"
-msgstr ""
-
-#: gui.py:437
+#: gui.py:447
 msgid "&About"
 msgstr ""
 
-#: gui.py:438
+#: gui.py:448
 msgid "&Exit"
 msgstr ""
 
-#: gui.py:439
+#: gui.py:456
 msgid "&File"
 msgstr ""
 
-#: gui.py:465
-msgid "Cycles"
+#: gui.py:457
+msgid "&Language"
 msgstr ""
 
-#: gui.py:469
+#: gui.py:481
+msgid "Cycles:"
+msgstr ""
+
+#: gui.py:485
 msgid "Run"
 msgstr ""
 
-#: gui.py:470
+#: gui.py:486
 msgid "Continue"
 msgstr ""
 
-#: gui.py:475
-msgid "+ Monitor"
+#: gui.py:506
+msgid "Monitors:"
 msgstr ""
 
-#: gui.py:478
-msgid "- Monitor"
+#: gui.py:540
+msgid "0"
 msgstr ""
 
-#: gui.py:482
-msgid "Set Switch"
+#: gui.py:541
+msgid "1"
 msgstr ""
 
-#: gui.py:522
+#: gui.py:570
 msgid ""
 "Logic Simulator\n"
 "Created by Mojisola Agboola\n"
 "2017"
 msgstr ""
 
-#: gui.py:522
+#: gui.py:570
 msgid "About Logsim"
 msgstr ""
 
-#: gui.py:549
-msgid "Cannot run for more than a total of {} cycles"
+#: gui.py:578
+msgid "Open"
 msgstr ""
 
-#: gui.py:568
-msgid "Error - Device is already being monitored"
+#: gui.py:579
+msgid "Text files (*.txt)|*.txt"
 msgstr ""
 
-#: gui.py:577
-msgid "Error - Device with such name does not exist"
+#: gui.py:595
+msgid "Error: Unable to load file"
 msgstr ""
 
-#: gui.py:591
-msgid "Error - Device with such name is not being monitored"
+#: gui.py:595 gui.py:625 gui.py:637 gui.py:667 gui.py:692 gui.py:722
+msgid "Error"
 msgstr ""
 
-#: gui.py:610
-msgid "Error - Switch name does not exist"
+#: gui.py:625
+msgid "Error: Cannot run for more than a total of {} cycles"
 msgstr ""
 
-#: gui.py:614
-msgid "Error - Input device is not a switch"
+#: gui.py:637 userint.py:255
+msgid "Error: Network oscillating."
 msgstr ""
 
-#: gui.py:622
-msgid "Error - Failed to set switch"
+#: gui.py:667
+msgid "Error: Corrupt signal value"
 msgstr ""
 
-#: gui.py:624
-msgid "Error - Invalid switch value. Enter 0 or 1 after \"=\""
+#: gui.py:692
+msgid "Error: BAD DEVICE found"
 msgstr ""
 
-#: gui.py:626
-msgid "Error - must assign value to switch e.g. \"sw1=0\""
-msgstr ""
-
-#: gui.py:628
-msgid "Invalid switch name"
-msgstr ""
-
-#: gui.py:639
-msgid "Error - Network oscillating."
-msgstr ""
-
-#: gui.py:669
-msgid "Error - corrupt signal value"
-msgstr ""
-
-#: gui.py:691
-msgid "Error - BAD DEVICE found"
+#: gui.py:722
+msgid "Error: Failed to set switch value"
 msgstr ""
 
 #: logsim.py:37
@@ -377,10 +359,6 @@ msgstr ""
 
 #: userint.py:244
 msgid "Error: Could not zap monitor."
-msgstr ""
-
-#: userint.py:255
-msgid "Error: Network oscillating."
 msgstr ""
 
 #: userint.py:267
