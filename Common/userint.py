@@ -99,7 +99,7 @@ class UserInterface:
             elif command == "c":
                 self.continue_command()
             else:
-                print(_("Invalid command. Enter 'h' for help."))
+                print(_("Error: Invalid command. Enter 'h' for help."))
             self.get_line()  # get the user entry
             command = self.read_command()  # read the first character
 
@@ -134,7 +134,7 @@ class UserInterface:
         self.skip_spaces()
         name_string = ""
         if not self.character.isalpha():  # the string must start with a letter
-            print(_("Error! Expected a name."))
+            print(_("Error: Expected a name."))
             return None
         while self.character.isalnum():
             name_string = "".join([name_string, self.character])
@@ -152,7 +152,7 @@ class UserInterface:
         else:
             name_id = self.names.query(name_string)
         if name_id is None:
-            print(_("Error! Unknown name."))
+            print(_("Error: Unknown name."))
         return name_id
 
     def read_signal_name(self):
@@ -180,7 +180,7 @@ class UserInterface:
         self.skip_spaces()
         number_string = ""
         if not self.character.isdigit():
-            print(_("Error! Expected a number."))
+            print(_("Error: Expected a number."))
             return None
         while self.character.isdigit():
             number_string = "".join([number_string, self.character])
@@ -189,12 +189,12 @@ class UserInterface:
 
         if upper_bound is not None:
             if number > upper_bound:
-                print(_("Number out of range."))
+                print(_("Error: Number out of range."))
                 return None
 
         if lower_bound is not None:
             if number < lower_bound:
-                print(_("Number out of range."))
+                print(_("Error: Number out of range."))
                 return None
 
         return number
@@ -219,7 +219,7 @@ class UserInterface:
                 if self.devices.set_switch(switch_id, switch_state):
                     print(_("Successfully set switch."))
                 else:
-                    print(_("Error! Invalid switch."))
+                    print(_("Error: Invalid switch."))
 
     def monitor_command(self):
         """Set the specified monitor."""
@@ -231,7 +231,7 @@ class UserInterface:
             if monitor_error == self.monitors.NO_ERROR:
                 print(_("Successfully made monitor."))
             else:
-                print(_("Error! Could not make monitor."))
+                print(_("Error: Could not make monitor."))
 
     def zap_command(self):
         """Remove the specified monitor."""
@@ -241,7 +241,7 @@ class UserInterface:
             if self.monitors.remove_monitor(device, port):
                 print(_("Successfully zapped monitor"))
             else:
-                print(_("Error! Could not zap monitor."))
+                print(_("Error: Could not zap monitor."))
 
     def run_network(self, cycles):
         """Run the network for the specified number of simulation cycles.
@@ -252,7 +252,7 @@ class UserInterface:
             if self.network.execute_network():
                 self.monitors.record_signals()
             else:
-                print(_("Error! Network oscillating."))
+                print(_("Error: Network oscillating."))
                 return False
         self.monitors.display_signals()
         return True
@@ -264,7 +264,7 @@ class UserInterface:
 
         if cycles is not None:  # if the number of cycles provided is valid
             self.monitors.reset_monitors()
-            print(_("".join(["Running for ", str(cycles), " cycles"])))
+            print(_("Running for {} cycles").format(cycles))
             self.devices.cold_startup()
             if self.run_network(cycles):
                 self.cycles_completed += cycles
@@ -274,8 +274,8 @@ class UserInterface:
         cycles = self.read_number(0, None)
         if cycles is not None:  # if the number of cycles provided is valid
             if self.cycles_completed == 0:
-                print(_("Error! Nothing to continue. Run first."))
+                print(_("Error: Nothing to continue. Run first."))
             elif self.run_network(cycles):
                 self.cycles_completed += cycles
-                print(_(" ".join(["Continuing for", str(cycles), "cycles.",
-                                "Total:", str(self.cycles_completed)])))
+                print(_("Continuing for {} cycles. Total: {} ")
+                        .format(cycles, self.cycles_completed))

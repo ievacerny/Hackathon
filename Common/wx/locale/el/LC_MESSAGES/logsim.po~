@@ -1,0 +1,397 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: LOGSIM\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-06-04 20:29+0100\n"
+"PO-Revision-Date: 2018-06-04 20:37+0100\n"
+"Last-Translator: \n"
+"Language-Team: Team0 <ic322@cam.ac.uk>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Country: UNITED KINGDOM\n"
+
+#: errors.py:28
+msgid "Error {}: Invalid parameter for the specified device."
+msgstr "Λάθος {}: "
+
+#: errors.py:30
+msgid "Error {}: Missing parameter for the specified device."
+msgstr "Λάθος {}: "
+
+#: errors.py:32
+msgid "Error {}: Invalid device. Supported devices: SWITCH, CLOCK, AND, NAND, OR, NOR, XOR, DTYPE, RC."
+msgstr "Λάθος {}: "
+
+#: errors.py:34
+msgid "Error {}: Specified devices does not need any parameters."
+msgstr "Λάθος {}: "
+
+#: errors.py:36
+msgid "Error {}: Device with such name already exists."
+msgstr "Λάθος {}: "
+
+#: errors.py:39
+msgid "Error {}: An input is connected to an input. Must be output -> input."
+msgstr "Λάθος {}: "
+
+#: errors.py:41
+msgid "Error {}: An output is connected to an output. Must be output -> input."
+msgstr "Λάθος {}: "
+
+#: errors.py:43
+msgid "Error {}: Specified input is already connected."
+msgstr "Λάθος {}: "
+
+#: errors.py:45
+msgid "Error {}: Invalid input or output port."
+msgstr "Λάθος {}: "
+
+#: errors.py:47
+msgid "Error {}: Device has not been defined."
+msgstr "Λάθος {}: "
+
+#: errors.py:50
+msgid "Error {}: Specified port is not an output. Only outputs can be monitored."
+msgstr "Λάθος {}: "
+
+#: errors.py:52
+msgid "Error {}: Specified port is already being monitored."
+msgstr "Λάθος {}: "
+
+#: errors.py:55
+msgid "Error {}: Expected section header 'DEVICES'."
+msgstr "Λάθος {}: "
+
+#: errors.py:57
+msgid "Error {}: Expected section header 'CONNECTIONS'."
+msgstr "Λάθος {}: "
+
+#: errors.py:59
+msgid "Error {}: There is no section header MONITOR, but a third section after the semicolon is found on file. Either semicolon is not placed correctly or section header is missing."
+msgstr "Λάθος {}: "
+
+#: errors.py:61
+msgid "Error {}: Expected a colon after the section header."
+msgstr "Λάθος {}: "
+
+#: errors.py:63
+msgid "Error {}: Expected a semicolon at the end of the list."
+msgstr "Λάθος {}: "
+
+#: errors.py:65
+msgid "Error {}: Invalid device name. Name must start with a letter and must consist of letters and digits only. Name can't be the same as one of the device types."
+msgstr "Λάθος {}: "
+
+#: errors.py:67
+msgid "Error {}: A comma between list items or a semicolon at the end of the list expected."
+msgstr "Λάθος {}: "
+
+#: errors.py:69
+msgid "Error {}: After dot a valid input or output port should follow."
+msgstr "Λάθος {}: "
+
+#: errors.py:71
+msgid "Error {}: Port must be a valid output of the specified device."
+msgstr "Λάθος {}: "
+
+#: errors.py:73
+msgid "Error {}: Port must be a valid input of the specified device."
+msgstr "Λάθος {}: "
+
+#: errors.py:75
+msgid "Error {}: Missing arrow in the connection description."
+msgstr "Λάθος {}: "
+
+#: errors.py:77
+msgid "Error {}: Not all inputs in the network are connected. Please check your circuit diagram."
+msgstr "Λάθος {}: "
+
+#: errors.py:79
+msgid "Error {}: Unexpected symbol detected."
+msgstr "Λάθος {}: "
+
+#: errors.py:81
+msgid "Error {}: File ended abruptly."
+msgstr "Λάθος {}: "
+
+#: errors.py:83
+msgid "Error {}: A comma was found instead of a semicolon at the end of the list. Or a section header is missplaced. Please check the definition file."
+msgstr "Λάθος {}: "
+
+#: gui.py:153
+msgid "Number of cycles"
+msgstr "Αριθμός κύκλων"
+
+#: gui.py:171
+#: gui.py:179
+msgid ""
+"Name\n"
+"[Type]"
+msgstr ""
+"Ονομα\n"
+"[Τύπος]"
+
+#: gui.py:437
+msgid "&About"
+msgstr "&Σχετικά με"
+
+#: gui.py:438
+msgid "&Exit"
+msgstr "&Εξοδος"
+
+#: gui.py:439
+msgid "&File"
+msgstr "&Αρχείο"
+
+#: gui.py:465
+msgid "Cycles"
+msgstr "Κύκλοι"
+
+#: gui.py:469
+msgid "Run"
+msgstr "Τρέξιμο"
+
+#: gui.py:470
+msgid "Continue"
+msgstr "Να συνεχίσει"
+
+#: gui.py:475
+msgid "+ Monitor"
+msgstr "+ Οθόνη"
+
+#: gui.py:478
+msgid "- Monitor"
+msgstr "- Οθόνη"
+
+#: gui.py:482
+msgid "Set Switch"
+msgstr "Ορισμός διακόπτη"
+
+#: gui.py:522
+msgid ""
+"Logic Simulator\n"
+"Created by Mojisola Agboola\n"
+"2017"
+msgstr ""
+"Λογικός προσομοιωτής\n"
+"Δημιουργήθηκε από Mojisola Agboola\n"
+"2017"
+
+#: gui.py:522
+msgid "About Logsim"
+msgstr "Σχετικά με Logsim"
+
+#: gui.py:549
+msgid "Cannot run for more than a total of {} cycles"
+msgstr "Δεν είναι δυνατή η εκτέλεση για περισσότερο από {} κύκλους συνολικά"
+
+#: gui.py:568
+msgid "Error - Device is already being monitored"
+msgstr "Λάθος - "
+
+#: gui.py:577
+msgid "Error - Device with such name does not exist"
+msgstr "Λάθος - "
+
+#: gui.py:591
+msgid "Error - Device with such name is not being monitored"
+msgstr "Λάθος - "
+
+#: gui.py:610
+msgid "Error - Switch name does not exist"
+msgstr "Λάθος - "
+
+#: gui.py:614
+msgid "Error - Input device is not a switch"
+msgstr "Λάθος - "
+
+#: gui.py:622
+msgid "Error - Failed to set switch"
+msgstr "Λάθος - "
+
+#: gui.py:624
+msgid "Error - Invalid switch value. Enter 0 or 1 after \"=\""
+msgstr "Λάθος - "
+
+#: gui.py:626
+msgid "Error - must assign value to switch e.g. \"sw1=0\""
+msgstr "Λάθος - "
+
+#: gui.py:628
+msgid "Invalid switch name"
+msgstr "Μη έγκυρο όνομα διακόπτη"
+
+#: gui.py:639
+msgid "Error - Network oscillating."
+msgstr "Λάθος - "
+
+#: gui.py:669
+msgid "Error - corrupt signal value"
+msgstr "Λάθος - "
+
+#: gui.py:691
+msgid "Error - BAD DEVICE found"
+msgstr "Λάθος - "
+
+#: logsim.py:37
+msgid ""
+"Usage:\n"
+"Show help: logsim.py -h\n"
+"Command line user interface: logsim.py -c <file path> [lang=<language code>]\n"
+"Graphical user interface: logsim.py <file path> [lang=<language code>]"
+msgstr ""
+"Χρήση:\n"
+"Εμφάνιση βοήθειας: logsim.py -h\n"
+"Γραμμή εντολών, περιβάλλον χρήστη: logsim.py -c <διαδρομή αρχείου> [lang=<κωδικό γλώσσας>]\n"
+"Γραφικό περιβάλλον χρήστη: logsim.py <διαδρομή αρχείου> [lang=<κωδικό γλώσσας>]"
+
+#: logsim.py:44
+msgid "Error: Invalid command line arguments.\n"
+msgstr "Λάθος: Μη έγκυρα επιχειρήματα γραμμής εντολών.\n"
+
+#: logsim.py:77
+msgid "Error: Only the file path and the language can be specified\n"
+msgstr "Λάθος: Μόνο η διαδρομή του αρχείου και η γλώσσα μπορούν να καθοριστούν\n"
+
+#: logsim.py:88
+msgid "Error: Language specified incorrectly. Specify using 'lang=<language code>'"
+msgstr "Λάθος: Η γλώσσα που καθορίστηκε εσφαλμένα. Καθορίστε τη χρήση 'lang=<κωδικό γλώσσας>'"
+
+#: logsim.py:89
+#: logsim.py:95
+msgid "Language will default to English"
+msgstr "Η προεπιλεγμένη γλώσσα θα είναι στα Αγγλικά"
+
+#: logsim.py:94
+msgid "Error: Unknown language code. Supported languages: 'en' (English), 'el' (Greek)."
+msgstr "Λάθος: Άγνωστος κωδικός γλώσσας. Υποστηριζόμενες γλώσσες: 'en' (Αγγλικά), 'el' (Ελληνικά)."
+
+#: logsim.py:100
+msgid "Logic Simulator"
+msgstr "Λογικός προσομοιωτής"
+
+#: parse.py:122
+msgid "Total number of errors detected: {}"
+msgstr "Συνολικός αριθμός ανιχνευθέντων σφαλμάτων: {}"
+
+#: scanner.py:40
+msgid "Error: Filename incorrect or file doesn't exist."
+msgstr "Λάθος: Το όνομα αρχείου ή το αρχείο δεν υπάρχουν."
+
+#: scanner.py:143
+#: scanner.py:168
+#: scanner.py:185
+#: scanner.py:194
+msgid "Line "
+msgstr "Γραμμή "
+
+#: userint.py:84
+msgid ""
+"Logic Simulator: interactive command line user interface.\n"
+"Enter 'h' for help."
+msgstr ""
+"Προσομοιωτής λογικής: διαδραστική διεπαφή χρήστη γραμμής εντολών.\n"
+"Πληκτρολογήστε 'h' για βοήθεια."
+
+#: userint.py:102
+msgid "Error: Invalid command. Enter 'h' for help."
+msgstr "Λάθος: Ακυρη εντολή. Πληκτρολογήστε 'h' για βοήθεια."
+
+#: userint.py:137
+msgid "Error: Expected a name."
+msgstr "Λάθος: Αναμενόμενο όνομα."
+
+#: userint.py:155
+msgid "Error: Unknown name."
+msgstr "Λάθος: Άγνωστο όνομα."
+
+#: userint.py:183
+msgid "Error: Expected a number."
+msgstr "Λάθος: Αναμενόταν ένας αριθμός."
+
+#: userint.py:192
+#: userint.py:197
+msgid "Error: Number out of range."
+msgstr "Λάθος: Αριθμός εκτός εμβέλειας."
+
+#: userint.py:204
+msgid "User commands:"
+msgstr "Εντολές χρηστών:"
+
+#: userint.py:205
+msgid "r N       - run the simulation for N cycles"
+msgstr "r N       - εκτελέστε τη προσομοίωση για κύκλους N"
+
+#: userint.py:206
+msgid "c N       - continue the simulation for N cycles"
+msgstr "c N       - συνεχίστε την προσομοίωση για τους κύκλους Ν"
+
+#: userint.py:207
+msgid "s X N     - set switch X to N (0 or 1)"
+msgstr "s X N     - ρυθμίστε το διακόπτη X στο N (0 ή 1)"
+
+#: userint.py:208
+msgid "m X       - set a monitor on signal X"
+msgstr "m X       - ορίστε μια οθόνη στο σήμα X"
+
+#: userint.py:209
+msgid "z X       - zap the monitor on signal X"
+msgstr "z X       - ενεργοποιήστε την οθόνη στο σήμα X"
+
+#: userint.py:210
+msgid "h         - help (this command)"
+msgstr "h         - βοήθεια (αυτή η εντολή)"
+
+#: userint.py:211
+msgid "q         - quit the program"
+msgstr "q         - τερματίστε το πρόγραμμα"
+
+#: userint.py:220
+msgid "Successfully set switch."
+msgstr "Επιτυχώς ο διακόπτης."
+
+#: userint.py:222
+msgid "Error: Invalid switch."
+msgstr "Λάθος: Μη έγκυρος διακόπτης."
+
+#: userint.py:232
+msgid "Successfully made monitor."
+msgstr "Επιτυχής παρακολούθηση."
+
+#: userint.py:234
+msgid "Error: Could not make monitor."
+msgstr "Λάθος: Δεν ήταν δυνατή η δημιουργία της οθόνης."
+
+#: userint.py:242
+msgid "Successfully zapped monitor"
+msgstr "Η παρακολούθηση ολοκληρώθηκε με επιτυχία"
+
+#: userint.py:244
+msgid "Error: Could not zap monitor."
+msgstr "Λάθος: Δεν ήταν δυνατή η παρακολούθηση του προγράμματος."
+
+#: userint.py:255
+msgid "Error: Network oscillating."
+msgstr "Λάθος: Το δίκτυο ταλαντώνεται."
+
+#: userint.py:267
+msgid "Running for {} cycles"
+msgstr "Λειτουργεί για {} κύκλους"
+
+#: userint.py:277
+msgid "Error: Nothing to continue. Run first."
+msgstr "Λάθος: Τίποτα δεν θα συνεχιστεί. Εκτελέστε πρώτα."
+
+#: userint.py:280
+msgid "Continuing for {} cycles. Total: {} "
+msgstr "Συνεχίζοντας για {} κύκλους. Σύνολο: {}"
+
+#~ msgid "Error: one file path required\n"
+#~ msgstr "Λάθος:\n"

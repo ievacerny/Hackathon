@@ -177,7 +177,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         	self.render_line_strip([[self.origin_x, size.height - self.top_offset],
         							[size.width - self.right_offset, size.height - self.top_offset]], 'black') #top horizontal line
         	self.render_text(_('Name\n[Type]'), self.y_axis_label_offset + 30/self.zoom, size.height - self.top_offset - 10,'black')
-
+        
         #Adjust small and big intervals to occupy window area
         big_interval = int((size.width - self.right_offset - self.origin_x) / 5)
         self.grid_small_interval = int(big_interval / 10)
@@ -315,7 +315,6 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         GL.glRasterPos2f(x_pos, y_pos)
 
         font = GLUT.GLUT_BITMAP_HELVETICA_12
-
         for character in text:
             if character == '\n':
                 y_pos = y_pos - 20
@@ -547,7 +546,7 @@ class Gui(wx.Frame):
             self.num_cycles = self.num_cycles + spin_value #update num_cycles
             self.canvas.render() #Display new output
         else:
-            print(_('Cannot run for more than a total of ' + str(self.num_cycles_max) + ' cycles'))
+            print(_('Cannot run for more than a total of {} cycles'.format(self.num_cycles_max)))
 
     def on_add_monitor_name(self, event):
         '''Execute event handler when user presses Enter'''

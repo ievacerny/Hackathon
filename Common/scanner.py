@@ -37,7 +37,7 @@ class Scanner:
         try:
             self.input_file = open(path, 'r')
         except FileNotFoundError:
-            print(_("Filename incorrect or file doesn't exist"))
+            print(_("Error: Filename incorrect or file doesn't exist."))
             sys.exit()
 
         self.list_file = [line.rstrip('\n') for line in open(path, 'r')]

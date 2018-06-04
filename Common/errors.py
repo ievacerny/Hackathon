@@ -20,6 +20,7 @@ class Errors:
 
     def __init__(self, devices, network, monitors, parser):
         """Initialise error messages attribute and collects all errors."""
+        
         self.no_error = [devices.NO_ERROR, network.NO_ERROR, monitors.NO_ERROR]
 
         self.error_msg = {
@@ -57,7 +58,7 @@ class Errors:
                 .format(parser.NO_CONNECTIONS_KEYWORD),
             parser.NO_MONITOR_KEYWORD:_("Error {}: There is no section header MONITOR, but a third section after the semicolon is found on file. Either semicolon is not placed correctly or section header is missing.")
                 .format(parser.NO_MONITOR_KEYWORD),
-            parser.MISSING_COLON:_("Error {}: Expected a colon after the section header."
+            parser.MISSING_COLON:_("Error {}: Expected a colon after the section header.")
                 .format(parser.MISSING_COLON),
             parser.MISSING_SEMICOLON:_("Error {}: Expected a semicolon at the end of the list.")
                 .format(parser.MISSING_SEMICOLON),

@@ -14,6 +14,9 @@ import getopt
 import sys
 
 import wx
+import gettext
+# Set default to English for imports
+gettext.install('logsim')
 
 from names import Names
 from devices import Devices
@@ -33,12 +36,12 @@ def main(arg_list):
     """
     usage_message = _("Usage:\n"
                      "Show help: logsim.py -h\n"
-                     "Command line user interface: logsim.py -c <file path>\n"
-                     "Graphical user interface: logsim.py <file path>")
+                     "Command line user interface: logsim.py -c <file path> [lang=<language code>]\n"
+                     "Graphical user interface: logsim.py <file path> [lang=<language code>]")
     try:
         options, arguments = getopt.getopt(arg_list, "hc:")
     except getopt.GetoptError:
-        print(_("Error: invalid command line arguments\n"))
+        print(_("Error: Invalid command line arguments.\n"))
         print(usage_message)
         sys.exit()
 
@@ -63,14 +66,34 @@ def main(arg_list):
 
     if not options:  # no option given, use the graphical user interface
 
-        if len(arguments) != 1:  # wrong number of arguments
-            print(_("Error: one file path required\n"))
+        l = None
+
+        if len(arguments) == 1:
+            [path] = arguments
+        elif len(arguments) == 2:
+            [path, language] = arguments
+            l = language.split('=')
+        else:  # wrong number of arguments
+            print(_("Error: Only the file path and the language can be specified.\n"))
             print(usage_message)
             sys.exit()
 
-        [path] = arguments
         scanner = Scanner(path, names)
         parser = Parser(names, devices, network, monitors, scanner)
+        
+        # Set language (English is already installed, change if needed)
+        if l is None:
+            pass
+        elif len(l) != 2 or l[0] != 'lang':
+            print(_("Error: Language specified incorrectly. Specify using 'lang=<language code>'"))
+            print(_("Language will default to English."))
+        elif l[1] == 'el':
+            el = gettext.translation('logsim', localedir='wx/locale', languages=['el'])
+            el.install()
+        elif l[1] != 'en':
+            print(_("Error: Unknown language code. Supported languages: 'en' (English), 'el' (Greek)."))
+            print(_("Language will default to English."))
+        
         if parser.parse_network():
             # Initialise an instance of the gui.Gui() class
             app = wx.App()
@@ -81,4 +104,5 @@ def main(arg_list):
 
 
 if __name__ == "__main__":
+    
     main(sys.argv[1:])
