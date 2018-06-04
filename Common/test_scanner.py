@@ -8,11 +8,11 @@ from names import Names
 
 @pytest.fixture
 def init_scanner(data):
-    with open('test_file_scanner.txt', 'w') as f:
+    with open('test_file.txt', 'w') as f:
         f.write(data)
     name = Names()
     #scan = Scanner('scan_test_doc.txt', name)
-    scan = Scanner('test_file_scanner.txt', name)
+    scan = Scanner('test_file.txt', name)
     return scan
 
 # def test_scanner_keyword(test_scanner):
