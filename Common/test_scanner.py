@@ -28,7 +28,7 @@ def init_scanner(data):
     ('DEVICES',[3, 0]),
     ('CONNECTIONS',[3, 1]),
     ('7', [4, 7]),
-    ('SW1', [5,11]),
+    ('SW1', [5,13]),
     ('->', [6, None]),
     ('', [7, None]),
     ('.', [9, None]),
@@ -42,7 +42,7 @@ def init_scanner(data):
     ('-->', [None, None]),
     ('<-', [None, None]),
     ('\\ABC', [None, None]),
-    ('B1C', [5, 11]),
+    ('B1C', [5, 13]),
     ('*\\', [None, None]),
     ('\\\\ \n\\', [None, None]),
     ('\\\\ \n\\*ABC*\\.', [9, None]),
@@ -52,9 +52,9 @@ def init_scanner(data):
     ('\\\\ \n\\*A\\BC*\\\t.', [9, None]),
     ('\\\\ \n\\*A\\\\BC**\\.', [9, None]),
     ('\\\\ \n\\*A\\\\BC\\*\\.', [9, None]),
-    #('\\*', [7, None]),
-    ('NOT', [3, None]),  # TODO update id
-    ('RC', [3, None])  # TODO update id
+    ('\\*', [7, None]),
+    ('NOT', [3, 12]),  # TODO update id
+    ('RC', [3, 11])  # TODO update id
 ])
 
 
@@ -117,21 +117,21 @@ def test_advance(data, expected_output):
 
 @pytest.mark.parametrize("data, expected_output", [
     ('ABC:DEVICES 24;',
-        [[5, 11], [2, None], [3, 0], [4, 24], [1, None]]),
+        [[5, 13], [2, None], [3, 0], [4, 24], [1, None]]),
     ('''\\\\Comment\nDEVICES: SW1 -> A1''',
-        [[3, 0], [2, None], [5, 11], [6, None], [5, 12]]),
+        [[3, 0], [2, None], [5, 13], [6, None], [5, 14]]),
     ('''\\\\Comment\nCONNECTION: SW1 -> A1''',
-        [[5, 11], [2, None], [5, 12], [6, None], [5, 13]]),
+        [[5, 13], [2, None], [5, 14], [6, None], [5, 15]]),
     ('''\\*Comment*\\DEVICES: SW1 -> A1''',
-        [[3, 0], [2, None], [5, 11], [6, None], [5, 12]]),
+        [[3, 0], [2, None], [5, 13], [6, None], [5, 14]]),
     ('NAND N! 4,',
-        [[3, 6], [5, 11], [None, None], [4, 4], [0, None]]),
+        [[3, 6], [5, 13], [None, None], [4, 4], [0, None]]),
     ('\t123\nABC\rDEF\t\n\rDEVICES :',
-        [[4, 123], [5, 11], [5, 12], [3, 0], [2, None]]),
+        [[4, 123], [5, 13], [5, 14], [3, 0], [2, None]]),
     ('''\\*Comment\n*\\DEVICES: SW1 -> A1''',
-        [[3, 0], [2, None], [5, 11], [6, None], [5, 12]]),
+        [[3, 0], [2, None], [5, 13], [6, None], [5, 14]]),
     ('''\\*Comment\n\\\\anothercomment*\\DEVICES: SW1 -> A1''',
-        [[3, 0], [2, None], [5, 11], [6, None], [5, 12]])
+        [[3, 0], [2, None], [5, 13], [6, None], [5, 14]])
 ])
 def test_symbol_sequence(data, expected_output):
     """Test if a sequence of symbols is correct."""
@@ -275,9 +275,7 @@ def test_get_line(capsys, data, expected_output, error_prev_symb,
     ('definitelynonexistentfileordirectory'),
     ('wx')  # Existent directory
 ])
-def test_open_file_fail(capsys, file):
+def test_open_file_fail(file):
     """Test if file opening failures are handeled correctly."""
-    Scanner(file, Names())
-    out, err = capsys.readouterr()
-    # TODO change the error message accordingly
-    assert err == "SystemExit"
+    with pytest.raises(SystemExit):
+        Scanner(file, Names())
