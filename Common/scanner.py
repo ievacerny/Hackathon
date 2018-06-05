@@ -37,7 +37,7 @@ class Scanner:
         try:
             self.input_file = open(path, 'r')
         except (FileNotFoundError, IsADirectoryError):
-            print(_("Error: Filename incorrect or file doesn't exist."))
+            print("Error: Filename incorrect or file doesn't exist.")
             sys.exit()
 
         self.list_file = [line.rstrip('\n') for line in open(path, 'r')]
@@ -46,8 +46,8 @@ class Scanner:
         self.symbol_type_list = [self.COMMA, self.SEMICOLON, self.COLON,
                                  self.KEYWORD, self.NUMBER, self.NAME, self.ARROW, self.EOF, self.NEWLINE, self.DOT] = range(10)
         self.keywords_list = ["DEVICES", "CONNECTIONS", "MONITOR", "DTYPE", "XOR", "AND", "NAND", "OR", "NOR", "SWITCH",
-                              "CLOCK", "RC"]
-        dummy = self.names.lookup(self.keywords_list)
+                              "CLOCK", "RC", "NOT"]
+        self.names.lookup(self.keywords_list)
         [self.DEVICES_ID, self.CONNECTIONS_ID, self.MONITOR_ID] = self.names.lookup(self.keywords_list[:3])
         self.current_character = ""
         self.name_string = ''
@@ -133,14 +133,14 @@ class Scanner:
             line_cut = line[find_comment_end:]
             no_ws_cut = line_cut.strip()
 
-            if (line.strip()).find(symbol) == 0 or ((line.strip()).find('*\\') != -1 and no_ws_cut.find(symbol) == 0
+            if ((line.strip()).find(symbol) == 0 or ((line.strip()).find('*\\') != -1 and no_ws_cut.find(symbol) == 0
                     and (line.strip()).find('\\*') == -1) or ((line.strip()).find('*\\') != -1 and
                             line.strip().find('*\\') + 2 == (line.strip()).find(symbol)
-                                    and (line.strip()).find('\\*') == 0):
+                                    and (line.strip()).find('\\*') == 0)):
 
                 str_index = str(prev_line_index+1)
                 len_index = len(str_index)
-                print(_('Line ') + str_index + ': ' + prev_line)
+                print('Line ' + str_index + ': ' + prev_line)
 
                 if prev_line.find('\\*') != -1:
                     arrow_index = prev_line.find('\\*') - 1
@@ -165,7 +165,7 @@ class Scanner:
                 cur_index = self.line_count
                 str_index = str(cur_index + 1)
                 len_index = len(str_index)
-                print(_('Line ') + str_index + ': ' + line)
+                print('Line ' + str_index + ': ' + line)
 
                 cut_line = line[:character_no - len(symbol) - 1 - self.space_count]
                 arrow_line = ''
@@ -182,7 +182,7 @@ class Scanner:
             cur_index = self.line_count
             str_index = str(cur_index + 1)
 
-            print(_('Line ') + str_index + ': ' + line)
+            print('Line ' + str_index + ': ' + line)
 
         elif before is False and arrow is False:
             line = self.list_file[self.line_count]
@@ -191,7 +191,7 @@ class Scanner:
             len_index = len(str_index)
             character_no = self.character_count
 
-            print(_('Line ') + str_index + ': ' + line)
+            print('Line ' + str_index + ': ' + line)
 
             cut_line = line[:character_no - 1]
             arrow_line = ''
@@ -253,9 +253,9 @@ class Scanner:
                     self.advance()
                     self.space_count += 2
 
-                    while self.current_character != '\\':
+                    while self.current_character != '\\' and self.current_character != '':
 
-                        while self.current_character != '*':
+                        while self.current_character != '*' and self.current_character != '':
 
                             if self.current_character == "\n":
                                 self.add_ignore()
