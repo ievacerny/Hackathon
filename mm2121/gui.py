@@ -196,8 +196,9 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         for x in range(self.origin_x, size.width - self.right_offset + 1, self.grid_small_interval): # +1 so we can draw a grid marker on the last point as well
             if (x - self.origin_x) % self.grid_big_interval == 0: #Draw a big marker 
                 self.render_line_strip([[x,self.origin_y], [x,self.origin_y - 10]], 'black') #draw a longer line for large intervals
-                self.render_text(str(self.grid_big_value*(x - self.origin_x) / (self.grid_big_interval)), 
-                                 x - self.grid_hor_text_offset, self.origin_y - self.grid_vert_text_offset, 'black') #also show value at large intervals
+                self.render_text(str(round(self.grid_big_value*(x - self.origin_x) 
+                                        / (self.grid_big_interval),1)), 
+                                x - self.grid_hor_text_offset, self.origin_y - self.grid_vert_text_offset, 'black') #also show value at large intervals
             else: #Draw a small marker
                 self.render_line_strip([[x,self.origin_y], [x,self.origin_y - 5]], 'black')
 
@@ -436,6 +437,7 @@ class Gui(wx.Frame):
     def __init__(self, title, path, names, devices, network, monitors):
         """Initialise widgets and layout."""
         super().__init__(parent=None, title=title, size=(900, 600))
+        
 
         # Configure the file menu
         fileMenu = wx.Menu()
@@ -504,7 +506,6 @@ class Gui(wx.Frame):
         self.side_sizer_cycles.Add(self.run_button, 1, wx.ALL, 5)
         self.side_sizer_cycles.Add(self.continue_button, 1, wx.ALL, 5)
 
-
         #Add 'Monitors' header
         self.text_monitors = wx.StaticText(self, wx.ID_ANY,
                                            _("Monitors:"), size=self.button_size)
@@ -521,7 +522,7 @@ class Gui(wx.Frame):
 
         #---------------------------------------------------------------------------
 
-        self.SetSizeHints(300, 300)
+        self.SetSizeHints(700, 500)
         self.SetSizer(self.main_sizer)
 
 
