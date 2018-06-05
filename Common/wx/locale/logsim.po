@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-06-05 11:25+0100\n"
+"POT-Creation-Date: 2018-06-05 13:30+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,89 +17,89 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: gui.py:446
+#: gui.py:443
 msgid "&Open File"
 msgstr ""
 
-#: gui.py:447
+#: gui.py:444
 msgid "&About"
 msgstr ""
 
-#: gui.py:448
+#: gui.py:445
 msgid "&Exit"
 msgstr ""
 
-#: gui.py:456
+#: gui.py:453
 msgid "&File"
 msgstr ""
 
-#: gui.py:457
+#: gui.py:454
 msgid "&Language"
 msgstr ""
 
-#: gui.py:482
+#: gui.py:480
 msgid "Cycles:"
 msgstr ""
 
-#: gui.py:486
+#: gui.py:484
 msgid "Run"
 msgstr ""
 
-#: gui.py:487
+#: gui.py:485
 msgid "Continue"
 msgstr ""
 
-#: gui.py:507
+#: gui.py:510
 msgid "Monitors:"
 msgstr ""
 
-#: gui.py:541
+#: gui.py:565
 msgid "0"
 msgstr ""
 
-#: gui.py:542
+#: gui.py:567
 msgid "1"
 msgstr ""
 
-#: gui.py:571
+#: gui.py:616
 msgid ""
 "Logic Simulator\n"
 "Created by Mojisola Agboola\n"
 "2017"
 msgstr ""
 
-#: gui.py:571
+#: gui.py:616
 msgid "About Logsim"
 msgstr ""
 
-#: gui.py:583
+#: gui.py:627
 msgid "Open"
 msgstr ""
 
-#: gui.py:601
-msgid "Error: Unable to load file"
+#: gui.py:646
+msgid "Error: Invalid logic circuit definition file"
 msgstr ""
 
-#: gui.py:601 gui.py:631 gui.py:643 gui.py:673 gui.py:698 gui.py:728
+#: gui.py:646 gui.py:675 gui.py:687 gui.py:717 gui.py:744 gui.py:774
 msgid "Error"
 msgstr ""
 
-#: gui.py:631
+#: gui.py:675
 msgid "Error: Cannot run for more than a total of {} cycles"
 msgstr ""
 
-#: gui.py:643
-msgid "Error: Network oscillating."
+#: gui.py:687
+msgid "Error: Network oscillating"
 msgstr ""
 
-#: gui.py:673
+#: gui.py:717
 msgid "Error: Corrupt signal value"
 msgstr ""
 
-#: gui.py:698
-msgid "Error: BAD DEVICE found"
+#: gui.py:744
+msgid "Error: Unsupported device found"
 msgstr ""
 
-#: gui.py:728
+#: gui.py:774
 msgid "Error: Failed to set switch value"
 msgstr ""

@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: LOGSIM\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-06-05 11:25+0100\n"
-"PO-Revision-Date: 2018-06-05 11:28+0100\n"
+"POT-Creation-Date: 2018-06-05 13:30+0100\n"
+"PO-Revision-Date: 2018-06-05 13:33+0100\n"
 "Last-Translator: \n"
 "Language-Team: Team0 <ic322@cam.ac.uk>\n"
 "Language: \n"
@@ -17,51 +17,51 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-Country: UNITED KINGDOM\n"
 
-#: gui.py:446
+#: gui.py:443
 msgid "&Open File"
 msgstr "&Ανοιγμα αρχείου"
 
-#: gui.py:447
+#: gui.py:444
 msgid "&About"
 msgstr "&Σχετικά με"
 
-#: gui.py:448
+#: gui.py:445
 msgid "&Exit"
 msgstr "&Εξοδος"
 
-#: gui.py:456
+#: gui.py:453
 msgid "&File"
 msgstr "&Αρχείο"
 
-#: gui.py:457
+#: gui.py:454
 msgid "&Language"
 msgstr "&Γλώσσα"
 
-#: gui.py:482
+#: gui.py:480
 msgid "Cycles:"
 msgstr "Κύκλοι:"
 
-#: gui.py:486
+#: gui.py:484
 msgid "Run"
 msgstr "Τρέξιμο"
 
-#: gui.py:487
+#: gui.py:485
 msgid "Continue"
 msgstr "Να συνεχίσει"
 
-#: gui.py:507
+#: gui.py:510
 msgid "Monitors:"
 msgstr "Οθόνες:"
 
-#: gui.py:541
+#: gui.py:565
 msgid "0"
 msgstr "0"
 
-#: gui.py:542
+#: gui.py:567
 msgid "1"
 msgstr "1"
 
-#: gui.py:571
+#: gui.py:616
 msgid ""
 "Logic Simulator\n"
 "Created by Mojisola Agboola\n"
@@ -71,46 +71,52 @@ msgstr ""
 "Δημιουργήθηκε από Mojisola Agboola\n"
 "2017"
 
-#: gui.py:571
+#: gui.py:616
 msgid "About Logsim"
 msgstr "Σχετικά με Logsim"
 
-#: gui.py:583
+#: gui.py:627
 msgid "Open"
 msgstr "Ανοιξε"
 
-#: gui.py:601
-msgid "Error: Unable to load file"
-msgstr "Λάθος: Δεν είναι δυνατή η φόρτωση αρχείου"
+#: gui.py:646
+msgid "Error: Invalid logic circuit definition file"
+msgstr "Λάθος: Μη έγκυρο αρχείο ορισμού κυκλώματος λογικής"
 
-#: gui.py:601
-#: gui.py:631
-#: gui.py:643
-#: gui.py:673
-#: gui.py:698
-#: gui.py:728
+#: gui.py:646
+#: gui.py:675
+#: gui.py:687
+#: gui.py:717
+#: gui.py:744
+#: gui.py:774
 msgid "Error"
-msgstr "Error"
+msgstr "Λάθος"
 
-#: gui.py:631
+#: gui.py:675
 msgid "Error: Cannot run for more than a total of {} cycles"
 msgstr "Λάθος: Δεν είναι δυνατή η εκτέλεση για περισσότερο από {} κύκλους συνολικά"
 
-#: gui.py:643
-msgid "Error: Network oscillating."
-msgstr "Λάθος: Το δίκτυο ταλαντώνεται."
+#: gui.py:687
+msgid "Error: Network oscillating"
+msgstr "Λάθος: Το δίκτυο ταλαντώνεται"
 
-#: gui.py:673
+#: gui.py:717
 msgid "Error: Corrupt signal value"
 msgstr "Λάθος: Τιμή αλλοιωμένου σήματος"
 
-#: gui.py:698
-msgid "Error: BAD DEVICE found"
-msgstr "Λάθος: Βρήκε κακή συσκευή"
+#: gui.py:744
+msgid "Error: Unsupported device found"
+msgstr "Λάθος: Εντοπίστηκε μη υποστηριζόμενη συσκευή"
 
-#: gui.py:728
+#: gui.py:774
 msgid "Error: Failed to set switch value"
 msgstr "Λάθος: Δεν ήταν δυνατή η ρύθμιση της τιμής του διακόπτη"
+
+#~ msgid "Error: Unable to load file"
+#~ msgstr "Λάθος: Δεν είναι δυνατή η φόρτωση αρχείου"
+
+#~ msgid "Error: BAD DEVICE found"
+#~ msgstr "Λάθος: Βρήκε κακή συσκευή"
 
 #~ msgid "Error {}: Invalid parameter for the specified device."
 #~ msgstr "Λάθος {}: Μη έγκυρη παράμετρος για τη συγκεκριμένη συσκευή."

@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: LOGSIM\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-06-04 22:38+0100\n"
-"PO-Revision-Date: 2018-06-04 22:42+0100\n"
+"POT-Creation-Date: 2018-06-05 11:25+0100\n"
+"PO-Revision-Date: 2018-06-05 13:29+0100\n"
 "Last-Translator: \n"
 "Language-Team: Team0 <ic322@cam.ac.uk>\n"
 "Language: \n"
@@ -16,114 +16,6 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-Country: UNITED KINGDOM\n"
-
-#: errors.py:28
-msgid "Error {}: Invalid parameter for the specified device."
-msgstr "Λάθος {}: Μη έγκυρη παράμετρος για τη συγκεκριμένη συσκευή."
-
-#: errors.py:30
-msgid "Error {}: Missing parameter for the specified device."
-msgstr "Λάθος {}: Λείπει παράμετρος για τη συγκεκριμένη συσκευή."
-
-#: errors.py:32
-msgid "Error {}: Invalid device. Supported devices: SWITCH, CLOCK, AND, NAND, OR, NOR, XOR, DTYPE, RC."
-msgstr "Λάθος {}: Μη έγκυρη συσκευή. Υποστηριζόμενες συσκευές: SWITCH, CLOCK, AND, NAND, OR, NOR, XOR, DTYPE, RC."
-
-#: errors.py:34
-msgid "Error {}: Specified devices does not need any parameters."
-msgstr "Λάθος {}: Οι συγκεκριμένες συσκευές δεν χρειάζονται καμία παράμετρο."
-
-#: errors.py:36
-msgid "Error {}: Device with such name already exists."
-msgstr "Λάθος {}: Η συσκευή με αυτό το όνομα υπάρχει ήδη."
-
-#: errors.py:39
-msgid "Error {}: An input is connected to an input. Must be output -> input."
-msgstr "Λάθος {}: Μια είσοδος συνδέεται με μια είσοδο. Πρέπει να είναι παραγωγή -> εισαγωγή."
-
-#: errors.py:41
-msgid "Error {}: An output is connected to an output. Must be output -> input."
-msgstr "Λάθος {}: Μια έξοδος συνδέεται με μια έξοδο. Πρέπει να είναι παραγωγή -> εισαγωγή."
-
-#: errors.py:43
-msgid "Error {}: Specified input is already connected."
-msgstr "Λάθος {}: Η καθορισμένη είσοδος είναι ήδη συνδεδεμένη."
-
-#: errors.py:45
-msgid "Error {}: Invalid input or output port."
-msgstr "Λάθος {}: Μη έγκυρη θύρα εισόδου ή εξόδου."
-
-#: errors.py:47
-msgid "Error {}: Device has not been defined."
-msgstr "Λάθος {}: Η συσκευή δεν έχει οριστεί."
-
-#: errors.py:50
-msgid "Error {}: Specified port is not an output. Only outputs can be monitored."
-msgstr "Λάθος {}: Η καθορισμένη θύρα δεν είναι έξοδος. Μόνο οι εξόδους μπορούν να παρακολουθούνται."
-
-#: errors.py:52
-msgid "Error {}: Specified port is already being monitored."
-msgstr "Λάθος {}: Ο καθορισμένος λιμένας παρακολουθείται ήδη."
-
-#: errors.py:55
-msgid "Error {}: Expected section header 'DEVICES'."
-msgstr "Λάθος {}: Αναμενόμενη κεφαλίδα ενότητας 'DEVICES'."
-
-#: errors.py:57
-msgid "Error {}: Expected section header 'CONNECTIONS'."
-msgstr "Λάθος {}: Αναμενόμενη κεφαλίδα ενότητας 'CONNECTIONS'."
-
-#: errors.py:59
-msgid "Error {}: There is no section header MONITOR, but a third section after the semicolon is found on file. Either semicolon is not placed correctly or section header is missing."
-msgstr "Λάθος {}: Δεν υπάρχει κεφαλίδα ενότητας MONITOR, αλλά ένα τρίτο τμήμα μετά το ερωτηματικό βρίσκεται στο αρχείο. Οποιοδήποτε ερωτηματικό δεν τοποθετείται σωστά ή λείπει η κεφαλίδα ενότητας."
-
-#: errors.py:61
-msgid "Error {}: Expected a colon after the section header."
-msgstr "Λάθος {}: Αναμενόταν ένα παχύ τελεία μετά την κεφαλίδα ενότητας."
-
-#: errors.py:63
-msgid "Error {}: Expected a semicolon at the end of the list."
-msgstr "Λάθος {}: Αναμενόταν ένα ερωτηματικό στο τέλος της λίστας."
-
-#: errors.py:65
-msgid "Error {}: Invalid device name. Name must start with a letter and must consist of letters and digits only. Name can't be the same as one of the device types."
-msgstr "Λάθος {}: Μη έγκυρο όνομα συσκευής. Το όνομα πρέπει να ξεκινά με ένα γράμμα και πρέπει να αποτελείται μόνο από γράμματα και ψηφία. Το όνομα δεν μπορεί να είναι το ίδιο με έναν από τους τύπους συσκευών."
-
-#: errors.py:67
-msgid "Error {}: A comma between list items or a semicolon at the end of the list expected."
-msgstr "Λάθος {}: Ένα κόμμα ανάμεσα στα στοιχεία λίστας ή ένα ερωτηματικό στο τέλος της λίστας αναμένεται."
-
-#: errors.py:69
-msgid "Error {}: After dot a valid input or output port should follow."
-msgstr "Λάθος {}: Μετά την κουκίδα πρέπει να ακολουθήσει μια έγκυρη θύρα εισόδου ή εξόδου."
-
-#: errors.py:71
-msgid "Error {}: Port must be a valid output of the specified device."
-msgstr "Λάθος {}: Η θύρα πρέπει να είναι μια έγκυρη έξοδος της συγκεκριμένης συσκευής."
-
-#: errors.py:73
-msgid "Error {}: Port must be a valid input of the specified device."
-msgstr "Λάθος {}: Η θύρα πρέπει να είναι μια έγκυρη είσοδος της συγκεκριμένης συσκευής."
-
-#: errors.py:75
-msgid "Error {}: Missing arrow in the connection description."
-msgstr "Λάθος {}: Λείπει το βέλος στην περιγραφή της σύνδεσης."
-
-#: errors.py:77
-msgid "Error {}: Not all inputs in the network are connected. Please check your circuit diagram."
-msgstr "Λάθος {}: Δεν συνδέονται όλες οι εισόδους στο δίκτυο. Ελέγξτε το διάγραμμα κυκλωμάτων σας."
-
-#: errors.py:79
-msgid "Error {}: Unexpected symbol detected."
-msgstr "Λάθος {}: Εμφανίστηκε απροσδόκητο σύμβολο."
-
-#: errors.py:81
-msgid "Error {}: File ended abruptly."
-msgstr "Λάθος {}: Το αρχείο έληξε απότομα."
-
-#: errors.py:83
-msgid "Error {}: A comma was found instead of a semicolon at the end of the list. Or a section header is missplaced. Please check the definition file."
-msgstr "Λάθος {}: Ένα κόμμα βρέθηκε αντί για ένα ερωτηματικό στο τέλος της λίστας. Ή μια κεφαλίδα ενότητας δεν είναι σωστή. Ελέγξτε το αρχείο ορισμού."
 
 #: gui.py:446
 msgid "&Open File"
@@ -145,31 +37,31 @@ msgstr "&Αρχείο"
 msgid "&Language"
 msgstr "&Γλώσσα"
 
-#: gui.py:481
+#: gui.py:482
 msgid "Cycles:"
 msgstr "Κύκλοι:"
 
-#: gui.py:485
+#: gui.py:486
 msgid "Run"
 msgstr "Τρέξιμο"
 
-#: gui.py:486
+#: gui.py:487
 msgid "Continue"
 msgstr "Να συνεχίσει"
 
-#: gui.py:506
+#: gui.py:507
 msgid "Monitors:"
 msgstr "Οθόνες:"
 
-#: gui.py:540
+#: gui.py:541
 msgid "0"
 msgstr "0"
 
-#: gui.py:541
+#: gui.py:542
 msgid "1"
 msgstr "1"
 
-#: gui.py:570
+#: gui.py:571
 msgid ""
 "Logic Simulator\n"
 "Created by Mojisola Agboola\n"
@@ -179,204 +71,295 @@ msgstr ""
 "Δημιουργήθηκε από Mojisola Agboola\n"
 "2017"
 
-#: gui.py:570
+#: gui.py:571
 msgid "About Logsim"
 msgstr "Σχετικά με Logsim"
 
-#: gui.py:578
+#: gui.py:583
 msgid "Open"
 msgstr "Ανοιξε"
 
-#: gui.py:579
-msgid "Text files (*.txt)|*.txt"
-msgstr ""
-
-#: gui.py:595
+#: gui.py:601
 msgid "Error: Unable to load file"
 msgstr "Λάθος: Δεν είναι δυνατή η φόρτωση αρχείου"
 
-#: gui.py:595
-#: gui.py:625
-#: gui.py:637
-#: gui.py:667
-#: gui.py:692
-#: gui.py:722
+#: gui.py:601
+#: gui.py:631
+#: gui.py:643
+#: gui.py:673
+#: gui.py:698
+#: gui.py:728
 msgid "Error"
-msgstr "Error"
+msgstr "Λάθος:"
 
-#: gui.py:625
-#, fuzzy
+#: gui.py:631
 msgid "Error: Cannot run for more than a total of {} cycles"
-msgstr "Δεν είναι δυνατή η εκτέλεση για περισσότερο από {} κύκλους συνολικά"
+msgstr "Λάθος: Δεν είναι δυνατή η εκτέλεση για περισσότερο από {} κύκλους συνολικά"
 
-#: gui.py:637
-#: userint.py:255
+#: gui.py:643
 msgid "Error: Network oscillating."
 msgstr "Λάθος: Το δίκτυο ταλαντώνεται."
 
-#: gui.py:667
-#, fuzzy
+#: gui.py:673
 msgid "Error: Corrupt signal value"
-msgstr "Λάθος - "
+msgstr "Λάθος: Τιμή αλλοιωμένου σήματος"
 
-#: gui.py:692
-#, fuzzy
+#: gui.py:698
 msgid "Error: BAD DEVICE found"
-msgstr "Λάθος - "
+msgstr "Λάθος: Βρήκε κακή συσκευή"
 
-#: gui.py:722
-#, fuzzy
+#: gui.py:728
 msgid "Error: Failed to set switch value"
-msgstr "Λάθος - "
+msgstr "Λάθος: Δεν ήταν δυνατή η ρύθμιση της τιμής του διακόπτη"
 
-#: logsim.py:37
-msgid ""
-"Usage:\n"
-"Show help: logsim.py -h\n"
-"Command line user interface: logsim.py -c <file path> [lang=<language code>]\n"
-"Graphical user interface: logsim.py <file path> [lang=<language code>]"
-msgstr ""
-"Χρήση:\n"
-"Εμφάνιση βοήθειας: logsim.py -h\n"
-"Γραμμή εντολών, περιβάλλον χρήστη: logsim.py -c <διαδρομή αρχείου> [lang=<κωδικό γλώσσας>]\n"
-"Γραφικό περιβάλλον χρήστη: logsim.py <διαδρομή αρχείου> [lang=<κωδικό γλώσσας>]"
+#~ msgid "Error {}: Invalid parameter for the specified device."
+#~ msgstr "Λάθος {}: Μη έγκυρη παράμετρος για τη συγκεκριμένη συσκευή."
 
-#: logsim.py:44
-msgid "Error: Invalid command line arguments.\n"
-msgstr "Λάθος: Μη έγκυρα επιχειρήματα γραμμής εντολών.\n"
+#~ msgid "Error {}: Missing parameter for the specified device."
+#~ msgstr "Λάθος {}: Λείπει παράμετρος για τη συγκεκριμένη συσκευή."
 
-#: logsim.py:77
-msgid "Error: Only the file path and the language can be specified.\n"
-msgstr "Λάθος: Μόνο η διαδρομή του αρχείου και η γλώσσα μπορούν να καθοριστούν.\n"
+#~ msgid ""
+#~ "Error {}: Invalid device. Supported devices: SWITCH, CLOCK, AND, NAND, "
+#~ "OR, NOR, XOR, DTYPE, RC."
+#~ msgstr ""
+#~ "Λάθος {}: Μη έγκυρη συσκευή. Υποστηριζόμενες συσκευές: SWITCH, CLOCK, "
+#~ "AND, NAND, OR, NOR, XOR, DTYPE, RC."
 
-#: logsim.py:88
-msgid "Error: Language specified incorrectly. Specify using 'lang=<language code>'"
-msgstr "Λάθος: Η γλώσσα που καθορίστηκε εσφαλμένα. Καθορίστε τη χρήση 'lang=<κωδικό γλώσσας>'"
+#~ msgid "Error {}: Specified devices does not need any parameters."
+#~ msgstr ""
+#~ "Λάθος {}: Οι συγκεκριμένες συσκευές δεν χρειάζονται καμία παράμετρο."
 
-#: logsim.py:89
-#: logsim.py:95
-msgid "Language will default to English."
-msgstr "Η προεπιλεγμένη γλώσσα θα είναι στα Αγγλικά."
+#~ msgid "Error {}: Device with such name already exists."
+#~ msgstr "Λάθος {}: Η συσκευή με αυτό το όνομα υπάρχει ήδη."
 
-#: logsim.py:94
-msgid "Error: Unknown language code. Supported languages: 'en' (English), 'el' (Greek)."
-msgstr "Λάθος: Άγνωστος κωδικός γλώσσας. Υποστηριζόμενες γλώσσες: 'en' (Αγγλικά), 'el' (Ελληνικά)."
+#~ msgid ""
+#~ "Error {}: An input is connected to an input. Must be output -> input."
+#~ msgstr ""
+#~ "Λάθος {}: Μια είσοδος συνδέεται με μια είσοδο. Πρέπει να είναι παραγωγή -"
+#~ "> εισαγωγή."
 
-#: logsim.py:100
-msgid "Logic Simulator"
-msgstr "Λογικός προσομοιωτής"
+#~ msgid ""
+#~ "Error {}: An output is connected to an output. Must be output -> input."
+#~ msgstr ""
+#~ "Λάθος {}: Μια έξοδος συνδέεται με μια έξοδο. Πρέπει να είναι παραγωγή -> "
+#~ "εισαγωγή."
 
-#: parse.py:122
-msgid "Total number of errors detected: {}"
-msgstr "Συνολικός αριθμός ανιχνευθέντων σφαλμάτων: {}"
+#~ msgid "Error {}: Specified input is already connected."
+#~ msgstr "Λάθος {}: Η καθορισμένη είσοδος είναι ήδη συνδεδεμένη."
 
-#: scanner.py:40
-msgid "Error: Filename incorrect or file doesn't exist."
-msgstr "Λάθος: Το όνομα αρχείου ή το αρχείο δεν υπάρχουν."
+#~ msgid "Error {}: Invalid input or output port."
+#~ msgstr "Λάθος {}: Μη έγκυρη θύρα εισόδου ή εξόδου."
 
-#: scanner.py:143
-#: scanner.py:168
-#: scanner.py:185
-#: scanner.py:194
-msgid "Line "
-msgstr "Γραμμή "
+#~ msgid "Error {}: Device has not been defined."
+#~ msgstr "Λάθος {}: Η συσκευή δεν έχει οριστεί."
 
-#: userint.py:84
-msgid ""
-"Logic Simulator: interactive command line user interface.\n"
-"Enter 'h' for help."
-msgstr ""
-"Προσομοιωτής λογικής: διαδραστική διεπαφή χρήστη γραμμής εντολών.\n"
-"Πληκτρολογήστε 'h' για βοήθεια."
+#~ msgid ""
+#~ "Error {}: Specified port is not an output. Only outputs can be monitored."
+#~ msgstr ""
+#~ "Λάθος {}: Η καθορισμένη θύρα δεν είναι έξοδος. Μόνο οι εξόδους μπορούν να "
+#~ "παρακολουθούνται."
 
-#: userint.py:102
-msgid "Error: Invalid command. Enter 'h' for help."
-msgstr "Λάθος: Ακυρη εντολή. Πληκτρολογήστε 'h' για βοήθεια."
+#~ msgid "Error {}: Specified port is already being monitored."
+#~ msgstr "Λάθος {}: Ο καθορισμένος λιμένας παρακολουθείται ήδη."
 
-#: userint.py:137
-msgid "Error: Expected a name."
-msgstr "Λάθος: Αναμενόμενο όνομα."
+#~ msgid "Error {}: Expected section header 'DEVICES'."
+#~ msgstr "Λάθος {}: Αναμενόμενη κεφαλίδα ενότητας 'DEVICES'."
 
-#: userint.py:155
-msgid "Error: Unknown name."
-msgstr "Λάθος: Άγνωστο όνομα."
+#~ msgid "Error {}: Expected section header 'CONNECTIONS'."
+#~ msgstr "Λάθος {}: Αναμενόμενη κεφαλίδα ενότητας 'CONNECTIONS'."
 
-#: userint.py:183
-msgid "Error: Expected a number."
-msgstr "Λάθος: Αναμενόταν ένας αριθμός."
+#~ msgid ""
+#~ "Error {}: There is no section header MONITOR, but a third section after "
+#~ "the semicolon is found on file. Either semicolon is not placed correctly "
+#~ "or section header is missing."
+#~ msgstr ""
+#~ "Λάθος {}: Δεν υπάρχει κεφαλίδα ενότητας MONITOR, αλλά ένα τρίτο τμήμα "
+#~ "μετά το ερωτηματικό βρίσκεται στο αρχείο. Οποιοδήποτε ερωτηματικό δεν "
+#~ "τοποθετείται σωστά ή λείπει η κεφαλίδα ενότητας."
 
-#: userint.py:192
-#: userint.py:197
-msgid "Error: Number out of range."
-msgstr "Λάθος: Αριθμός εκτός εμβέλειας."
+#~ msgid "Error {}: Expected a colon after the section header."
+#~ msgstr "Λάθος {}: Αναμενόταν ένα παχύ τελεία μετά την κεφαλίδα ενότητας."
 
-#: userint.py:204
-msgid "User commands:"
-msgstr "Εντολές χρηστών:"
+#~ msgid "Error {}: Expected a semicolon at the end of the list."
+#~ msgstr "Λάθος {}: Αναμενόταν ένα ερωτηματικό στο τέλος της λίστας."
 
-#: userint.py:205
-msgid "r N       - run the simulation for N cycles"
-msgstr "r N       - εκτελέστε τη προσομοίωση για κύκλους N"
+#~ msgid ""
+#~ "Error {}: Invalid device name. Name must start with a letter and must "
+#~ "consist of letters and digits only. Name can't be the same as one of the "
+#~ "device types."
+#~ msgstr ""
+#~ "Λάθος {}: Μη έγκυρο όνομα συσκευής. Το όνομα πρέπει να ξεκινά με ένα "
+#~ "γράμμα και πρέπει να αποτελείται μόνο από γράμματα και ψηφία. Το όνομα "
+#~ "δεν μπορεί να είναι το ίδιο με έναν από τους τύπους συσκευών."
 
-#: userint.py:206
-msgid "c N       - continue the simulation for N cycles"
-msgstr "c N       - συνεχίστε την προσομοίωση για τους κύκλους Ν"
+#~ msgid ""
+#~ "Error {}: A comma between list items or a semicolon at the end of the "
+#~ "list expected."
+#~ msgstr ""
+#~ "Λάθος {}: Ένα κόμμα ανάμεσα στα στοιχεία λίστας ή ένα ερωτηματικό στο "
+#~ "τέλος της λίστας αναμένεται."
 
-#: userint.py:207
-msgid "s X N     - set switch X to N (0 or 1)"
-msgstr "s X N     - ρυθμίστε το διακόπτη X στο N (0 ή 1)"
+#~ msgid "Error {}: After dot a valid input or output port should follow."
+#~ msgstr ""
+#~ "Λάθος {}: Μετά την κουκίδα πρέπει να ακολουθήσει μια έγκυρη θύρα εισόδου "
+#~ "ή εξόδου."
 
-#: userint.py:208
-msgid "m X       - set a monitor on signal X"
-msgstr "m X       - ορίστε μια οθόνη στο σήμα X"
+#~ msgid "Error {}: Port must be a valid output of the specified device."
+#~ msgstr ""
+#~ "Λάθος {}: Η θύρα πρέπει να είναι μια έγκυρη έξοδος της συγκεκριμένης "
+#~ "συσκευής."
 
-#: userint.py:209
-msgid "z X       - zap the monitor on signal X"
-msgstr "z X       - ενεργοποιήστε την οθόνη στο σήμα X"
+#~ msgid "Error {}: Port must be a valid input of the specified device."
+#~ msgstr ""
+#~ "Λάθος {}: Η θύρα πρέπει να είναι μια έγκυρη είσοδος της συγκεκριμένης "
+#~ "συσκευής."
 
-#: userint.py:210
-msgid "h         - help (this command)"
-msgstr "h         - βοήθεια (αυτή η εντολή)"
+#~ msgid "Error {}: Missing arrow in the connection description."
+#~ msgstr "Λάθος {}: Λείπει το βέλος στην περιγραφή της σύνδεσης."
 
-#: userint.py:211
-msgid "q         - quit the program"
-msgstr "q         - τερματίστε το πρόγραμμα"
+#~ msgid ""
+#~ "Error {}: Not all inputs in the network are connected. Please check your "
+#~ "circuit diagram."
+#~ msgstr ""
+#~ "Λάθος {}: Δεν συνδέονται όλες οι εισόδους στο δίκτυο. Ελέγξτε το "
+#~ "διάγραμμα κυκλωμάτων σας."
 
-#: userint.py:220
-msgid "Successfully set switch."
-msgstr "Επιτυχώς ο διακόπτης."
+#~ msgid "Error {}: Unexpected symbol detected."
+#~ msgstr "Λάθος {}: Εμφανίστηκε απροσδόκητο σύμβολο."
 
-#: userint.py:222
-msgid "Error: Invalid switch."
-msgstr "Λάθος: Μη έγκυρος διακόπτης."
+#~ msgid "Error {}: File ended abruptly."
+#~ msgstr "Λάθος {}: Το αρχείο έληξε απότομα."
 
-#: userint.py:232
-msgid "Successfully made monitor."
-msgstr "Επιτυχής παρακολούθηση."
+#~ msgid ""
+#~ "Error {}: A comma was found instead of a semicolon at the end of the "
+#~ "list. Or a section header is missplaced. Please check the definition file."
+#~ msgstr ""
+#~ "Λάθος {}: Ένα κόμμα βρέθηκε αντί για ένα ερωτηματικό στο τέλος της "
+#~ "λίστας. Ή μια κεφαλίδα ενότητας δεν είναι σωστή. Ελέγξτε το αρχείο "
+#~ "ορισμού."
 
-#: userint.py:234
-msgid "Error: Could not make monitor."
-msgstr "Λάθος: Δεν ήταν δυνατή η δημιουργία της οθόνης."
+#~ msgid ""
+#~ "Usage:\n"
+#~ "Show help: logsim.py -h\n"
+#~ "Command line user interface: logsim.py -c <file path> [lang=<language "
+#~ "code>]\n"
+#~ "Graphical user interface: logsim.py <file path> [lang=<language code>]"
+#~ msgstr ""
+#~ "Χρήση:\n"
+#~ "Εμφάνιση βοήθειας: logsim.py -h\n"
+#~ "Γραμμή εντολών, περιβάλλον χρήστη: logsim.py -c <διαδρομή αρχείου> "
+#~ "[lang=<κωδικό γλώσσας>]\n"
+#~ "Γραφικό περιβάλλον χρήστη: logsim.py <διαδρομή αρχείου> [lang=<κωδικό "
+#~ "γλώσσας>]"
 
-#: userint.py:242
-msgid "Successfully zapped monitor"
-msgstr "Η παρακολούθηση ολοκληρώθηκε με επιτυχία"
+#~ msgid "Error: Invalid command line arguments.\n"
+#~ msgstr "Λάθος: Μη έγκυρα επιχειρήματα γραμμής εντολών.\n"
 
-#: userint.py:244
-msgid "Error: Could not zap monitor."
-msgstr "Λάθος: Δεν ήταν δυνατή η παρακολούθηση του προγράμματος."
+#~ msgid "Error: Only the file path and the language can be specified.\n"
+#~ msgstr ""
+#~ "Λάθος: Μόνο η διαδρομή του αρχείου και η γλώσσα μπορούν να καθοριστούν.\n"
 
-#: userint.py:267
-msgid "Running for {} cycles"
-msgstr "Λειτουργεί για {} κύκλους"
+#~ msgid ""
+#~ "Error: Language specified incorrectly. Specify using 'lang=<language "
+#~ "code>'"
+#~ msgstr ""
+#~ "Λάθος: Η γλώσσα που καθορίστηκε εσφαλμένα. Καθορίστε τη χρήση "
+#~ "'lang=<κωδικό γλώσσας>'"
 
-#: userint.py:277
-msgid "Error: Nothing to continue. Run first."
-msgstr "Λάθος: Τίποτα δεν θα συνεχιστεί. Εκτελέστε πρώτα."
+#~ msgid "Language will default to English."
+#~ msgstr "Η προεπιλεγμένη γλώσσα θα είναι στα Αγγλικά."
 
-#: userint.py:280
-msgid "Continuing for {} cycles. Total: {} "
-msgstr "Συνεχίζοντας για {} κύκλους. Σύνολο: {}"
+#~ msgid ""
+#~ "Error: Unknown language code. Supported languages: 'en' (English), "
+#~ "'el' (Greek)."
+#~ msgstr ""
+#~ "Λάθος: Άγνωστος κωδικός γλώσσας. Υποστηριζόμενες γλώσσες: 'en' (Αγγλικά), "
+#~ "'el' (Ελληνικά)."
+
+#~ msgid "Logic Simulator"
+#~ msgstr "Λογικός προσομοιωτής"
+
+#~ msgid "Total number of errors detected: {}"
+#~ msgstr "Συνολικός αριθμός ανιχνευθέντων σφαλμάτων: {}"
+
+#~ msgid "Error: Filename incorrect or file doesn't exist."
+#~ msgstr "Λάθος: Το όνομα αρχείου ή το αρχείο δεν υπάρχουν."
+
+#~ msgid "Line "
+#~ msgstr "Γραμμή "
+
+#~ msgid ""
+#~ "Logic Simulator: interactive command line user interface.\n"
+#~ "Enter 'h' for help."
+#~ msgstr ""
+#~ "Προσομοιωτής λογικής: διαδραστική διεπαφή χρήστη γραμμής εντολών.\n"
+#~ "Πληκτρολογήστε 'h' για βοήθεια."
+
+#~ msgid "Error: Invalid command. Enter 'h' for help."
+#~ msgstr "Λάθος: Ακυρη εντολή. Πληκτρολογήστε 'h' για βοήθεια."
+
+#~ msgid "Error: Expected a name."
+#~ msgstr "Λάθος: Αναμενόμενο όνομα."
+
+#~ msgid "Error: Unknown name."
+#~ msgstr "Λάθος: Άγνωστο όνομα."
+
+#~ msgid "Error: Expected a number."
+#~ msgstr "Λάθος: Αναμενόταν ένας αριθμός."
+
+#~ msgid "Error: Number out of range."
+#~ msgstr "Λάθος: Αριθμός εκτός εμβέλειας."
+
+#~ msgid "User commands:"
+#~ msgstr "Εντολές χρηστών:"
+
+#~ msgid "r N       - run the simulation for N cycles"
+#~ msgstr "r N       - εκτελέστε τη προσομοίωση για κύκλους N"
+
+#~ msgid "c N       - continue the simulation for N cycles"
+#~ msgstr "c N       - συνεχίστε την προσομοίωση για τους κύκλους Ν"
+
+#~ msgid "s X N     - set switch X to N (0 or 1)"
+#~ msgstr "s X N     - ρυθμίστε το διακόπτη X στο N (0 ή 1)"
+
+#~ msgid "m X       - set a monitor on signal X"
+#~ msgstr "m X       - ορίστε μια οθόνη στο σήμα X"
+
+#~ msgid "z X       - zap the monitor on signal X"
+#~ msgstr "z X       - ενεργοποιήστε την οθόνη στο σήμα X"
+
+#~ msgid "h         - help (this command)"
+#~ msgstr "h         - βοήθεια (αυτή η εντολή)"
+
+#~ msgid "q         - quit the program"
+#~ msgstr "q         - τερματίστε το πρόγραμμα"
+
+#~ msgid "Successfully set switch."
+#~ msgstr "Επιτυχώς ο διακόπτης."
+
+#~ msgid "Error: Invalid switch."
+#~ msgstr "Λάθος: Μη έγκυρος διακόπτης."
+
+#~ msgid "Successfully made monitor."
+#~ msgstr "Επιτυχής παρακολούθηση."
+
+#~ msgid "Error: Could not make monitor."
+#~ msgstr "Λάθος: Δεν ήταν δυνατή η δημιουργία της οθόνης."
+
+#~ msgid "Successfully zapped monitor"
+#~ msgstr "Η παρακολούθηση ολοκληρώθηκε με επιτυχία"
+
+#~ msgid "Error: Could not zap monitor."
+#~ msgstr "Λάθος: Δεν ήταν δυνατή η παρακολούθηση του προγράμματος."
+
+#~ msgid "Running for {} cycles"
+#~ msgstr "Λειτουργεί για {} κύκλους"
+
+#~ msgid "Error: Nothing to continue. Run first."
+#~ msgstr "Λάθος: Τίποτα δεν θα συνεχιστεί. Εκτελέστε πρώτα."
+
+#~ msgid "Continuing for {} cycles. Total: {} "
+#~ msgstr "Συνεχίζοντας για {} κύκλους. Σύνολο: {}"
 
 #~ msgid "Number of cycles"
 #~ msgstr "Αριθμός κύκλων"
