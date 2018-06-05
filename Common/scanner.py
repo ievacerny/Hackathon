@@ -214,7 +214,7 @@ class Scanner:
 
         elif before is False and arrow is False:
             # Prints the current line with a caret beneath the current symbol
-            
+
             line = self.list_file[self.line_count]
             cur_index = self.line_count
             str_index = str(cur_index + 1)
@@ -309,8 +309,9 @@ class Scanner:
                     self.space_count += 1
 
                 elif self.current_character == '\\':    # single line comment (\\)
-                    while self.current_character != '\n':
+                    while self.current_character != '\n' and self.current_character != '':
                         self.advance()
+
                 else:   # there is only one slash meaning this isn't a recognised symbol
                     self.prev_symbol = self.current_symbol
                     self.current_symbol = "\\"
