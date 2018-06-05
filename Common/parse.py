@@ -248,7 +248,8 @@ class Parser:
         # Report an error if expected parameter is not a number
         elif (device_type in self.type_id_list and
               device_type != self.devices.D_TYPE and
-              device_type != self.devices.XOR):
+              device_type != self.devices.XOR and
+              device_type != self.devices.NOT):
             no_error &= self._error(self.devices.INVALID_QUALIFIER)
 
         # Parse delimiter
