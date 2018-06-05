@@ -119,7 +119,7 @@ class Parser:
 
         # Print total number of errors
         if not no_error:
-            print(_("Total number of errors detected: {}")
+            print("Total number of errors detected: {}"
                   .format(self.error_counter))
         return no_error
 
