@@ -225,7 +225,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             #Draw colored panel behind signal
             self.render_rectangle([corner_x, corner_y], 
             					  self.panel_height, size.width - corner_x - self.right_offset, 
-            					  color, 0.2) 
+            					  color, 0.1) 
 
             #Truncate names that exceed 10 characters
             if len(device_name) > self.max_margin: 
@@ -435,11 +435,8 @@ class Gui(wx.Frame):
 
     def __init__(self, title, path, names, devices, network, monitors):
         """Initialise widgets and layout."""
-        super().__init__(parent=None, title=title, size=(800, 600))
-        self.initialise(path, names, devices, network, monitors) 
+        super().__init__(parent=None, title=title, size=(900, 600))
 
-
-    def initialise(self, path, names, devices, network, monitors): 
         # Configure the file menu
         fileMenu = wx.Menu()
         menuBar = wx.MenuBar()
@@ -456,6 +453,7 @@ class Gui(wx.Frame):
         menuBar.Append(fileMenu, _("&File"))
         menuBar.Append(langMenu, _("&Language"))
         self.SetMenuBar(menuBar)
+        self.Bind(wx.EVT_MENU, self.on_menu)
 
         #store external class instances as local attributes
         self.path = path
@@ -487,33 +485,59 @@ class Gui(wx.Frame):
         self.continue_button = wx.Button(self, wx.ID_ANY, _("Continue"), size=self.button_size)
 
         # Bind events to widgets
-        self.Bind(wx.EVT_MENU, self.on_menu)
         self.run_button.Bind(wx.EVT_BUTTON, self.on_run_button)
         self.continue_button.Bind(wx.EVT_BUTTON, self.on_continue_button)
 
-        # Configure sizers for layout
-        main_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        side_sizer = wx.BoxSizer(wx.VERTICAL)
+        # Configure sizers for layout and add widgets to sizers
+        self.main_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.side_sizer_parent = wx.BoxSizer(wx.VERTICAL)
+        self.side_sizer_cycles = wx.BoxSizer(wx.VERTICAL)
+        self.side_sizer_monitor = wx.BoxSizer(wx.VERTICAL)
+        
+        self.main_sizer.Add(self.canvas, 5, wx.EXPAND | wx.ALL, 5)
+        self.main_sizer.Add(self.side_sizer_parent, 1, wx.ALL, 5)
+        self.side_sizer_parent.Add(self.side_sizer_cycles, 1, wx.ALL, 5)
+        self.side_sizer_parent.Add(self.side_sizer_monitor, 1, wx.ALL, 5)
 
-        main_sizer.Add(self.canvas, 5, wx.EXPAND | wx.ALL, 5)
-        main_sizer.Add(side_sizer, 1, wx.ALL, 5)
+        self.side_sizer_cycles.Add(self.text_cycles, 1, wx.TOP, 5)
+        self.side_sizer_cycles.Add(self.spin, 1, wx.ALL, 5)
+        self.side_sizer_cycles.Add(self.run_button, 1, wx.ALL, 5)
+        self.side_sizer_cycles.Add(self.continue_button, 1, wx.ALL, 5)
 
-        side_sizer.Add(self.text_cycles, 1, wx.TOP, 5)
-        side_sizer.Add(self.spin, 1, wx.ALL, 5)
-        side_sizer.Add(self.run_button, 1, wx.ALL, 5)
-        side_sizer.Add(self.continue_button, 1, wx.ALL, 5)
-       
+
         #Add 'Monitors' header
-        self.text_monitors = wx.StaticText(self, wx.ID_ANY, _("Monitors:"), size=self.button_size)
-        side_sizer.Add(self.text_monitors, 1, wx.TOP, 5)
+        self.text_monitors = wx.StaticText(self, wx.ID_ANY,
+                                           _("Monitors:"), size=self.button_size)
+        self.side_sizer_monitor.Add(self.text_monitors, 1, wx.TOP, 5)
+        self.side_sizer_monitor.AddSpacer(10)
+       
+        #--------------------MONITORS (SCROLLING) PANEL-----------------------------
+
+        #Add checkboxes for monitor control
+        self.checkbox_size = wx.Size(80,20)
+        self.radiobutton_size = wx.Size(50,20)
+
+        self.set_monitor_panel()
+
+        #---------------------------------------------------------------------------
+
+        self.SetSizeHints(300, 300)
+        self.SetSizer(self.main_sizer)
+
+
+    def set_monitor_panel(self):
+
+        #Panel setup
+        self.scrolled_panel = scrolled.ScrolledPanel(self,-1,size=(130,800),style = wx.TAB_TRAVERSAL|wx.SUNKEN_BORDER)
+        self.scrolled_panel.SetupScrolling()
+        self.scrolled_panel_sizer = wx.BoxSizer(wx.VERTICAL)
+
+        self.checkbox_list = []
+        self.radiobutton_list = []
 
         #Get full list of device names 
         [monitored_list,non_monitored_list] = self.monitors.get_signal_names()
         full_list = monitored_list + non_monitored_list
-        
-        #Add checkboxes for monitor control
-        self.checkbox_size = wx.Size(20,20)
-        self.radiobutton_size = wx.Size(50,20)
 
         for device_name in full_list:
             #Generate checkbox object and assign label and name to it
@@ -521,16 +545,16 @@ class Gui(wx.Frame):
             if len(label) > self.canvas.max_margin: #Truncate names that exceed 10 characters
                 label = device_name[:self.canvas.max_margin - 3] + '...' #-3 to give space for '...'
 
-            checkbox = wx.CheckBox(self,wx.ID_ANY,label,size = self.checkbox_size) 
+            checkbox = wx.CheckBox(self.scrolled_panel,wx.ID_ANY,label,size = self.checkbox_size) 
             checkbox.Bind(wx.EVT_CHECKBOX,self.on_checkbox) #one event handler for all checkboxes
             checkbox.name = device_name #need this since we cannot refer to device using truncated name
-            
-            # Tick boxes for devices that are already being monitored 
             if device_name in monitored_list: #set to default value for devices already being monitored
                 checkbox.SetValue(True)
 
+            self.checkbox_list.append(checkbox)
+
             #Add monitoring checkbox
-            side_sizer.Add(checkbox, 1, wx.ALL, 5)
+            self.scrolled_panel_sizer.Add(checkbox, 1, wx.ALL, 5)
 
             #If device is a switch, add a radio button control below it
             [device_id, output_id] = self.devices.get_signal_ids(device_name)
@@ -538,8 +562,10 @@ class Gui(wx.Frame):
             device_type = device_object.device_kind
 
             if device_type == self.devices.SWITCH:
-                radio_0 = wx.RadioButton(self,wx.ID_ANY,_('0'),size=self.radiobutton_size,style=wx.RB_GROUP) #specify style to start a new group of radio buttons
-                radio_1 = wx.RadioButton(self,wx.ID_ANY,_('1'),size=self.radiobutton_size)
+                radio_0 = wx.RadioButton(self.scrolled_panel,wx.ID_ANY,_('0'),
+                                         size=self.radiobutton_size,style=wx.RB_GROUP) #specify style to start a new group of radio buttons
+                radio_1 = wx.RadioButton(self.scrolled_panel,wx.ID_ANY,_('1'),
+                                         size=self.radiobutton_size)
                 radio_0.Bind(wx.EVT_RADIOBUTTON,self.on_radiobutton)
                 radio_1.Bind(wx.EVT_RADIOBUTTON,self.on_radiobutton)
                 radio_0.name = device_name
@@ -554,10 +580,29 @@ class Gui(wx.Frame):
                 sub_side_sizer = wx.BoxSizer(wx.HORIZONTAL)
                 sub_side_sizer.Add(radio_0, 1, wx.ALL, 5)
                 sub_side_sizer.Add(radio_1, 1, wx.ALL, 5)
-                side_sizer.Add(sub_side_sizer, 1, wx.ALL, 5)
+                self.scrolled_panel_sizer.Add(sub_side_sizer, 1, wx.ALL, 5)
 
-        self.SetSizeHints(300, 300)
-        self.SetSizer(main_sizer)
+        self.scrolled_panel.SetSizer(self.scrolled_panel_sizer)
+        self.side_sizer_monitor.Add(self.scrolled_panel, 1, wx.ALL, 5)
+
+
+    def reset(self, path, names, devices, network, monitors):
+        #store external class instances as local attributes
+        self.path = path
+        self.names = names
+        self.devices = devices
+        self.network = network
+        self.monitors = monitors
+
+        self.run_network(True, self.num_cycles) #Pass True so that clocks and dtypes are initialised
+        self.update_canvas_monitors()
+        self.canvas.grid_big_value = self.num_cycles/5
+
+        self.scrolled_panel.Destroy()
+
+        self.set_monitor_panel()
+
+        self.side_sizer_monitor.Layout() #Draw sizer again to show properly
 
 
     def on_menu(self, event):
@@ -571,13 +616,12 @@ class Gui(wx.Frame):
             wx.MessageBox(_("Logic Simulator\nCreated by Mojisola Agboola\n2017"),_("About Logsim"), wx.ICON_INFORMATION | wx.OK)
         elif Id == self.ENGLISH_ID:
             gettext.install('logsim')
-            self.initialise(self.path, self.names, self.devices, self.network, self.monitors)
+            self.reset(self.path, self.names, self.devices, self.network, self.monitors)
         elif Id == self.GREEK_ID:
             el = gettext.translation('logsim', localedir='wx/locale', languages=['el'])
             el.install()
-            self.initialise(self.path, self.names, self.devices, self.network, self.monitors)
+            self.reset(self.path, self.names, self.devices, self.network, self.monitors)
             
-
 
     def load_file(self, event):
         open_file_dialog = wx.FileDialog(self, _("Open"), "", "", 
@@ -587,19 +631,19 @@ class Gui(wx.Frame):
         path = open_file_dialog.GetPath()
         
         if path:
-            #Initialise instances
-            names = Names()
-            devices = Devices(names)
-            network = Network(names, devices)
-            monitors = Monitors(names, devices, network)
-            scanner = Scanner(path, names)
-            parser = Parser(names, devices, network, monitors, scanner)
-    
-            if parser.parse_network():
-                self.initialise(path, names, devices, network, monitors)
-            else:
-                wx.MessageBox(_("Error: Unable to load file"),_("Error"), wx.ICON_INFORMATION | wx.OK)
+            if path[-4:] == '.txt':
+                #Initialise instances
+                names = Names()
+                devices = Devices(names)
+                network = Network(names, devices)
+                monitors = Monitors(names, devices, network)
+                scanner = Scanner(path, names)
+                parser = Parser(names, devices, network, monitors, scanner)
         
+                if parser.parse_network():
+                    self.reset(path, names, devices, network, monitors)
+                else:
+                    wx.MessageBox(_("Error: Invalid logic circuit definition file"),_("Error"), wx.ICON_INFORMATION | wx.OK)
         open_file_dialog.Destroy()
 
 
@@ -640,7 +684,7 @@ class Gui(wx.Frame):
             if self.network.execute_network():
                 self.monitors.record_signals()
             else:
-                wx.MessageBox(_("Error: Network oscillating."), _("Error"), wx.ICON_INFORMATION | wx.OK)
+                wx.MessageBox(_("Error: Network oscillating"), _("Error"), wx.ICON_INFORMATION | wx.OK)
 
 
     def update_canvas_monitors(self): 
@@ -694,8 +738,10 @@ class Gui(wx.Frame):
         #     return 'NOT'
         elif device_kind == self.devices.D_TYPE:
             return 'DTYPE'
+        elif device_kind == self.devices.RC:
+            return 'RC'
         else:
-            wx.MessageBox(_('Error: BAD DEVICE found'), _("Error"), wx.ICON_INFORMATION | wx.OK)
+            wx.MessageBox(_('Error: Unsupported device found'), _("Error"), wx.ICON_INFORMATION | wx.OK)
             return 'BAD DEVICE'
 
 
