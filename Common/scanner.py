@@ -103,7 +103,7 @@ class Scanner:
 
         return name
 
-    def cur_sym(self): # for testing
+    def cur_sym(self):  # for testing
         """Prints current symbol."""
 
         print(self.current_symbol)
