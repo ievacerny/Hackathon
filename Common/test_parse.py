@@ -13,6 +13,9 @@ Written by Ieva and Mark
 import pytest
 import operator
 
+import gettext
+gettext.install('logsim')
+
 from names import Names
 from devices import Devices
 from network import Network
@@ -118,6 +121,24 @@ def test_monitor_parsing(capsys, data, expected_error):
     # Compare printed message with expected
     out, err = capsys.readouterr()
     assert out[:len(expected_error_msg)] == expected_error_msg
+
+
+@pytest.mark.parametrize("file, expected_return", [
+    ("def_files/parser_test_file.txt", False),
+    ("def_files/parser_test_file1.txt", True),
+    ("def_files/parser_test_file2.txt", False),
+    ("def_files/parser_test_file3.txt", True)
+])
+def test_correct_parsing(file, expected_return):
+    """Test if parser distinguishes between bad and good definition files."""
+    names = Names()
+    devices = Devices(names)
+    network = Network(names, devices)
+    monitors = Monitors(names, devices, network)
+    scanner = Scanner(file, names)
+    parser = Parser(names, devices, network, monitors, scanner)
+    parsed_succesfully = parser.parse_network()
+    assert parsed_succesfully is expected_return
 
 
 # ------Tests below are written my Mark-------------------------

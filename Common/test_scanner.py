@@ -18,6 +18,7 @@ def init_scanner(data):
 # def test_scanner_keyword(test_scanner):
 #     assert test_scanner.get_symbol() == [3, 0]
 
+# TODO update all name ids
 
 @pytest.mark.parametrize("data, expected_output", [
     (',', [0, None]),
@@ -51,7 +52,9 @@ def init_scanner(data):
     ('\\\\ \n\\*A\\BC*\\\t.', [9, None]),
     ('\\\\ \n\\*A\\\\BC**\\.', [9, None]),
     ('\\\\ \n\\*A\\\\BC\\*\\.', [9, None]),
-    ('\\*', [7, None])
+    #('\\*', [7, None]),
+    ('NOT', [3, None]),  # TODO update id
+    ('RC', [3, None])  # TODO update id
 ])
 
 
@@ -264,4 +267,17 @@ def test_get_line(capsys, data, expected_output, error_prev_symb,
         scanner.get_symbol()
     scanner.get_line(error_prev_symb, no_arrow)
     out, err = capsys.readouterr()
-    assert out == expected_output, scanner.current_symbol
+    assert out == expected_output
+
+
+@pytest.mark.parametrize("file", [
+    ('definitelynonexistentfile.txt'),
+    ('definitelynonexistentfileordirectory'),
+    ('wx')  # Existent directory
+])
+def test_open_file_fail(capsys, file):
+    """Test if file opening failures are handeled correctly."""
+    Scanner(file, Names())
+    out, err = capsys.readouterr()
+    # TODO change the error message accordingly
+    assert err == "SystemExit"
