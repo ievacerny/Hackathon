@@ -34,6 +34,7 @@ class Scanner:
 
     def __init__(self, path, names):
         """Open specified file and initialise reserved words and IDs."""
+
         try:
             self.input_file = open(path, 'r')
         except (FileNotFoundError, IsADirectoryError):
@@ -44,7 +45,8 @@ class Scanner:
 
         self.names = names
         self.symbol_type_list = [self.COMMA, self.SEMICOLON, self.COLON,
-                                 self.KEYWORD, self.NUMBER, self.NAME, self.ARROW, self.EOF, self.NEWLINE, self.DOT] = range(10)
+                                 self.KEYWORD, self.NUMBER, self.NAME, self.ARROW,
+                                 self.EOF, self.NEWLINE, self.DOT] = range(10)
         self.keywords_list = ["DEVICES", "CONNECTIONS", "MONITOR", "DTYPE", "XOR", "AND", "NAND", "OR", "NOR", "SWITCH",
                               "CLOCK", "RC", "NOT"]
         self.names.lookup(self.keywords_list)
@@ -61,12 +63,16 @@ class Scanner:
         self.skip_spaces()
 
     def advance(self):
+        """reads one further character into the document"""
+
         char = self.input_file.read(1)
         self.character_count += 1
         self.current_character = char
         return char
 
     def skip_spaces(self):
+        """"advances until the character is no longer a space"""
+
         while self.current_character.isspace():
 
             if self.current_character == "\n":
@@ -78,6 +84,9 @@ class Scanner:
             self.character_count += 1
 
     def get_name(self):
+        """If the current character is a letter, advances until the current character isn't a letter or a number and
+        returns the name"""
+
         name = ''
         if self.current_character.isalpha():
             name = self.current_character
@@ -94,49 +103,66 @@ class Scanner:
 
         return name
 
-    def cur_sym(self):
+    def cur_sym(self): # for testing
+        """Prints current symbol."""
+
         print(self.current_symbol)
 
     def add_ignore(self):
+        """lines to ignore when calling get_line and printing the previous line as they have comments"""
+
         line_index = self.line_count
+
+        # The whole line is commented as only \* occurs at the beginning
         if ((self.list_file[line_index]).strip()).find('\\*') == 0 \
                 and ((self.list_file[line_index]).strip()).find('*\\') == -1:
             self.comment_lines.append(line_index)
 
+        # \* at the beginning of the line and *\ at the end of the line
         elif ((self.list_file[line_index]).strip()).find('*\\') == len(((self.list_file[line_index]).strip()))-2 \
                 and ((self.list_file[line_index]).strip()).find('\\*') == 0:
             self.comment_lines.append(line_index)
 
+        # The whole line is commented as only *\ occurs at the end
         elif ((self.list_file[line_index]).strip()).find('*\\') == len(((self.list_file[line_index]).strip()))-2 \
                 and ((self.list_file[line_index]).strip()).find('\\*') == -1:
             self.comment_lines.append(line_index)
 
+        # The whole line is commented as the line is between \* and *\ but neither occur in the line
         elif ((self.list_file[line_index]).strip()).find('\\*') == -1 \
                 and ((self.list_file[line_index]).strip()).find('*\\') == -1:
             self.comment_lines.append(line_index)
 
-    def get_line(self, before, arrow):  # arrow true means no arrow
+    def get_line(self, before, arrow):
+        """Called by the parser to print a line when an error occurs. If before is true, there is an issue with the
+        previous symbol, if false, the current symbol, if arrow is true, the caret line doesn't need to be
+        printed."""
+
         if before is True and arrow is False:
             symbol = self.current_symbol
             line = self.list_file[self.line_count]
             prev_line_index = self.line_count - 1
             character_no = self.character_count
 
+            # uses character count to find the last symbol while disregarding comments and spaces
             while self.list_file[prev_line_index].isspace() is True or len(self.list_file[prev_line_index]) == 0 \
                     or ((self.list_file[prev_line_index]).strip()).find('\\\\') == 0 \
-                            or prev_line_index in self.comment_lines:
+                    or prev_line_index in self.comment_lines:
                 prev_line_index -= 1
 
+            # if current symbol is the first on the line, then the previous symbol is the last on the previous line
             prev_line = self.list_file[prev_line_index]
 
             find_comment_end = (line.strip()).find('*\\') + 2
             line_cut = line[find_comment_end:]
             no_ws_cut = line_cut.strip()
 
-            if ((line.strip()).find(symbol) == 0 or ((line.strip()).find('*\\') != -1 and no_ws_cut.find(symbol) == 0
-                    and (line.strip()).find('\\*') == -1) or ((line.strip()).find('*\\') != -1 and
-                            line.strip().find('*\\') + 2 == (line.strip()).find(symbol)
-                                    and (line.strip()).find('\\*') == 0)):
+            # find the last symbol while ignoring comments
+            if ((line.strip()).find(symbol) == 0 or
+                ((line.strip()).find('*\\') != -1 and no_ws_cut.find(symbol) == 0
+                 and (line.strip()).find('\\*') == -1)
+                or ((line.strip()).find('*\\') != -1 and line.strip().find('*\\') + 2 == (line.strip()).find(symbol)
+                    and (line.strip()).find('\\*') == 0)):
 
                 str_index = str(prev_line_index+1)
                 len_index = len(str_index)
@@ -178,6 +204,8 @@ class Scanner:
                 print(' ' * (7 + len_index) + arrow_line + '^')
 
         elif before is False and arrow is True:
+            # Just prints the line without a caret
+
             line = self.list_file[self.line_count]
             cur_index = self.line_count
             str_index = str(cur_index + 1)
@@ -185,6 +213,8 @@ class Scanner:
             print('Line ' + str_index + ': ' + line)
 
         elif before is False and arrow is False:
+            # Prints the current line with a caret beneath the current symbol
+            
             line = self.list_file[self.line_count]
             cur_index = self.line_count
             str_index = str(cur_index + 1)
@@ -203,10 +233,13 @@ class Scanner:
                 else:
                     arrow_line = arrow_line + char
 
-            # print(arrow_line + '^')
             print(' ' * (7 + len_index) + arrow_line + '^')
 
     def get_number(self):
+
+        """When the current symbol is a number, advances until the end of the number and returns the number
+        as an integer"""
+
         number = ""
         if self.current_character.isdigit():
             number = self.current_character
@@ -244,15 +277,16 @@ class Scanner:
 
         self.skip_spaces()
 
-        while self.current_character == '\\':
+        while self.current_character == '\\':  # skipping over spaces
             if self.current_character == "\\":
                 self.advance()
 
-                if self.current_character == '*':
+                if self.current_character == '*':   # multi-line comment (between \* and *\)
                     self.add_ignore()
                     self.advance()
                     self.space_count += 2
 
+                    # stops when it finds the symbol corresponding the end of comment or at end of file
                     while self.current_character != '\\' and self.current_character != '':
 
                         while self.current_character != '*' and self.current_character != '':
@@ -274,10 +308,10 @@ class Scanner:
                     self.advance()
                     self.space_count += 1
 
-                elif self.current_character == '\\':
+                elif self.current_character == '\\':    # single line comment (\\)
                     while self.current_character != '\n':
                         self.advance()
-                else:
+                else:   # there is only one slash meaning this isn't a recognised symbol
                     self.prev_symbol = self.current_symbol
                     self.current_symbol = "\\"
                     return [None, None]
@@ -304,58 +338,58 @@ class Scanner:
             self.current_symbol = str(symbol_id)
             symbol_type = self.NUMBER
 
-        elif self.current_character == ",":
+        elif self.current_character == ",":  # comma
             self.prev_symbol = self.current_symbol
             self.current_symbol = self.current_character
             symbol_type = self.COMMA
             symbol_id = None
             self.advance()
 
-        elif self.current_character == ";":
+        elif self.current_character == ";":  # semi-colon
             self.prev_symbol = self.current_symbol
             self.current_symbol = self.current_character
             symbol_type = self.SEMICOLON
             symbol_id = None
             self.advance()
 
-        elif self.current_character == ":":
+        elif self.current_character == ":":  # colon
             self.prev_symbol = self.current_symbol
             self.current_symbol = self.current_character
             symbol_type = self.COLON
             symbol_id = None
             self.advance()
 
-        elif self.current_character == ".":
+        elif self.current_character == ".":  # dot
             self.prev_symbol = self.current_symbol
             self.current_symbol = self.current_character
             symbol_type = self.DOT
             symbol_id = None
             self.advance()
 
-        elif self.current_character == '\n':
+        elif self.current_character == '\n':  # new line
             self.prev_symbol = self.current_symbol
             self.current_symbol = self.current_character
             symbol_type = self.NEWLINE
             symbol_id = None
             self.advance()
 
-        elif self.current_character == "":
+        elif self.current_character == "":  # end of file
             self.prev_symbol = self.current_symbol
             self.current_symbol = self.current_character
             symbol_type = self.EOF
             symbol_id = None
 
-        elif self.current_character == "-":
+        elif self.current_character == "-":  # detecting first character of arrow
             self.prev_symbol = self.current_symbol
             self.current_symbol = self.current_character
             self.advance()
-            if self.current_character == ">":
+            if self.current_character == ">":  # completing arrow
                 self.prev_symbol = self.current_symbol
                 self.current_symbol = self.current_character
                 symbol_type = self.ARROW
                 symbol_id = None
                 self.advance()
-            else:
+            else:   # only - was detected which isn't valid
                 self.prev_symbol = self.current_symbol
                 self.current_symbol = self.current_character
                 symbol_type = None
