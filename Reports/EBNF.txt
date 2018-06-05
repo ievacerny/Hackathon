@@ -5,17 +5,21 @@ specfile = "DEVICES:" , device_list , ";" , "CONNECTIONS:" , connection_list , "
 
 
 
-device_list = (dtype | xor | andnandornor | switch | clock) , { "," , (dtype | xor | andnandornor | switch | clock) };
+device_list = ( dtype | xor | not | andnandornor | switch | clock | rc ) , { "," , ( dtype | xor | not | andnandornor | switch | clock | rc ) };
 
 dtype = "DTYPE" , name; 
 
 xor = "XOR" , name; 
 
-andnandornor = ( "AND" | "NAND" | "OR" | "NOR" ) , name, one_to_sixteen; 
+not = "NOT" , name;
+
+andnandornor = ( "AND" | "NAND" | "OR" | "NOR" ) , name , one_to_sixteen; 
 
 switch = "SWITCH" , name , bool;
 
 clock = "CLOCK" , name , nonzeronumber;
+
+rc = "RC" , name , nonzeronumber;
 
 name = letter , { letter | digit };
 
