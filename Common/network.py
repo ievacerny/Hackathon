@@ -310,8 +310,8 @@ class Network:
         device = self.devices.get_device(device_id)
         output_signal = device.outputs[None]  # output ID is None
 
-        # Signal is updated only on timer=rc_constant
-        if device.rc_counter == device.rc_constant:
+        # Signal changes after n (rc_constant) cycles. Updates only once
+        if device.rc_counter == device.rc_constant + 1:
             if output_signal in [self.devices.HIGH, self.devices.FALLING]:
                 new_signal = self.update_signal(output_signal,
                                                 self.devices.LOW)
