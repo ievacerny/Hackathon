@@ -18,7 +18,6 @@ def init_scanner(data):
 # def test_scanner_keyword(test_scanner):
 #     assert test_scanner.get_symbol() == [3, 0]
 
-# TODO update all name ids
 
 @pytest.mark.parametrize("data, expected_output", [
     (',', [0, None]),
@@ -52,9 +51,10 @@ def init_scanner(data):
     ('\\\\ \n\\*A\\BC*\\\t.', [9, None]),
     ('\\\\ \n\\*A\\\\BC**\\.', [9, None]),
     ('\\\\ \n\\*A\\\\BC\\*\\.', [9, None]),
+    ('\\\\', [7, None]),
     ('\\*', [7, None]),
-    ('NOT', [3, 12]),  # TODO update id
-    ('RC', [3, 11])  # TODO update id
+    ('NOT', [3, 12]),
+    ('RC', [3, 11])
 ])
 
 
