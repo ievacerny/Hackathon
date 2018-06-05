@@ -337,11 +337,10 @@ class Devices:
                     error_type = self.NO_ERROR
 
             elif device_kind == self.NOT:
-                device_kind = self.NAND
-                if device_property not in [None, 1]:
-                    error_type = self.INVALID_QUALIFIER
+                if device_property is not None:
+                    error_type = self.QUALIFIER_PRESENT
                 else:
-                    device_property = 1
+                    device_property = 1  # 1 input
                     self.make_gate(device_id, device_kind, device_property)
                     error_type = self.NO_ERROR
 

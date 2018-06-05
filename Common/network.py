@@ -215,6 +215,31 @@ class Network:
             device.outputs[None] = updated_signal
             return True
 
+    def execute_not(self, device_id):
+        """Simulate a NOT device and update its output signal value.
+
+        Return True if successful.
+        """
+        device = self.devices.get_device(device_id)
+        input_signal_list = []
+        for input_id in device.inputs:
+            input_signal = self.get_input_signal(device_id, input_id)
+            if input_signal is None:  # this input is unconnected
+                return False
+            input_signal_list.append(input_signal)
+
+        device.device_kind == self.devices.NOT
+        output_signal = self.invert_signal(input_signal_list[0])
+
+        signal = self.get_output_signal(device_id, None)
+        target = output_signal
+        updated_signal = self.update_signal(signal, target)
+        if updated_signal is None:  # if the update is unsuccessful
+            return False
+        device.outputs[None] = updated_signal
+        return True
+
+
     def execute_gate(self, device_id, x=None, y=None):
         """Simulate a logic gate and update its output signal value.
 
@@ -379,6 +404,7 @@ class Network:
         nor_devices = self.devices.find_devices(self.devices.NOR)
         xor_devices = self.devices.find_devices(self.devices.XOR)
         rc_devices = self.devices.find_devices(self.devices.RC)
+        not_devices = self.devices.find_devices(self.devices.NOT)
 
         # This sets clock signals to RISING or FALLING, where necessary
         self.update_clocks()
@@ -432,6 +458,10 @@ class Network:
 
             for device_id in rc_devices:  # execute RC devices
                 if not self.execute_rc(device_id):
+                    return False
+
+            for device_id in not_devices:  # execute NOT devices
+                if not self.execute_not(device_id):
                     return False
 
             if self.steady_state:
