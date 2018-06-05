@@ -141,7 +141,9 @@ def test_correct_parsing(file, expected_return):
     assert parsed_succesfully is expected_return
 
 
-# ------Tests below are written my Mark-------------------------
+# ------Tests below are written by Mark-------------------------
+
+
 @pytest.mark.parametrize("data, expected_error", [
     ("","PREMATURE_EOF"),
     ("DEVICES: SWITCH s1 0,SWITCH s2 0,NAND n1 2; CONNECTIONS: s1->n1.I1,s2->n1.I2", "PREMATURE_EOF"),
@@ -166,9 +168,34 @@ def test_correct_parsing(file, expected_return):
     ("DEVICES: SWITCH s1 0, DTYPE d1; CONNECTIONS: d1->d1.DATA;", "network.PORT_ABSENT"),
     ("DEVICES: SWITCH s1 0,SWITCH s2 0,NAND n1 2; CONNECTIONS: s1->n1.I1,s2->n1;", "network.OUTPUT_TO_OUTPUT"),
     ("DEVICES: SWITCH s1 0,SWITCH s2 0,NAND n1 2; CONNECTIONS: s1->n1.I1,s2->n1.I1;", "network.INPUT_CONNECTED"),
+
+    #New tests for NOT
+    ("DEVICES: SWITCH s1 0, NO n1; CONNECTIONS: s1->n1.;", "devices.BAD_DEVICE"),
+    ("DEVICES: SWITCH s1 0, NOTD n1; CONNECTIONS: s1->n1.;", "devices.BAD_DEVICE"),
+    ("DEVICES: SWITCH s1 0, NOT n1 324; CONNECTIONS: s1->n1.I1;", "devices.QUALIFIER_PRESENT"), #fail
+    ("DEVICES: SWITCH s1 0, NOT n1 asd; CONNECTIONS: s1->n1.I1;", "MISSING_DELIMITER"), 
+    ("DEVICES: SWITCH s1 0, NOT n1; CONNECTIONS: s1->n1;", "network.OUTPUT_TO_OUTPUT"), 
+    ("DEVICES: SWITCH s1 0, NOT n1; CONNECTIONS: s1->n1.I2;", "INVALID_INPUT"),
+    ("DEVICES: SWITCH s1 0, NOT n1; CONNECTIONS: s1->n1.I;", "INVALID_INPUT"),
+    ("DEVICES: SWITCH s1 0, NOT n1; CONNECTIONS: s1->n1.;", "PORT_MISSING"),
+    ("DEVICES: SWITCH s1 0, NOT n1; CONNECTIONS: s1->n1.I1; MONITOR: n1.I1", "INVALID_OUTPUT"),
+
+    #New tests for RC
+    ("DEVICES: SWITCH s1 0, R r1; CONNECTIONS: ;", "devices.BAD_DEVICE"),
+    ("DEVICES: SWITCH s1 0, RCA r1; CONNECTIONS: ;", "devices.BAD_DEVICE"),
+    ("DEVICES: SWITCH s1 0, RC r1; CONNECTIONS: ;", "devices.INVALID_QUALIFIER"),
+    ("DEVICES: SWITCH s1 0, RC; CONNECTIONS: ;", "INVALID_DEVICE_NAME"),
+    ("DEVICES: SWITCH s1 0, RC r1 0; CONNECTIONS: ;", "devices.INVALID_QUALIFIER"),
+    ("DEVICES: SWITCH s1 0, RC r1 adas; CONNECTIONS: ;", "devices.INVALID_QUALIFIER"),
+    ("DEVICES: SWITCH s1 0, RC r1 5; CONNECTIONS: s1->r1;", "network.OUTPUT_TO_OUTPUT"),
+    ("DEVICES: SWITCH s1 0, RC r1 5; CONNECTIONS: s1->r1.I1;", "INVALID_INPUT"),
+    ("DEVICES: SWITCH s1 0, RC r1 5, NAND n1 2; CONNECTIONS: r1.Q->n1.I1, s1->n1.I2;", "INVALID_OUTPUT"),
+    ("DEVICES: SWITCH s1 0, RC r1 5, NAND n1 2; CONNECTIONS: r1.->n1.I1, s1->n1.I2;", "PORT_MISSING"),
+    ("DEVICES: SWITCH s1 0, RC r1 5, NAND n1 2; CONNECTIONS: r1->n1.I1, s1->n1.I2; MONITOR: r1.I", "INVALID_OUTPUT")
 ])
 
-def test_network_parsing(capsys, data, expected_error):
+
+def test_network_parsing_fail(capsys, data, expected_error):
     """Test parse_network function."""
     parser = init_parser(data)
 
@@ -180,3 +207,18 @@ def test_network_parsing(capsys, data, expected_error):
     # Compare printed message with expected
     out, err = capsys.readouterr()
     assert out[:len(expected_error_msg)] == expected_error_msg
+
+
+@pytest.mark.parametrize("data", [
+    ("DEVICES: SWITCH s1 0, NOT n1; CONNECTIONS: s1->n1.I1;"),
+    ("DEVICES: SWITCH s1 1, NOT n1; CONNECTIONS: s1->n1.I1;"),
+    ("DEVICES: NOT n1, RC r1 5; CONNECTIONS: r1->n1.I1; MONITOR: n1;"),
+    ("DEVICES: SWITCH s1 1, RC r1 5, NOT n2, NAND n1 2; CONNECTIONS: r1->n1.I1, s1->n1.I2, n1->n2.I1;")
+])
+
+
+def test_network_parsing_pass(capsys, data):
+    """Test parse_network function."""
+    parser = init_parser(data)
+
+    assert parser.parse_network()
