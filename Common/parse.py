@@ -67,13 +67,7 @@ class Parser:
 
         self.errors = Errors(devices, network, monitors, self)
 
-        self.log = False
         self.count_errors = True  # Set to False once EOF is reached
-
-    # Method for debugging purposes
-    def _log(self, msg):
-        if self.log:
-            print(msg)
 
     def parse_network(self):
         """Parse the circuit definition file.
@@ -82,7 +76,6 @@ class Parser:
         """
         no_error = True
 
-        self._log("Start parsing")
         [self.symbol_type, self.symbol_id] = self.scanner.get_symbol()
         no_error &= self._parse_section('device',
                                         self.scanner.DEVICES_ID,
@@ -135,7 +128,6 @@ class Parser:
             next_keyword = self.scanner.EOF
 
         # First symbol must be the keyword of the section
-        self._log("Parsing {} section".format(section))
         if (self.symbol_type == self.scanner.KEYWORD and
            self.symbol_id == keyword_id):
             [self.symbol_type, self.symbol_id] = self.scanner.get_symbol()
@@ -164,14 +156,11 @@ class Parser:
 
         Also report missing semicolons and attempt error recovery.
         """
-        self._log("Parse {} list".format(section))
         no_error = True
         # Method that will be called depending on section:
         method_name = '_parse_' + section
         parse_item = getattr(self, method_name)
 
-        self._log("Before parsing item, symbol: {}, {}"
-                  .format(self.symbol_type, self.symbol_id))
         no_error &= parse_item()
         # Parse_item returns successfully only when , or ; is detected
         # If an error has happened, skip until next comma or semicolon
@@ -179,8 +168,6 @@ class Parser:
             self._skip_until(self.scanner.COMMA, self.scanner.SEMICOLON,
                              next_keyword)
 
-        self._log("After parsing item, symbol: {}, {}"
-                  .format(self.symbol_type, self.symbol_id))
         # If a comma at the end of the item, keep reading items
         while self.symbol_type == self.scanner.COMMA:
             no_error &= parse_item()
@@ -191,7 +178,6 @@ class Parser:
             elif not no_error:
                 self._skip_until(self.scanner.COMMA, self.scanner.SEMICOLON,
                                  next_keyword)
-                self._log("After skip {}".format(self.symbol_type))
 
         # Semicolon is checked in section parsing
 
@@ -202,7 +188,6 @@ class Parser:
 
     def _parse_device(self):
         """Parse device: device type, name and parameters."""
-        self._log("Parse device")
         no_error = True
         device_type, device_id, device_param = None, None, None
 
@@ -274,7 +259,6 @@ class Parser:
 
     def _parse_connection(self):
         """Parse connection: devices and ports, arrow symbol."""
-        self._log("Parse connection")
         no_error = True
         first_device_id, first_port_id = None, None
         second_device_id, second_port_id = None, None
@@ -358,7 +342,6 @@ class Parser:
 
     def _parse_monitor(self):
         """Parse monitor: devices and ports."""
-        self._log("Parse monitor")
         no_error = True
         device_id, output_id = None, None
 
