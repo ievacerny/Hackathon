@@ -12,7 +12,10 @@ DEVICES list is the first one to be parsed. *\
     NOR No4 2,
     \\*No parameter ones*
     XOR Xo5,
-    DTYPE D6;
+    DTYPE D6,
+    \\ *\ New devices
+    RC R7 3,
+    NOT N8;
 
 CONNECTIONS:
     Cl5 -> A1.I1,
@@ -28,7 +31,9 @@ CONNECTIONS:
     A1 -> D6.DATA,
     Na2 -> D6.CLK,
     O3 -> D6.SET,
-    No4 -> D6.CLEAR;
+    R7 -> N8.I1,
+    N8 -> D6.CLEAR;
+
 
 MONITOR:
-    A1, Na2, O3, No4, Xo5, D6.Q, D6.QBAR;
+    A1, Na2, O3, No4, Xo5, D6.Q, D6.QBAR, R7, N8;

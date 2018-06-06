@@ -76,7 +76,7 @@
 	\\ *\ New devices
 	RC R7 3,
 	NOT N8;
-	
+
 	CONNECTIONS:
 	Cl5 -> A1.I1,
 	Cl5 -> Na2.I1,
@@ -91,9 +91,9 @@
 	A1 -> D6.DATA,
 	Na2 -> D6.CLK,
 	O3 -> D6.SET,
-	R7 -> N8,
+	R7 -> N8.I1,
 	N8 -> D6.CLEAR;
-	
+
 	MONITOR:
 	A1, Na2, O3, No4, Xo5, D6.Q, D6.QBAR, R7, N8;
 \end{spverbatim}
