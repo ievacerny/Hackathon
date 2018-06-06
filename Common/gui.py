@@ -187,12 +187,14 @@ class MyGLCanvas(wxcanvas.GLCanvas):
 
         # Draw lower horizontal line of frame and x-axis label
         self.render_line_strip([[self.origin_x, self.origin_y], [
-                               size.width - self.right_offset, self.origin_y]], 'black')
+                               size.width - self.right_offset, self.origin_y]],
+                               'black')
         self.render_text('Number of cycles', size.width - self.right_offset -
                          self.x_axis_label_offset / self.zoom, 15, 'black')
 
         # Keep text close to the y-axis when zooming
-        self.y_axis_label_offset = self.origin_x - 7 * self.max_margin / self.zoom
+        self.y_axis_label_offset = self.origin_x - 7 * self.max_margin /
+        self.zoom
 
         # Max number of devices that will fit in un-resized window
         max_devices_fit = (
@@ -201,9 +203,10 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         num_devices_now = len(self.devices_monitored)
 
         # Draw the other 3 edges of the main frame and y-axis label
-        if num_devices_now > max_devices_fit:  # if number of monitors large, push label up
+        if num_devices_now > max_devices_fit:  # push label up
             max_height_panels = self.bottom_offset + \
-                (self.panel_height + self.inter_panel_spacing) * num_devices_now
+                (self.panel_height + self.inter_panel_spacing)
+            * num_devices_now
 
             # left vertical line
             self.render_line_strip([[self.origin_x, self.origin_y], [
@@ -211,20 +214,27 @@ class MyGLCanvas(wxcanvas.GLCanvas):
 
             # right vertical line
             self.render_line_strip([[size.width -
-                                     self.right_offset, max_height_panels], [size.width -
-                                                                             self.right_offset, self.origin_y]], 'black')
+                                     self.right_offset, max_height_panels],
+                                    [size.width - self.right_offset,
+                                    self.origin_y]],
+                                   'black')
 
             # top horizontal line
-            self.render_line_strip([[self.origin_x, max_height_panels], [
-                                   size.width - self.right_offset, max_height_panels]], 'black')
+            self.render_line_strip([[self.origin_x, max_height_panels],
+                                    [size.width - self.right_offset,
+                                    max_height_panels]],
+                                   'black')
 
             # y-axis label (name and type of device)
             self.render_text('Name\n[Type]', self.y_axis_label_offset +
-                             30 / self.zoom, max_height_panels + 30, 'black')
+                             30 / self.zoom, max_height_panels + 30,
+                             'black')
         else:
             # left vertical line
             self.render_line_strip([[self.origin_x, self.origin_y], [
-                                   self.origin_x, size.height - self.top_offset]], 'black')
+                                   self.origin_x, size.height -
+                                   self.top_offset]],
+                                   'black')
 
             # right vertical line
             self.render_line_strip([[size.width - self.right_offset,
@@ -257,7 +267,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.grid_small_interval = int(big_interval / 10)
         self.grid_big_interval = 10 * self.grid_small_interval
 
-        if self.grid_small_interval <= 0:  # avoid passing negative integers to range()
+        if self.grid_small_interval <= 0:
             self.grid_small_interval = 1  # minimum acceptable value
             self.grid_big_interval = 10
 
@@ -267,7 +277,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
                 self.origin_x,
                 size.width - self.right_offset + 1,
                 self.grid_small_interval):
-            if (x - self.origin_x) % self.grid_big_interval == 0:  # Draw a big marker
+            if (x - self.origin_x) % self.grid_big_interval == 0:  # big marker
                 # draw a longer line for large intervals
                 self.render_line_strip(
                     [[x, self.origin_y], [x, self.origin_y - 10]], 'black')
@@ -276,7 +286,8 @@ class MyGLCanvas(wxcanvas.GLCanvas):
                                             self.origin_x) /
                                            (self.grid_big_interval), 1)), x -
                                  self.grid_hor_text_offset, self.origin_y -
-                                 self.grid_vert_text_offset, 'black')  # show x-axis value
+                                 self.grid_vert_text_offset,
+                                 'black')
             else:  # Draw a small marker
                 self.render_line_strip(
                     [[x, self.origin_y], [x, self.origin_y - 5]], 'black')
@@ -466,8 +477,10 @@ class MyGLCanvas(wxcanvas.GLCanvas):
 
     def render_signal(self, corner_y, bits, size):
         """Draw the signal
-        corner_y is the y-coordinate of the bottom-left corner of the panel that the signal belongs to
-        bits contains a list of values 0, 1, 0.5 (rising), -0.5 (falling) or 2 (blank)
+        corner_y is the y-coordinate of the bottom-left corner of the
+        panel that the signal belongs to
+        bits contains a list of values 0, 1, 0.5 (rising),
+         -0.5 (falling) or 2 (blank)
         """
         x_prev = self.origin_x  # starting value of x
         # since there are 10 small intervals in one big interval
@@ -479,7 +492,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         y_prev = y_base  # starting value of y
 
         for index, bit in enumerate(bits):
-            if x_prev + x_interval >= x_max:  # signal about to go outside panel
+            if x_prev + x_interval >= x_max:  # signal about to go outside
                 break
             elif bit in [-0.5, 0.5]:  # rising / falling
                 # if -0.5, y is going to be zero; if +0.5, y is going to be 1
@@ -524,13 +537,15 @@ class Gui(wx.Frame):
 
     load_file(self, event): Open file dialog to allow selection of new file
 
-    on_spin(self, event): Handle event when the user changes the spin control value.
+    on_spin(self, event): Handle event when the user changes the
+                            spin control value.
 
     on_run_button(self, event): Handle event when user clicks the run button.
 
     on_continue_button(self, event): Handle event when user continues sim.
 
-    run_network(self, restart, num_cycles): Run the network for a given number of cycles
+    run_network(self, restart, num_cycles): Run the network for
+                                            a given number of cycles
 
     update_canvas_monitors(self):  Update the device properties stored
                                     separately in canvas
@@ -538,11 +553,14 @@ class Gui(wx.Frame):
     translate_signal(self, signal_list): Convert signal to integer values for
                                             ease of rendering
 
-    translate_device_kind(self, device_kind): Convert to string for canvas rendering
+    translate_device_kind(self, device_kind): Convert to string
+                                            for canvas rendering
 
-    on_checkbox(self, event): Handle event when user selects a monitor checkbox
+    on_checkbox(self, event): Handle event when user
+                            selects a monitor checkbox
 
-    on_radiobutton(self, event): Handle event when user selects a radio button
+    on_radiobutton(self, event): Handle event when user
+                                selects a radio button
     """
 
     def __init__(self, title, path, names, devices, network, monitors):
@@ -572,7 +590,7 @@ class Gui(wx.Frame):
 
         # define initial number and maximum allowed number of cycles
         self.num_cycles = 200  # initial value
-        self.num_cycles_max = 10000
+        self.num_cycles_max = 2000
 
         # pass True so that clocks and dtypes are initialised
         self.run_network(True, self.num_cycles)
@@ -590,10 +608,12 @@ class Gui(wx.Frame):
         self.button_size = wx.Size(105, 30)  # default button size
         self.text_cycles = wx.StaticText(
             self, wx.ID_ANY, _("Cycles:"), size=self.button_size)
-        self.spin = wx.SpinCtrl(self, wx.ID_ANY, value="", pos=wx.DefaultPosition,
+        self.spin = wx.SpinCtrl(self, wx.ID_ANY, value="",
+                                pos=wx.DefaultPosition,
                                 # added width to show spin properly on Linux
-                                size=wx.Size(120, 30), style=wx.SP_ARROW_KEYS, min=1,
-                                max=self.num_cycles_max, initial=self.num_cycles)
+                                size=wx.Size(120, 30), style=wx.SP_ARROW_KEYS,
+                                min=1, max=self.num_cycles_max,
+                                initial=self.num_cycles)
         self.run_button = wx.Button(
             self, wx.ID_ANY, _("Run"), size=self.button_size)
         self.continue_button = wx.Button(
@@ -645,7 +665,8 @@ class Gui(wx.Frame):
 
         # Panel setup
         self.scrolled_panel = scrolled.ScrolledPanel(
-            self, -1, size=(130, 800), style=wx.TAB_TRAVERSAL | wx.SUNKEN_BORDER)
+            self, -1, size=(130, 800),
+            style=wx.TAB_TRAVERSAL | wx.SUNKEN_BORDER)
         self.scrolled_panel.SetupScrolling()
         self.scrolled_panel_sizer = wx.BoxSizer(wx.VERTICAL)
 
@@ -754,7 +775,6 @@ class Gui(wx.Frame):
                 _("About Logsim"),
                 wx.ICON_INFORMATION | wx.OK)
 
-
     def load_file(self, event):
         """
         Open a file dialog window to allow the user to select
@@ -803,7 +823,8 @@ class Gui(wx.Frame):
     def on_continue_button(self, event):
         """
         To run the network for a further n number of cycles,
-        don't reset monitors and run the network without restarting dtypes/clocks
+        don't reset monitors and run the network without restarting
+        dtypes/clocks
         Then, update canvas monitors.
         """
         spin_value = self.spin.GetValue()
@@ -816,9 +837,10 @@ class Gui(wx.Frame):
             self.num_cycles = self.num_cycles + spin_value  # update num_cycles
             self.canvas.render()  # Display new output
         else:
+            msg = _('Error: Cannot run for more than a total'
+                    ' of {} cycles').format(self.num_cycles_max)
             wx.MessageBox(
-                _('Error: Cannot run for more than a total of {} cycles').format(
-                    self.num_cycles_max),
+                msg,
                 _("Error"),
                 wx.ICON_INFORMATION | wx.OK)
 
