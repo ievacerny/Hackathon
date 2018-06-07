@@ -95,9 +95,3 @@ class Names:
         name_id = len(self.name_table)
         self.name_table.append(name_string)
         return name_id
-
-    # DEBUGGING METHODS
-    def print_name_table(self):
-        """Print name table for debugging purposes."""
-        for key, value in enumerate(self.name_table):
-            print(key, value)
