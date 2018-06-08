@@ -193,8 +193,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
                          self.x_axis_label_offset / self.zoom, 15, 'black')
 
         # Keep text close to the y-axis when zooming
-        self.y_axis_label_offset = self.origin_x - 7 * self.max_margin /
-        self.zoom
+        self.y_axis_label_offset = self.origin_x - 7 * self.max_margin / self.zoom
 
         # Max number of devices that will fit in un-resized window
         max_devices_fit = (
@@ -205,8 +204,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         # Draw the other 3 edges of the main frame and y-axis label
         if num_devices_now > max_devices_fit:  # push label up
             max_height_panels = self.bottom_offset + \
-                (self.panel_height + self.inter_panel_spacing)
-            * num_devices_now
+                (self.panel_height + self.inter_panel_spacing) * num_devices_now
 
             # left vertical line
             self.render_line_strip([[self.origin_x, self.origin_y], [
